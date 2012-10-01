@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{312030EA-3158-47A8-A9EC-4C28FDBF0F3E}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>BL2SDKDLL</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\..\bin\$(Configuration)\</OutDir>
+    <IntDir>..\..\obj\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\bin\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;BL2SDKDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(DETOURS_LIB)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;BL2SDKDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(DETOURS_LIB)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\BL2SDK\BL2SDK.cpp" />
+    <ClCompile Include="..\..\src\Detours\CSimpleDetour.cpp" />
+    <ClCompile Include="..\..\src\Detours\DetourManager.cpp" />
+    <ClCompile Include="..\..\src\GameSDK\AkAudio_functions.cpp" />
+    <ClCompile Include="..\..\src\GameSDK\Core_functions.cpp" />
+    <ClCompile Include="..\..\src\GameSDK\Engine_functions.cpp" />
+    <ClCompile Include="..\..\src\GameSDK\GameFramework_functions.cpp" />
+    <ClCompile Include="..\..\src\GameSDK\GearboxFramework_functions.cpp" />
+    <ClCompile Include="..\..\src\GameSDK\GFxUI_functions.cpp" />
+    <ClCompile Include="..\..\src\GameSDK\IpDrv_functions.cpp" />
+    <ClCompile Include="..\..\src\GameSDK\OnlineSubsystemSteamworks_functions.cpp" />
+    <ClCompile Include="..\..\src\GameSDK\WillowGame_functions.cpp" />
+    <ClCompile Include="..\..\src\GameSDK\WinDrv_functions.cpp" />
+    <ClCompile Include="..\..\src\GameSDK\XAudio2_functions.cpp" />
+    <ClCompile Include="..\..\src\Logging\Logging.cpp" />
+    <ClCompile Include="..\..\src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\BL2SDK\BL2SDK.h" />
+    <ClInclude Include="..\..\src\Detours\CSimpleDetour.h" />
+    <ClInclude Include="..\..\src\Detours\DetourManager.h" />
+    <ClInclude Include="..\..\src\Detours\detours.h" />
+    <ClInclude Include="..\..\src\GameSDK\AkAudio_classes.h" />
+    <ClInclude Include="..\..\src\GameSDK\AkAudio_f_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\AkAudio_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\Core_classes.h" />
+    <ClInclude Include="..\..\src\GameSDK\Core_f_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\Core_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\Engine_classes.h" />
+    <ClInclude Include="..\..\src\GameSDK\Engine_f_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\Engine_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\GameDefines.h" />
+    <ClInclude Include="..\..\src\GameSDK\GameFramework_classes.h" />
+    <ClInclude Include="..\..\src\GameSDK\GameFramework_f_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\GameFramework_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\GameSDK.h" />
+    <ClInclude Include="..\..\src\GameSDK\GearboxFramework_classes.h" />
+    <ClInclude Include="..\..\src\GameSDK\GearboxFramework_f_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\GearboxFramework_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\GFxUI_classes.h" />
+    <ClInclude Include="..\..\src\GameSDK\GFxUI_f_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\GFxUI_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\IpDrv_classes.h" />
+    <ClInclude Include="..\..\src\GameSDK\IpDrv_f_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\IpDrv_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\OnlineSubsystemSteamworks_classes.h" />
+    <ClInclude Include="..\..\src\GameSDK\OnlineSubsystemSteamworks_f_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\OnlineSubsystemSteamworks_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\WillowGame_classes.h" />
+    <ClInclude Include="..\..\src\GameSDK\WillowGame_f_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\WillowGame_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\WinDrv_classes.h" />
+    <ClInclude Include="..\..\src\GameSDK\WinDrv_f_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\WinDrv_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\XAudio2_classes.h" />
+    <ClInclude Include="..\..\src\GameSDK\XAudio2_f_structs.h" />
+    <ClInclude Include="..\..\src\GameSDK\XAudio2_structs.h" />
+    <ClInclude Include="..\..\src\Logging\Logging.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
