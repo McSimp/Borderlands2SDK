@@ -1,13 +1,17 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <stdio.h>
+
+#include "GameSDK/GameSDK.h"
 #include "Logging/Logging.h"
 
 namespace Logging
 {
-	FILE*	pLogFile				= NULL;
-	bool	bLogToExternalConsole	= false;
-	bool	bLogToFile				= false;
+	FILE*				pLogFile				= NULL;
+	bool				bLogToExternalConsole	= false;
+	bool				bLogToFile				= false;
+	bool				bLogToGameConsole		= false;
+	UWillowConsole*		pGameConsole			= NULL;
 
 	void LogWinConsole(char *szBuff, int len)
 	{
@@ -46,6 +50,17 @@ namespace Logging
 			}
 		}
 
+		if(bLogToGameConsole)
+		{
+			if(pGameConsole != NULL)
+			{
+				wchar_t* wa = new wchar_t[len];
+				mbstowcs(wa, szBuff, len);
+				pGameConsole->eventOutputText(FString(wa));
+				delete[] wa;
+			}
+		}
+
 		delete[] szBuff;
 	}
 
@@ -61,8 +76,20 @@ namespace Logging
 		bLogToFile = true;
 	}
 
+	void InitializeGameConsole()
+	{
+		// There should only be 1 instance so we should be right to just use it in this way
+		UWillowConsole* console = UObject::FindObject<UWillowConsole>("WillowConsole WillowGameEngine.WillowGameViewportClient.WillowConsole");
+		
+		if(console != NULL)
+		{
+			pGameConsole = console;
+			bLogToGameConsole = true;
+		}
+	}
+
 	void PrintLogHeader()
 	{
-		Log("======== BL2 Mod SDK Version %s ========\n", "1");
+		Log("======== BL2 Mod SDK %s ========\n", BL2_SDK_VER);
 	}
 }

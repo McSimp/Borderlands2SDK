@@ -3,11 +3,19 @@
 
 #include "GameSDK/GameSDK.h"
 
+#include <string>
+#include <list>
+#include <map>
+
 namespace BL2SDK
 {
+	typedef bool (tProcessEventHook) (UObject*, UFunction*, void*, void*);
+	typedef std::pair<std::string, tProcessEventHook*> tFuncNameHookPair;
+
 	void hkRawProcessEvent();
-	void __stdcall hkProcessEvent(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult);
-	void LogAllEvents(bool);
+	void LogAllEvents(bool enabled);
+	void InjectedCallNext();
+	void RegisterHook(const std::string& funcName, tProcessEventHook* funcHook);
 }
 
 #endif

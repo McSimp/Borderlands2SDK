@@ -25,8 +25,10 @@
 # ========================================================================================= #
 */
 
-#define GObjects			0x019C6DC0
-#define GNames				0x019849E4
+#define BL2_SDK_VER				"1 September 2012"
+#define GObjects				0x019C6DC0
+#define GNames					0x019849E4
+#define UObject_ProcessEvent	0x0065C820
 
 /*
 # ========================================================================================= #

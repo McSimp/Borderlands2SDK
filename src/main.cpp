@@ -3,20 +3,24 @@
 #include "BL2SDK/BL2SDK.h"
 #include "Logging/Logging.h"
 #include "Detours/DetourManager.h"
-
-#pragma comment (lib, "detours.lib")
+#include "Commands/ConCmdManager.h"
 
 void onAttach()
 {	
+	if(!DetourManager::AttachProcessEvent())
+	{
+		MessageBox(NULL, L"Failed to attach to ProcessEvent. This is likely caused by the Mod SDK being outdated or attempting to use it with a cracked version of the game.", L"SDK ERROR", MB_OK);
+		return;
+	}
+
 	Logging::InitializeExtern();
 	Logging::InitializeFile("pelog.txt");
+	Logging::InitializeGameConsole();
 	Logging::PrintLogHeader();
 
-	BL2SDK::LogAllEvents(true);
-
-	//DetourManager::ProcessEvent_Detour.Attach();
-	DetourManager::AttachProcessEvent();
 	Logging::Log("Detour attached\n");
+	ConCmdManager::Initialize();
+
 }
 
 BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)

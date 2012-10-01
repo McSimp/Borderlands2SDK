@@ -8,8 +8,7 @@ namespace DetourManager
 {
 	typedef void (__thiscall *tProcessEvent) (UObject*, UFunction*, void*, void*);
 	extern tProcessEvent pProcessEvent;
-	//extern CSimpleDetour ProcessEvent_Detour;
-	void AttachProcessEvent();
+	bool AttachProcessEvent();
 }
 
 #endif

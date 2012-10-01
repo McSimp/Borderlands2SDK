@@ -2,10 +2,10 @@
 #include "BL2SDK/BL2SDK.h"
 #include "Logging/Logging.h"
 
+#pragma comment (lib, "detours.lib")
+
 namespace DetourManager
 {
-	#define UObject_ProcessEvent 0x0065C820
-
 	tProcessEvent pProcessEvent = reinterpret_cast<tProcessEvent>(UObject_ProcessEvent);
 
 	//typedef HCURSOR (APIENTRY* tSetCursor) (HCURSOR);
@@ -18,12 +18,11 @@ namespace DetourManager
 	//SETUP_SIMPLE_DETOUR(SetCursor_Detour, pSetCursor, BL2SDK::hkSetCursor);
 	//SETUP_SIMPLE_DETOUR(EndScene_Detour, pEndScene, BL2SDK::hkEndScene);
 
-	void AttachProcessEvent()
+	bool AttachProcessEvent()
 	{
 		DetourTransactionBegin();
 		DetourUpdateThread(GetCurrentThread());
 		DetourAttach(&(PVOID&)pProcessEvent, BL2SDK::hkRawProcessEvent);
-		if(DetourTransactionCommit() == NO_ERROR)
-			Logging::Log("ProcessEvent Detoured successfully, 0x%X\n", pProcessEvent);
+		return (DetourTransactionCommit() == NO_ERROR);
 	}
 }
