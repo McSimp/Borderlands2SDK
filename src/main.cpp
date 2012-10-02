@@ -1,4 +1,5 @@
 #define WIN32_LEAN_AND_MEAN
+#define STEAM_VERSION
 #include <Windows.h>
 #include "BL2SDK/BL2SDK.h"
 #include "Logging/Logging.h"
@@ -7,20 +8,21 @@
 
 void onAttach()
 {	
-	if(!DetourManager::AttachProcessEvent())
+	Logging::InitializeExtern();
+	Logging::InitializeFile("pelog.txt");
+	Logging::Log("[INTERNAL] Injecting SDK...\n");
+
+	// Figure out GObjects and GNames
+	if(!BL2SDK::Initialize())
 	{
-		MessageBox(NULL, L"Failed to attach to ProcessEvent. This is likely caused by the Mod SDK being outdated or attempting to use it with a cracked version of the game.", L"SDK ERROR", MB_OK);
+		MessageBox(NULL, L"An error occurred while loading the SDK. Please check the logfile for details.", L"SDK ERROR", MB_OK);	
 		return;
 	}
 
-	Logging::InitializeExtern();
-	Logging::InitializeFile("pelog.txt");
 	Logging::InitializeGameConsole();
 	Logging::PrintLogHeader();
 
-	Logging::Log("Detour attached\n");
 	ConCmdManager::Initialize();
-
 }
 
 BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)

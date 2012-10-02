@@ -25,11 +25,17 @@
 # ========================================================================================= #
 */
 
-#define BL2_SDK_VER				"1 September 2012"
+/*
+#ifdef STEAM_VERSION
+#define GObjects				0x019C7D60
+#define GNames					0x01985984
+#define UObject_ProcessEvent	0x0065C820// TODO
+#else
 #define GObjects				0x019C6DC0
 #define GNames					0x019849E4
 #define UObject_ProcessEvent	0x0065C820
-
+#endif
+*/
 /*
 # ========================================================================================= #
 # Structs
@@ -125,7 +131,7 @@ struct FName
 
 	static TArray< FNameEntry* >* Names() 
 	{ 
-		return (TArray< FNameEntry* >*) GNames; 
+		return (TArray< FNameEntry* >*) BL2SDK::GNames(); 
 	}; 
 
 	char* GetName() 

@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <stdio.h>
 
-#include "GameSDK/GameSDK.h"
+#include "BL2SDK/BL2SDK.h"
 #include "Logging/Logging.h"
 
 namespace Logging
@@ -54,8 +54,9 @@ namespace Logging
 		{
 			if(pGameConsole != NULL)
 			{
-				wchar_t* wa = new wchar_t[len];
+				wchar_t* wa = new wchar_t[buffSize];
 				mbstowcs(wa, szBuff, len);
+				wa[buffSize - 1] = 0;
 				pGameConsole->eventOutputText(FString(wa));
 				delete[] wa;
 			}
@@ -90,6 +91,6 @@ namespace Logging
 
 	void PrintLogHeader()
 	{
-		Log("======== BL2 Mod SDK %s ========\n", BL2_SDK_VER);
+		Log("======== BL2 Mod SDK Loaded (Version %s) ========\n", BL2_SDK_VER);
 	}
 }

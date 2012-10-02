@@ -1,6 +1,29 @@
 #ifndef GAMESDK_H
 #define GAMESDK_H
 
+#define BL2_SDK_VER				"1 September 2012"
+
+#define MOV_OP_OFFSET			2
+
+#define GObjects_Pattern		"\x8B\x0D\x00\x00\x00\x00\x8B\x04\xB1\x8B\x40\x08"
+#define GObjects_Mask			"xx????xxxxxx"
+#define GObjects_SigLen			12
+
+#define GNames_Pattern			"\x8B\x0D\x00\x00\x00\x00\x83\x3C\x81\x00\x74"
+#define GNames_Mask				"xx????xxxxx"
+#define GNames_SigLen			11
+
+#define ProcessEvent_Pattern	"\x55\x8B\xEC\x6A\xFF\x68\x00\x00\x00\x00\x64\xA1\x00\x00\x00\x00\x50\x83\xEC\x50\xA1\x00\x00\x00\x00\x33\xC5\x89\x45\xF0\x53\x56\x57\x50\x8D\x45\xF4\x64\xA3\x00\x00\x00\x00\x8B\xF1\x89\x75\xEC"
+#define ProcessEvent_Mask		"xxxxxx????xx????xxxxx????xxxxxxxxxxxxxx????xxxxx"
+#define ProcessEvent_SigLen		48
+
+namespace BL2SDK
+{
+	unsigned long GNames();
+	unsigned long GObjects();
+	unsigned long ProcessEventAddr();
+}
+
 #include "GameSDK/GameDefines.h"
 #include "GameSDK/Core_structs.h"
 #include "GameSDK/Core_classes.h"

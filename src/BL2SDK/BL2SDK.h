@@ -16,6 +16,7 @@ namespace BL2SDK
 	void LogAllEvents(bool enabled);
 	void InjectedCallNext();
 	void RegisterHook(const std::string& funcName, tProcessEventHook* funcHook);
+	bool Initialize();
 }
 
 #endif
