@@ -28,12 +28,19 @@ You'll then want to search for `ConsoleKey=` and change that line to `ConsoleKey
 
 ### Injecting the DLL
 
-After you've compiled the SDK you'll have a DLL called "BL2SDKDLL.dll" somewhere in bin/Debug. You'll now need to
-launch your game and use a DLL injector to inject it into the process. I've uploaded Winject to the Downloads page,
-so use that if you don't have your own.
+After you've compiled the SDK you'll have a DLL called `BL2SDKDLL.dll` somewhere in `bin/Debug`. You'll now need to
+launch your game and use a DLL injector to inject it into the process. I've uploaded Winject to the 
+[Downloads page](https://github.com/McSimp/Borderlands2SDK/downloads), so use that if you don't have your own.
 
 ### Profit
 
 After it's injected into the game, you'll have a Windows console open up and if you press your in-game console key,
 you should be able to see some various messages in that console too.
 
+Resources
+---------
+
+Here are some useful resources.
+
+* [Unreal Developer Network](http://udn.epicgames.com)
+* [UDK Console Commands](http://udn.epicgames.com/Three/ConsoleCommands.html)
