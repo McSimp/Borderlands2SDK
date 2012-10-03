@@ -55,6 +55,7 @@ namespace Logging
 			if(pGameConsole != NULL)
 			{
 				wchar_t* wa = new wchar_t[buffSize];
+				memset(wa, 0, buffSize);
 				mbstowcs(wa, szBuff, len);
 				wa[buffSize - 1] = 0;
 				pGameConsole->eventOutputText(FString(wa));

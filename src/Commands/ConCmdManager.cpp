@@ -33,7 +33,10 @@ namespace ConCmdManager
 
 		// Because 'say' is appended to everything, take that off
 		wchar_t* ptr = parms->Command.Data;
-		ptr = ptr + 4;
+		if(ptr[0] == L's' && ptr[1] == L'a' && ptr[2] == L'y') // HACK. TODO: Fix this
+		{
+			ptr = ptr + 4;
+		}
 		Logging::Log("[ConCmd] New command = \"%ls\"\n", ptr);
 
 		// Convert to a normal string because a) I don't give a fuck and b) Lua uses a normal char* for strings
