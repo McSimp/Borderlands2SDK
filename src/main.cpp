@@ -12,6 +12,28 @@ CON_COMMAND(PrintSDKVersion)
 	Logging::Log("BL2 SDK Version %s\n", BL2_SDK_VER);
 }
 
+CON_COMMAND(SetDNCycleRate)
+{
+	if(args.size() < 2)
+	{
+		Logging::Log("Bad arguments to command\n");
+		return;
+	}
+
+	float rate = std::atof(args[1].c_str());
+	UGlobalsDefinition* gd = UObject::FindObject<UGlobalsDefinition>("GlobalsDefinition GD_Globals.General.Globals");
+	gd->DayNightCycleRate = rate;
+
+	AWillowGameReplicationInfo* ri = UObject::FindObject<AWillowGameReplicationInfo>("WillowGameReplicationInfo TheWorld.PersistentLevel.WillowGameReplicationInfo");
+	ri->DayNightCycleRate = rate;
+	ri->DayNightCycleRateBaseValue = rate;
+
+	UWillowSeqAct_DayNightCycle* seqact = UObject::FindObject<UWillowSeqAct_DayNightCycle>("WillowSeqAct_DayNightCycle PersistentLevel.Main_Sequence.WillowSeqAct_DayNightCycle");
+	seqact->PlayRate = rate;
+
+	Logging::Log("Day/Night cycle rate changed to %f\n", rate);
+}
+
 void onAttach()
 {	
 	Logging::InitializeExtern();

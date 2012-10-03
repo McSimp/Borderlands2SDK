@@ -87,6 +87,7 @@
     <ClCompile Include="..\..\src\BL2SDK\CSigScan.cpp" />
     <ClCompile Include="..\..\src\Commands\ConCommand.cpp" />
     <ClCompile Include="..\..\src\Commands\ConCmdManager.cpp" />
+    <ClCompile Include="..\..\src\Commands\SlotMachines.cpp" />
     <ClCompile Include="..\..\src\Detours\CSimpleDetour.cpp" />
     <ClCompile Include="..\..\src\Detours\DetourManager.cpp" />
     <ClCompile Include="..\..\src\GameSDK\AkAudio_functions.cpp" />
