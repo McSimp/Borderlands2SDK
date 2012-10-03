@@ -5,6 +5,12 @@
 #include "Logging/Logging.h"
 #include "Detours/DetourManager.h"
 #include "Commands/ConCmdManager.h"
+#include "Commands/ConCommand.h"
+
+CON_COMMAND(PrintSDKVersion)
+{	
+	Logging::Log("BL2 SDK Version %s\n", BL2_SDK_VER);
+}
 
 void onAttach()
 {	
@@ -32,7 +38,7 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 	switch (dwReason)
 	{
 		case DLL_PROCESS_ATTACH:
-			DisableThreadLibraryCalls (hModule);
+			DisableThreadLibraryCalls (hModule);	
 			CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) onAttach, NULL, 0, NULL);
 			return true;
 		break;

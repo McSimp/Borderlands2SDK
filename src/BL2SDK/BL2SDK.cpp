@@ -121,6 +121,7 @@ namespace BL2SDK
 		return addrProcEvent;
 	}
 
+	// TODO: Make less shit
 	bool Initialize()
 	{
 		// Setup Sigscan

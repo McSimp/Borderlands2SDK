@@ -1,13 +1,13 @@
 #include "BL2SDK/BL2SDK.h"
 #include "Logging/Logging.h"
 #include "Commands/ConCmdManager.h"
+#include "Commands/ConCommand.h"
 
 #include <map>
 #include <sstream>
 
 namespace ConCmdManager
 {
-	typedef std::pair<std::string, tConCommand*> tFuncNameConCmdPair;
 	typedef std::map<std::string, tConCommand*> tConCmdMap;
 	tConCmdMap ConCommands;
 
@@ -27,7 +27,8 @@ namespace ConCmdManager
 
 	bool eventConCommand(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
 	{
-		Logging::Log("[ConCmd] Incoming: pCaller = 0x%X, pFunction = 0x%X, pParms = 0x%X, pResult = 0x%X\n", pCaller, pFunction, pParms, pResult);
+		UWillowConsole* console = (UWillowConsole*)pCaller;
+		
 		UConsole_eventConsoleCommand_Parms* parms = (UConsole_eventConsoleCommand_Parms*)pParms;
 		Logging::Log("[ConCmd] Engine concmd = %ls\n", parms->Command);
 
@@ -39,7 +40,7 @@ namespace ConCmdManager
 		}
 		Logging::Log("[ConCmd] New command = \"%ls\"\n", ptr);
 
-		// Convert to a normal string because a) I don't give a fuck and b) Lua uses a normal char* for strings
+		// Convert to a normal string because #1 I don't give a fuck and #2 That's terror
 		std::wstring temp(ptr);
 		std::string cmdString(temp.begin(), temp.end());
 
@@ -49,12 +50,17 @@ namespace ConCmdManager
 		tConCmdMap::iterator iConCommands = ConCommands.find(cmd[0]); // cmd[0] is the command
 		if(iConCommands != ConCommands.end())
 		{
+			// My god UTF-16 is the biggest PITA
+			std::wstringstream s;
+			s << L"\n>>> " << temp.c_str() << L" <<<\n"; 
+
+			BL2SDK::InjectedCallNext();
+			console->eventOutputText(FString((wchar_t*)s.str().c_str()));
 			iConCommands->second(cmd); // Run the concommand
 		}
 		else // We don't handle it, maybe the engine does
 		{
 			Logging::Log("[ConCmd] Command not recognized by SDK, passing to engine\n");
-			UWillowConsole* console = (UWillowConsole*)pCaller;
 			BL2SDK::InjectedCallNext();
 			console->eventConsoleCommand(FString(ptr));
 		}
@@ -66,11 +72,17 @@ namespace ConCmdManager
 	{
 		// Hook into the engine's concmd system
 		BL2SDK::RegisterHook(std::string("Function Engine.Console.ConsoleCommand"), &ConCmdManager::eventConCommand);
+		ConCommand::RegisterCommands();
 	}
 
 	void RegisterCommand(const std::string& command, tConCommand* func)
 	{
 		tFuncNameConCmdPair pair = std::make_pair(command, func);
+		ConCommands.insert(pair);
+	}
+
+	void RegisterCommand(const tFuncNameConCmdPair& pair)
+	{
 		ConCommands.insert(pair);
 	}
 }

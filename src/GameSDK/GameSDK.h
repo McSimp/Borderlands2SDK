@@ -1,7 +1,7 @@
 #ifndef GAMESDK_H
 #define GAMESDK_H
 
-#define BL2_SDK_VER				"1 September 2012"
+#define BL2_SDK_VER				"4 October 2012"
 
 #define MOV_OP_OFFSET			2
 
