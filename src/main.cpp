@@ -21,6 +21,8 @@ void onAttach()
 
 	Logging::InitializeGameConsole();
 	Logging::PrintLogHeader();
+	
+	//BL2SDK::LogAllEvents(true);
 
 	ConCmdManager::Initialize();
 }

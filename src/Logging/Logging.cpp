@@ -81,11 +81,15 @@ namespace Logging
 	{
 		// There should only be 1 instance so we should be right to just use it in this way
 		UWillowConsole* console = UObject::FindObject<UWillowConsole>("WillowConsole WillowGameEngine.WillowGameViewportClient.WillowConsole");
-		
+
 		if(console != NULL)
 		{
 			pGameConsole = console;
 			bLogToGameConsole = true;
+		}
+		else
+		{
+			Log("[LOGGING] Attempted to hook game console but 'WillowConsole WillowGameEngine.WillowGameViewportClient.WillowConsole' was not found.\n");
 		}
 	}
 

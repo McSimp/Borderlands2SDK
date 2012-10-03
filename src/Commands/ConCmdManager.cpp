@@ -27,6 +27,7 @@ namespace ConCmdManager
 
 	bool eventConCommand(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
 	{
+		Logging::Log("[ConCmd] Incoming: pCaller = 0x%X, pFunction = 0x%X, pParms = 0x%X, pResult = 0x%X\n", pCaller, pFunction, pParms, pResult);
 		UConsole_eventConsoleCommand_Parms* parms = (UConsole_eventConsoleCommand_Parms*)pParms;
 		Logging::Log("[ConCmd] Engine concmd = %ls\n", parms->Command);
 
@@ -49,6 +50,7 @@ namespace ConCmdManager
 		}
 		else // We don't handle it, maybe the engine does
 		{
+			Logging::Log("[ConCmd] Command not recognized by SDK, passing to engine\n");
 			UWillowConsole* console = (UWillowConsole*)pCaller;
 			BL2SDK::InjectedCallNext();
 			console->eventConsoleCommand(FString(ptr));

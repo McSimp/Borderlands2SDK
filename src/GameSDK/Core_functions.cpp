@@ -76,7 +76,7 @@ UClass* UClass::pClassPointer = NULL;
 
 TArray< UObject* >* UObject::GObjObjects() 
 { 
-	TArray< UObject* >* ObjectArray = (TArray< UObject* >*) BL2SDK::GObjects; 
+	TArray< UObject* >* ObjectArray = (TArray< UObject* >*) BL2SDK::GObjects(); 
 	return ObjectArray; 
 } 
 
