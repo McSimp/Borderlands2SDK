@@ -83,6 +83,7 @@ TArray< UObject* >* UObject::GObjObjects()
 char* UObject::GetName() 
 { 
 	static char cOutBuffer[ 256 ]; 
+	ZeroMemory( cOutBuffer, 256 );
 
 	sprintf_s ( cOutBuffer, "%s", this->Name.GetName() ); 
 
@@ -92,6 +93,7 @@ char* UObject::GetName()
 char* UObject::GetNameCPP() 
 { 
 	static char cOutBuffer[ 256 ]; 
+	ZeroMemory( cOutBuffer, 256 );
 
 	if ( this->IsA ( UClass::StaticClass() ) ) 
 	{ 
@@ -127,6 +129,7 @@ char* UObject::GetFullName()
 	if ( this->Class && this->Outer ) 
 	{ 
 		static char cOutBuffer[ 256 ]; 
+		ZeroMemory( cOutBuffer, 256 );
 
 		if ( this->Outer->Outer ) 
 		{ 
