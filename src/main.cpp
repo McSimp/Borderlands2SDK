@@ -6,6 +6,7 @@
 #include "Detours/DetourManager.h"
 #include "Commands/ConCmdManager.h"
 #include "Commands/ConCommand.h"
+#include "LuaInterface/LuaInterface.h"
 
 CON_COMMAND(PrintSDKVersion)
 {	
@@ -51,6 +52,8 @@ void onAttach()
 	Logging::PrintLogHeader();
 	
 	//BL2SDK::LogAllEvents(true);
+
+	LuaInterface::Initialize();
 
 	ConCmdManager::Initialize();
 }

@@ -51,9 +51,6 @@
     <ClCompile Include="..\..\src\Lua\ltable.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Lua\lua.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Lua\lparser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -143,9 +140,6 @@
     <ClInclude Include="..\..\src\Lua\llex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Lua\lauxlib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Lua\ldo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -189,6 +183,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Lua\luaconf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Lua\lauxlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

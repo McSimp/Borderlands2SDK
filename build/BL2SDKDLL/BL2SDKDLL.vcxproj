@@ -43,11 +43,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\bin\$(Configuration)\</OutDir>
     <IntDir>..\..\obj\$(ProjectName)\$(Configuration)\</IntDir>
+    <LibraryPath>..\..\lib;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\..\bin\$(Configuration)\</OutDir>
     <IntDir>..\..\obj\$(ProjectName)\$(Configuration)\</IntDir>
+    <LibraryPath>..\..\lib;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -88,6 +90,7 @@
     <ClCompile Include="..\..\src\BL2SDK\CSigScan.cpp" />
     <ClCompile Include="..\..\src\Commands\ConCommand.cpp" />
     <ClCompile Include="..\..\src\Commands\ConCmdManager.cpp" />
+    <ClCompile Include="..\..\src\Commands\LuaCommands.cpp" />
     <ClCompile Include="..\..\src\Commands\SlotMachines.cpp" />
     <ClCompile Include="..\..\src\Detours\CSimpleDetour.cpp" />
     <ClCompile Include="..\..\src\Detours\DetourManager.cpp" />
@@ -103,6 +106,7 @@
     <ClCompile Include="..\..\src\GameSDK\WinDrv_functions.cpp" />
     <ClCompile Include="..\..\src\GameSDK\XAudio2_functions.cpp" />
     <ClCompile Include="..\..\src\Logging\Logging.cpp" />
+    <ClCompile Include="..\..\src\LuaInterface\LuaInterface.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +153,12 @@
     <ClInclude Include="..\..\src\GameSDK\XAudio2_f_structs.h" />
     <ClInclude Include="..\..\src\GameSDK\XAudio2_structs.h" />
     <ClInclude Include="..\..\src\Logging\Logging.h" />
+    <ClInclude Include="..\..\src\LuaInterface\LuaInterface.h" />
+    <ClInclude Include="..\..\src\Lua\lauxlib.h" />
+    <ClInclude Include="..\..\src\Lua\lua.h" />
+    <ClInclude Include="..\..\src\Lua\lua.hpp" />
+    <ClInclude Include="..\..\src\Lua\luaconf.h" />
+    <ClInclude Include="..\..\src\Lua\lualib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

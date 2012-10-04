@@ -43,6 +43,15 @@
     <Filter Include="Header Files\Commands">
       <UniqueIdentifier>{8c397606-a0dc-4679-9f1d-6346f1b1cf59}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\LuaInterface">
+      <UniqueIdentifier>{f6928239-3ce2-4f55-bd11-210421270cba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LuaInterface">
+      <UniqueIdentifier>{d8c7a185-e9c3-484f-9925-af1a5aa402cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Lua">
+      <UniqueIdentifier>{62d2febe-3a64-4515-a484-a30ddd069429}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Logging\Logging.cpp">
@@ -103,6 +112,12 @@
       <Filter>Source Files\BL2SDK</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Commands\SlotMachines.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\LuaInterface\LuaInterface.cpp">
+      <Filter>Source Files\LuaInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Commands\LuaCommands.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
   </ItemGroup>
@@ -235,6 +250,24 @@
     </ClInclude>
     <ClInclude Include="..\..\src\BL2SDK\CSigScan.h">
       <Filter>Header Files\BL2SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\LuaInterface.h">
+      <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Lua\lauxlib.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Lua\lua.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Lua\lua.hpp">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Lua\lualib.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Lua\luaconf.h">
+      <Filter>Header Files\Lua</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
