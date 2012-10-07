@@ -10,6 +10,7 @@ To compile the SDK you'll need the following:
 
 * Microsoft Visual Studio 2012 (2010 probably works too, haven't tested)
 * Microsoft Detours library. If you don't have it, you can get it from the downloads page and put the contents in `build/BL2SDKDLL`
+* Windows SDK (I suggest version 6.0A since that works for me)
 
 Just open up the solution file in the build folder and compile in Debug mode. Hopefully it compiles,
 you're pretty lucky if it does.

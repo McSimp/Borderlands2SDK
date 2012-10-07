@@ -992,7 +992,14 @@ public:
 class UProperty : public UField
 {
 public:
-	unsigned char                                      UnknownData00[ 0x40 ];                            		// 0x0040 (0x0040) MISSED OFFSET
+	unsigned long		ArrayDim;									// 0x0040 (0x04)					
+	unsigned long		ElementSize;								// 0x0044 (0x04)
+	FQWord				PropertyFlags;								// 0x0048 (0x08)
+	unsigned short		PropertySize;								// 0x0050 (0x02)
+	unsigned short		UnknownData00;								// 0x0052 (0x02)
+	unsigned char		UnknownData01[ 0xC ];						// 0x0054 (0xC)
+	unsigned long		Offset;										// 0x0060 (0x04)
+	unsigned char		UnknownData02[ 0x1C ];						// 0x0064 (0x1C)
 
 private:
 	static UClass* pClassPointer;
@@ -1013,7 +1020,7 @@ public:
 class UStructProperty : public UProperty
 {
 public:
-	unsigned char                                      UnknownData00[ 0x4 ];                             		// 0x0080 (0x0004) MISSED OFFSET
+	class UStruct*		Struct;                             		// 0x0080 (0x0004) MISSED OFFSET
 
 private:
 	static UClass* pClassPointer;
@@ -1054,7 +1061,7 @@ public:
 class UObjectProperty : public UProperty
 {
 public:
-	unsigned char                                      UnknownData00[ 0x4 ];                             		// 0x0080 (0x0004) MISSED OFFSET
+	class UClass*		PropertyClass;                            		// 0x0080 (0x0004) MISSED OFFSET
 
 private:
 	static UClass* pClassPointer;
@@ -1344,7 +1351,7 @@ public:
 class UArrayProperty : public UProperty
 {
 public:
-	unsigned char                                      UnknownData00[ 0x4 ];                             		// 0x0080 (0x0004) MISSED OFFSET
+	class UProperty*	Inner;                             		// 0x0080 (0x0004) MISSED OFFSET
 
 private:
 	static UClass* pClassPointer;

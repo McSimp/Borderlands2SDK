@@ -2,9 +2,12 @@
 #include "Logging/Logging.h"
 #include "Commands/ConCmdManager.h"
 #include "Commands/ConCommand.h"
+#include "LuaInterface/LuaInterface.h"
 
 #include <map>
 #include <sstream>
+
+using LuaInterface::Lua;
 
 namespace ConCmdManager
 {
@@ -25,12 +28,39 @@ namespace ConCmdManager
 		return split(s, delim, elems);
 	}
 
+	bool issueLuaCommand(const std::vector<std::string> &args)
+	{
+		// Get the InjectConsoleCommand func and call it
+		lua_getglobal(Lua(), "InjectConsoleCommand");
+		
+		// Push the command name
+		lua_pushlstring(Lua(), args[0].c_str(), args[0].size());
+
+		// Create the args table
+		lua_newtable(Lua());
+		int top = lua_gettop(Lua());
+
+		for(int i = 0; i < args.size(); i++)
+		{
+			lua_pushnumber(Lua(), i+1);
+			lua_pushlstring(Lua(), args[i].c_str(), args[i].size());
+			lua_settable(Lua(), top);
+		}
+
+		lua_call(Lua(), 2, 1);
+
+		bool result = (bool)lua_toboolean(Lua(), -1);
+		lua_pop(Lua(), 1);
+
+		return result;
+	}
+
 	bool eventConCommand(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
 	{
 		UWillowConsole* console = (UWillowConsole*)pCaller;
 		
 		UConsole_eventConsoleCommand_Parms* parms = (UConsole_eventConsoleCommand_Parms*)pParms;
-		Logging::Log("[ConCmd] Engine concmd = %ls\n", parms->Command);
+		//Logging::Log("[ConCmd] Engine concmd = %ls\n", parms->Command);
 
 		// Because 'say' is appended to everything, take that off
 		wchar_t* ptr = parms->Command.Data;
@@ -38,7 +68,7 @@ namespace ConCmdManager
 		{
 			ptr = ptr + 4;
 		}
-		Logging::Log("[ConCmd] New command = \"%ls\"\n", ptr);
+		//Logging::Log("[ConCmd] New command = \"%ls\"\n", ptr);
 
 		// Convert to a normal string because #1 I don't give a fuck and #2 That's terror
 		std::wstring temp(ptr);
@@ -58,7 +88,7 @@ namespace ConCmdManager
 			console->eventOutputText(FString((wchar_t*)s.str().c_str()));
 			iConCommands->second(cmd); // Run the concommand
 		}
-		else // We don't handle it, maybe the engine does
+		else if(!issueLuaCommand(cmd)) // Maybe Lua handles it, it'll do it's thing
 		{
 			Logging::Log("[ConCmd] Command not recognized by SDK, passing to engine\n");
 			BL2SDK::InjectedCallNext();

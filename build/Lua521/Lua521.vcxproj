@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EDA83C37-464B-4DD8-885C-2705704FB678}</ProjectGuid>
-    <RootNamespace>Lua521Lib</RootNamespace>
+    <RootNamespace>Lua521</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

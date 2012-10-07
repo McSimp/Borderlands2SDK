@@ -1,6 +1,8 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
+#define LOGFILE "BL2SDKLog.txt"
+
 namespace Logging
 {
 	void Log(const char *szFmt, ...);
@@ -8,6 +10,7 @@ namespace Logging
 	void InitializeFile(const char *fileName);
 	void InitializeGameConsole();
 	void PrintLogHeader();
+	void Cleanup();
 }
 
 #endif

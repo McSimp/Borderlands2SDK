@@ -43,13 +43,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\bin\$(Configuration)\</OutDir>
     <IntDir>..\..\obj\$(ProjectName)\$(Configuration)\</IntDir>
-    <LibraryPath>..\..\lib;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+    <LibraryPath>..\..\lib;..\..\thirdparty;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\..\bin\$(Configuration)\</OutDir>
     <IntDir>..\..\obj\$(ProjectName)\$(Configuration)\</IntDir>
-    <LibraryPath>..\..\lib;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+    <LibraryPath>..\..\lib;..\..\thirdparty;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -64,7 +64,12 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(DETOURS_LIB)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CrashRpt1301d.lib;Lua521d.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -83,7 +88,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(DETOURS_LIB)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CrashRpt1301.lib;Lua521.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\BL2SDK\BL2SDK.cpp" />
@@ -106,6 +116,8 @@
     <ClCompile Include="..\..\src\GameSDK\WinDrv_functions.cpp" />
     <ClCompile Include="..\..\src\GameSDK\XAudio2_functions.cpp" />
     <ClCompile Include="..\..\src\Logging\Logging.cpp" />
+    <ClCompile Include="..\..\src\LuaInterface\LUObject.cpp" />
+    <ClCompile Include="..\..\src\LuaInterface\LUObjects.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\LuaInterface.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>
@@ -114,6 +126,7 @@
     <ClInclude Include="..\..\src\BL2SDK\CSigScan.h" />
     <ClInclude Include="..\..\src\Commands\ConCommand.h" />
     <ClInclude Include="..\..\src\Commands\ConCmdManager.h" />
+    <ClInclude Include="..\..\src\Crashrpt\CrashRpt.h" />
     <ClInclude Include="..\..\src\Detours\CSimpleDetour.h" />
     <ClInclude Include="..\..\src\Detours\DetourManager.h" />
     <ClInclude Include="..\..\src\Detours\detours.h" />
@@ -154,6 +167,8 @@
     <ClInclude Include="..\..\src\GameSDK\XAudio2_structs.h" />
     <ClInclude Include="..\..\src\Logging\Logging.h" />
     <ClInclude Include="..\..\src\LuaInterface\LuaInterface.h" />
+    <ClInclude Include="..\..\src\LuaInterface\LUObject.h" />
+    <ClInclude Include="..\..\src\LuaInterface\LUObjects.h" />
     <ClInclude Include="..\..\src\Lua\lauxlib.h" />
     <ClInclude Include="..\..\src\Lua\lua.h" />
     <ClInclude Include="..\..\src\Lua\lua.hpp" />

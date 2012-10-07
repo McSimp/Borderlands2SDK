@@ -52,6 +52,9 @@
     <Filter Include="Header Files\Lua">
       <UniqueIdentifier>{62d2febe-3a64-4515-a484-a30ddd069429}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Crashrpt">
+      <UniqueIdentifier>{c23ea6ef-c8de-40f8-873b-903173f61285}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Logging\Logging.cpp">
@@ -119,6 +122,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Commands\LuaCommands.cpp">
       <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\LuaInterface\LUObjects.cpp">
+      <Filter>Source Files\LuaInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\LuaInterface\LUObject.cpp">
+      <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -268,6 +277,15 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Lua\luaconf.h">
       <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Crashrpt\CrashRpt.h">
+      <Filter>Header Files\Crashrpt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\LUObjects.h">
+      <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\LUObject.h">
+      <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

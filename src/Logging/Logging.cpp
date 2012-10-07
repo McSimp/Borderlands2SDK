@@ -58,6 +58,7 @@ namespace Logging
 				memset(wa, 0, buffSize);
 				mbstowcs(wa, szBuff, len);
 				wa[buffSize - 1] = 0;
+				BL2SDK::InjectedCallNext();
 				pGameConsole->eventOutputText(FString(wa));
 				delete[] wa;
 			}
@@ -97,5 +98,14 @@ namespace Logging
 	void PrintLogHeader()
 	{
 		Log("======== BL2 Mod SDK Loaded (Version %s) ========\n", BL2_SDK_VER);
+	}
+
+	void Cleanup()
+	{
+		if(pLogFile != NULL)
+		{
+			fclose(pLogFile);
+			pLogFile = NULL;
+		}
 	}
 }

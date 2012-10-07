@@ -2,8 +2,6 @@
 #include "BL2SDK/BL2SDK.h"
 #include "Logging/Logging.h"
 
-#pragma comment (lib, "detours.lib")
-
 namespace DetourManager
 {
 	tProcessEvent pProcessEvent;
