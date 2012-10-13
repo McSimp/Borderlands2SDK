@@ -96,3 +96,6 @@ Desktop.ini
 
 # Mac crap
 .DS_Store
+
+.svn
+thirdparty/crashrpt/docs

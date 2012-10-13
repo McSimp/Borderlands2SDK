@@ -49,10 +49,13 @@
     <Filter Include="Header Files\LuaInterface">
       <UniqueIdentifier>{d8c7a185-e9c3-484f-9925-af1a5aa402cb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Lua">
-      <UniqueIdentifier>{62d2febe-3a64-4515-a484-a30ddd069429}</UniqueIdentifier>
+    <Filter Include="Header Files\Third Party">
+      <UniqueIdentifier>{58496320-c917-4bc0-9da3-405f788b22da}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Crashrpt">
+    <Filter Include="Header Files\Third Party\Lua521">
+      <UniqueIdentifier>{ecbaf7c2-6935-49b3-819a-f67e14d5a9fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Third Party\Crashrpt">
       <UniqueIdentifier>{c23ea6ef-c8de-40f8-873b-903173f61285}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -263,29 +266,29 @@
     <ClInclude Include="..\..\src\LuaInterface\LuaInterface.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Lua\lauxlib.h">
-      <Filter>Header Files\Lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Lua\lua.h">
-      <Filter>Header Files\Lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Lua\lua.hpp">
-      <Filter>Header Files\Lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Lua\lualib.h">
-      <Filter>Header Files\Lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Lua\luaconf.h">
-      <Filter>Header Files\Lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Crashrpt\CrashRpt.h">
-      <Filter>Header Files\Crashrpt</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\LuaInterface\LUObjects.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\LuaInterface\LUObject.h">
       <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\thirdparty\lua521\lauxlib.h">
+      <Filter>Header Files\Third Party\Lua521</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\thirdparty\lua521\lua.h">
+      <Filter>Header Files\Third Party\Lua521</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\thirdparty\lua521\lua.hpp">
+      <Filter>Header Files\Third Party\Lua521</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\thirdparty\lua521\luaconf.h">
+      <Filter>Header Files\Third Party\Lua521</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\thirdparty\lua521\lualib.h">
+      <Filter>Header Files\Third Party\Lua521</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\thirdparty\crashrpt\include\CrashRpt.h">
+      <Filter>Header Files\Third Party\Crashrpt</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

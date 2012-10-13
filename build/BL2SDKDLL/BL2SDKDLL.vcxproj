@@ -43,13 +43,11 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\bin\$(Configuration)\</OutDir>
     <IntDir>..\..\obj\$(ProjectName)\$(Configuration)\</IntDir>
-    <LibraryPath>..\..\lib;..\..\thirdparty;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\..\bin\$(Configuration)\</OutDir>
     <IntDir>..\..\obj\$(ProjectName)\$(Configuration)\</IntDir>
-    <LibraryPath>..\..\lib;..\..\thirdparty;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -58,13 +56,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;BL2SDKDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src;..\..\thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DETOURS_LIB)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>CrashRpt1301d.lib;Lua521d.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\lib;..\..\thirdparty;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CrashRpt1400d.lib;Lua521d.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -80,15 +78,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;BL2SDKDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src;..\..\thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(DETOURS_LIB)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>CrashRpt1301.lib;Lua521.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\lib;..\..\thirdparty;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CrashRpt1400.lib;Lua521.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -126,7 +124,6 @@
     <ClInclude Include="..\..\src\BL2SDK\CSigScan.h" />
     <ClInclude Include="..\..\src\Commands\ConCommand.h" />
     <ClInclude Include="..\..\src\Commands\ConCmdManager.h" />
-    <ClInclude Include="..\..\src\Crashrpt\CrashRpt.h" />
     <ClInclude Include="..\..\src\Detours\CSimpleDetour.h" />
     <ClInclude Include="..\..\src\Detours\DetourManager.h" />
     <ClInclude Include="..\..\src\Detours\detours.h" />
@@ -169,11 +166,12 @@
     <ClInclude Include="..\..\src\LuaInterface\LuaInterface.h" />
     <ClInclude Include="..\..\src\LuaInterface\LUObject.h" />
     <ClInclude Include="..\..\src\LuaInterface\LUObjects.h" />
-    <ClInclude Include="..\..\src\Lua\lauxlib.h" />
-    <ClInclude Include="..\..\src\Lua\lua.h" />
-    <ClInclude Include="..\..\src\Lua\lua.hpp" />
-    <ClInclude Include="..\..\src\Lua\luaconf.h" />
-    <ClInclude Include="..\..\src\Lua\lualib.h" />
+    <ClInclude Include="..\..\thirdparty\crashrpt\include\CrashRpt.h" />
+    <ClInclude Include="..\..\thirdparty\lua521\lauxlib.h" />
+    <ClInclude Include="..\..\thirdparty\lua521\lua.h" />
+    <ClInclude Include="..\..\thirdparty\lua521\lua.hpp" />
+    <ClInclude Include="..\..\thirdparty\lua521\luaconf.h" />
+    <ClInclude Include="..\..\thirdparty\lua521\lualib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

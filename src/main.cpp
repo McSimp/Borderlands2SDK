@@ -7,7 +7,7 @@
 #include "Commands/ConCmdManager.h"
 #include "Commands/ConCommand.h"
 #include "LuaInterface/LuaInterface.h"
-//#include "Crashrpt/CrashRpt.h"
+//#include "Crashrpt/include/CrashRpt.h"
 
 CON_COMMAND(PrintSDKVersion)
 {	
