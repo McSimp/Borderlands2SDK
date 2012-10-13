@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmLauncher));
             this.gbGamePath = new System.Windows.Forms.GroupBox();
             this.btnBrowse = new System.Windows.Forms.Button();
             this.txtGamePath = new System.Windows.Forms.TextBox();
@@ -39,54 +40,59 @@
             // 
             this.gbGamePath.Controls.Add(this.btnBrowse);
             this.gbGamePath.Controls.Add(this.txtGamePath);
-            this.gbGamePath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gbGamePath.Location = new System.Drawing.Point(13, 13);
+            this.gbGamePath.Location = new System.Drawing.Point(12, 12);
             this.gbGamePath.Name = "gbGamePath";
-            this.gbGamePath.Size = new System.Drawing.Size(334, 81);
+            this.gbGamePath.Size = new System.Drawing.Size(392, 88);
             this.gbGamePath.TabIndex = 0;
             this.gbGamePath.TabStop = false;
             this.gbGamePath.Text = "Game Path";
             // 
             // btnBrowse
             // 
-            this.btnBrowse.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnBrowse.Location = new System.Drawing.Point(253, 49);
+            this.btnBrowse.Image = ((System.Drawing.Image)(resources.GetObject("btnBrowse.Image")));
+            this.btnBrowse.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnBrowse.Location = new System.Drawing.Point(300, 52);
             this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.Size = new System.Drawing.Size(75, 23);
-            this.btnBrowse.TabIndex = 1;
+            this.btnBrowse.Size = new System.Drawing.Size(82, 27);
+            this.btnBrowse.TabIndex = 2;
             this.btnBrowse.Text = "Browse";
+            this.btnBrowse.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnBrowse.UseVisualStyleBackColor = true;
             this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 
             // txtGamePath
             // 
-            this.txtGamePath.Location = new System.Drawing.Point(7, 20);
+            this.txtGamePath.Location = new System.Drawing.Point(8, 23);
             this.txtGamePath.Name = "txtGamePath";
-            this.txtGamePath.Size = new System.Drawing.Size(321, 23);
-            this.txtGamePath.TabIndex = 0;
+            this.txtGamePath.Size = new System.Drawing.Size(374, 23);
+            this.txtGamePath.TabIndex = 1;
             // 
             // btnLaunch
             // 
-            this.btnLaunch.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnLaunch.Location = new System.Drawing.Point(13, 100);
+            this.btnLaunch.Image = ((System.Drawing.Image)(resources.GetObject("btnLaunch.Image")));
+            this.btnLaunch.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnLaunch.Location = new System.Drawing.Point(12, 106);
             this.btnLaunch.Name = "btnLaunch";
-            this.btnLaunch.Size = new System.Drawing.Size(334, 58);
-            this.btnLaunch.TabIndex = 1;
+            this.btnLaunch.Size = new System.Drawing.Size(392, 64);
+            this.btnLaunch.TabIndex = 3;
             this.btnLaunch.Text = "Launch Game";
+            this.btnLaunch.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnLaunch.UseVisualStyleBackColor = true;
             this.btnLaunch.Click += new System.EventHandler(this.btnLaunch_Click);
             // 
             // frmLauncher
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(359, 167);
+            this.ClientSize = new System.Drawing.Size(416, 182);
             this.Controls.Add(this.btnLaunch);
             this.Controls.Add(this.gbGamePath);
+            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "frmLauncher";
-            this.Text = "BL2 SDK Launcher";
+            this.Text = "Borderlands 2 SDK Launcher";
             this.Load += new System.EventHandler(this.frmLauncher_Load);
             this.gbGamePath.ResumeLayout(false);
             this.gbGamePath.PerformLayout();
