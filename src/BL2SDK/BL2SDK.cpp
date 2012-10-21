@@ -106,6 +106,21 @@ namespace BL2SDK
 		FuncsToFind.push_back(pair);
 	}
 
+	void RemoveHook(UFunction* pFunction)
+	{
+		int origSize = HookedFunctions.size();
+		HookedFunctions.erase(pFunction);
+		int newSize = HookedFunctions.size();
+		if(newSize < origSize)
+		{
+			Logging::Log("[Engine Hooks] Hook removed for \"%s\"\n", pFunction->GetFullName());
+		}
+		else
+		{
+			Logging::Log("[Engine Hooks] Failed to remove hook for \"%s\"\n", pFunction->GetFullName());
+		}
+	}
+
 	unsigned long GObjects()
 	{
 		return addrGObjects;

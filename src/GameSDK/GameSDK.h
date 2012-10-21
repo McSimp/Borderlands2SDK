@@ -1,8 +1,6 @@
 #ifndef GAMESDK_H
 #define GAMESDK_H
 
-#define BL2_SDK_VER				"5 October 2012"
-
 #define MOV_OP_OFFSET			2
 
 #define GObjects_Pattern		"\x8B\x0D\x00\x00\x00\x00\x8B\x04\xB1\x8B\x40\x08"

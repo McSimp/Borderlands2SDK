@@ -40,7 +40,7 @@ namespace ConCmdManager
 		lua_newtable(Lua());
 		int top = lua_gettop(Lua());
 
-		for(int i = 0; i < args.size(); i++)
+		for(unsigned int i = 0; i < args.size(); i++)
 		{
 			lua_pushnumber(Lua(), i+1);
 			lua_pushlstring(Lua(), args[i].c_str(), args[i].size());

@@ -16,7 +16,11 @@ namespace BL2SDK
 	void LogAllEvents(bool enabled);
 	void InjectedCallNext();
 	void RegisterHook(const std::string& funcName, tProcessEventHook* funcHook);
+	void RemoveHook(UFunction* pFunction);
 	bool Initialize();
+
+	const std::string Version = "October 21 2012";
+	const std::wstring VersionW = L"October 21 2012";
 }
 
 #endif

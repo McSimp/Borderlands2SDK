@@ -132,6 +132,12 @@
     <ClCompile Include="..\..\src\LuaInterface\LUObject.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\BL2SDK\CrashRptHelper.cpp">
+      <Filter>Source Files\BL2SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\BL2SDK\Settings.cpp">
+      <Filter>Source Files\BL2SDK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Logging\Logging.h">
@@ -289,6 +295,12 @@
     </ClInclude>
     <ClInclude Include="..\..\thirdparty\crashrpt\include\CrashRpt.h">
       <Filter>Header Files\Third Party\Crashrpt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BL2SDK\CrashRptHelper.h">
+      <Filter>Header Files\BL2SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BL2SDK\Settings.h">
+      <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

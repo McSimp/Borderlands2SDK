@@ -7,18 +7,27 @@
 
 namespace Logging
 {
-	FILE*				pLogFile				= NULL;
+	HANDLE				hLogFile				= NULL;
 	bool				bLogToExternalConsole	= false;
 	bool				bLogToFile				= false;
 	bool				bLogToGameConsole		= false;
 	UWillowConsole*		pGameConsole			= NULL;
 
+	void LogToFile(char *szBuff, int len)
+	{
+		if(hLogFile != INVALID_HANDLE_VALUE)
+		{
+			// Write to the log file. 0 fucks given if it fails.
+			DWORD dwBytesWritten = 0;
+			WriteFile(hLogFile, szBuff, len, &dwBytesWritten, NULL);
+		}
+	}
+
 	void LogWinConsole(char *szBuff, int len)
 	{
 		HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-
-		DWORD numWritten = 0;
-		WriteFile(hOutput, szBuff, len, &numWritten, NULL);
+		DWORD dwBytesWritten = 0;
+		WriteFile(hOutput, szBuff, len, &dwBytesWritten, NULL);
 	}
 
 	void Log(const char *szFmt, ...)
@@ -42,18 +51,13 @@ namespace Logging
 			LogWinConsole(szBuff, len);
 
 		if(bLogToFile)
-		{
-			if(pLogFile != NULL)
-			{
-				fputs(szBuff, pLogFile);
-				fflush(pLogFile);
-			}
-		}
+			LogToFile(szBuff, len);
 
 		if(bLogToGameConsole)
 		{
 			if(pGameConsole != NULL)
 			{
+				// TODO: Abstract away char -> wchar conversion (perhaps use Boost::widen)
 				wchar_t* wa = new wchar_t[buffSize];
 				memset(wa, 0, buffSize);
 				mbstowcs(wa, szBuff, len);
@@ -67,18 +71,29 @@ namespace Logging
 		delete[] szBuff;
 	}
 
-	void InitializeExtern()
+	bool InitializeExtern()
 	{
-		AllocConsole();
-		bLogToExternalConsole = true;
+		BOOL result = AllocConsole();
+		if(result)
+		{
+			bLogToExternalConsole = true;
+		}
+		return result;
 	}
 
-	void InitializeFile(const char *fileName)
+	bool InitializeFile(std::wstring &fileName)
 	{
-		pLogFile = fopen(fileName, "w");
+		hLogFile = CreateFile(fileName.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if(hLogFile == INVALID_HANDLE_VALUE)
+		{
+			return false;
+		}
+		
 		bLogToFile = true;
+		return true;
 	}
 
+	// TODO: Cleanup
 	void InitializeGameConsole()
 	{
 		// There should only be 1 instance so we should be right to just use it in this way
@@ -97,15 +112,14 @@ namespace Logging
 
 	void PrintLogHeader()
 	{
-		Log("======== BL2 Mod SDK Loaded (Version %s) ========\n", BL2_SDK_VER);
+		Log("======== BL2 Mod SDK Loaded (Version %s) ========\n", BL2SDK::Version.c_str());
 	}
 
 	void Cleanup()
 	{
-		if(pLogFile != NULL)
+		if(hLogFile != INVALID_HANDLE_VALUE)
 		{
-			fclose(pLogFile);
-			pLogFile = NULL;
+			CloseHandle(hLogFile);
 		}
 	}
 }
