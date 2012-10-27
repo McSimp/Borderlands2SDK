@@ -66,9 +66,6 @@
     <ClCompile Include="..\..\src\Detours\CSimpleDetour.cpp">
       <Filter>Source Files\Detours</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Detours\DetourManager.cpp">
-      <Filter>Source Files\Detours</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\GameSDK\WinDrv_functions.cpp">
       <Filter>Source Files\GameSDK</Filter>
     </ClCompile>
@@ -150,9 +147,6 @@
       <Filter>Header Files\Detours</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Detours\detours.h">
-      <Filter>Header Files\Detours</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Detours\DetourManager.h">
       <Filter>Header Files\Detours</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\GameSDK\AkAudio_structs.h">

@@ -2,7 +2,6 @@
 #include <Windows.h>
 #include "BL2SDK/BL2SDK.h"
 #include "Logging/Logging.h"
-#include "Detours/DetourManager.h"
 #include "Commands/ConCmdManager.h"
 #include "Commands/ConCommand.h"
 #include "LuaInterface/LuaInterface.h"
