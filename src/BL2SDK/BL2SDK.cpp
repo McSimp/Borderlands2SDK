@@ -1,7 +1,8 @@
 #include "BL2SDK/BL2SDK.h"
-#include "Detours/DetourManager.h"
+#include "Detours/CSimpleDetour.h"
 #include "Logging/Logging.h"
 #include "BL2SDK/CSigScan.h"
+#include "BL2SDK/CrashRptHelper.h"
 
 namespace BL2SDK
 {
@@ -12,7 +13,7 @@ namespace BL2SDK
 
 	unsigned long								addrGObjects;
 	unsigned long								addrGNames;
-	unsigned long								addrProcEvent;
+	tProcessEvent								pProcessEvent;
 
 	void __stdcall hkProcessEvent(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
 	{
@@ -23,7 +24,7 @@ namespace BL2SDK
 		{
 			bInjectedCallNext = false;
 			_asm popad;
-			DetourManager::pProcessEvent(pCaller, pFunction, pParms, pResult);
+			pProcessEvent(pCaller, pFunction, pParms, pResult);
 			return;
 		}
 
@@ -70,7 +71,7 @@ namespace BL2SDK
 		}
 
 		_asm popad;
-		DetourManager::pProcessEvent(pCaller, pFunction, pParms, pResult);
+		pProcessEvent(pCaller, pFunction, pParms, pResult);
 		return;
 	}
 
@@ -131,62 +132,96 @@ namespace BL2SDK
 		return addrGNames;
 	}
 
-	unsigned long ProcessEventAddr()
+	int UnrealExceptionHandler(unsigned int code, struct _EXCEPTION_POINTERS *ep)
 	{
-		return addrProcEvent;
+		if(CrashRptHelper::GenerateReport(code, ep))
+		{
+			TerminateProcess(GetCurrentProcess(), 1);
+		}
+		else
+		{
+			// TODO: Maybe have it call the original Engine func here
+		}
+
+		return EXCEPTION_EXECUTE_HANDLER;
 	}
 
 	// TODO: Make less shit
-	bool Initialize()
+	bool HookGame()
 	{
-		// Setup Sigscan
-		CSigScan::module_handle = GetModuleHandle(L"Borderlands2.exe");
-		if(CSigScan::module_handle == NULL || !CSigScan::GetModuleMemInfo())
+		CSigScan sigscan(L"Borderlands2.exe");
+
+		if(!sigscan.IsReady())
 		{
 			Logging::Log("[ERROR] Code = SDKMEMBASEERR. Failed to find base of Borderlands2.exe\n");
 			return false;
 		}
 
-		unsigned long base = (unsigned long)CSigScan::module_handle;
-		Logging::Log("[INTERNAL] Game base pointer = 0x%X\n", base);
-
-		// Scan for GObjects
-		CSigScan GObjectsSig;
-		int GObjResult = GObjectsSig.Init((unsigned char*)GObjects_Pattern, GObjects_Mask, GObjects_SigLen);
-		if(!GObjectsSig.is_set)
+		// Sigscan for GOBjects
+		unsigned char* pGObjects = (unsigned char*)sigscan.Scan((unsigned char*)GObjects_Pattern, GObjects_Mask);
+		if(pGObjects == NULL)
 		{
-			Logging::Log("[ERROR] Code = GOBJSIGFAIL (%i). Failed to sigscan for GObjects.\n", GObjResult);	
+			Logging::Log("[ERROR] Code = GOBJSIGFAIL. Failed to sigscan for GObjects.\n");	
 			return false;
 		}
-		addrGObjects = *((unsigned long*)((unsigned long)GObjectsSig.sig_addr + MOV_OP_OFFSET));
-		Logging::Log("[INTERNAL] GObjects = 0x%X (Offset = 0x%X)\n", addrGObjects, (addrGObjects - base));
+		pGObjects += MOV_OP_OFFSET;
+		addrGObjects = *(unsigned long*)pGObjects;
 
-		// Scan for GNames
-		CSigScan GNamesSig;
-		GNamesSig.Init((unsigned char*)GNames_Pattern, GNames_Mask, GNames_SigLen);
-		if(!GNamesSig.is_set)
+		// Sigscan for GNames
+		unsigned char* pGNames = (unsigned char*)sigscan.Scan((unsigned char*)GNames_Pattern, GNames_Mask);
+		if(pGNames == NULL)
 		{
 			Logging::Log("[ERROR] Code = GNAMESSIGFAIL. Failed to sigscan for GNames.\n");	
 			return false;
 		}
-		addrGNames = *((unsigned long*)((unsigned long)GNamesSig.sig_addr + MOV_OP_OFFSET));
-		Logging::Log("[INTERNAL] GNames = 0x%X (Offset = 0x%X)\n", addrGNames, (addrGNames - base));
+		pGNames += MOV_OP_OFFSET;
+		addrGNames = *(unsigned long*)pGNames;
 
-		// Scan for UObject::ProcessEvent
-		CSigScan ProcEventSig;
-		ProcEventSig.Init((unsigned char*)ProcessEvent_Pattern, ProcessEvent_Mask, ProcessEvent_SigLen);
-		if(!ProcEventSig.is_set)
+		// Sigscan for UObject::ProcessEvent which will be used for pretty much everything
+		void* addrProcEvent = sigscan.Scan((unsigned char*)ProcessEvent_Pattern, ProcessEvent_Mask);
+		if(addrProcEvent == NULL)
 		{
 			Logging::Log("[ERROR] Code = PROCEVENTSIGFAIL. Failed to sigscan for UObject::ProcessEvent().\n");	
 			return false;
 		}
-		addrProcEvent = (unsigned long)ProcEventSig.sig_addr;
-		Logging::Log("[INTERNAL] UObject::ProcessEvent = 0x%X (Offset = 0x%X)\n", addrProcEvent, (addrProcEvent - base));
-
+		pProcessEvent = reinterpret_cast<tProcessEvent>(addrProcEvent);
+		
 		// Detour UObject::ProcessEvent()
-		if(!DetourManager::AttachProcessEvent())
+		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkRawProcessEvent);
+		if(!detProcessEvent.Attach())
 		{
 			Logging::Log("[ERROR] Code = PROCEVENTDETOURFAIL. Failed to attach to UObject::ProcessEvent().\n");
+			return false;
+		}
+
+		// Sigscan for Unreal exception handler
+		void* addrUnrealEH = sigscan.Scan((unsigned char*)CrashHandler_Pattern, CrashHandler_Mask);
+		if(addrUnrealEH == NULL)
+		{
+			Logging::Log("[ERROR] Code = CRASHHANDLERSIGFAIL. Failed to sigscan for Unreal Exception Handler.\n");	
+			return false;
+		}
+
+		Logging::Log("Unreal Crash handler = 0x%X\n", addrUnrealEH);
+
+		// Detour Unreal exception handler
+		SETUP_SIMPLE_DETOUR(detUnrealEH, addrUnrealEH, UnrealExceptionHandler);
+		if(!detUnrealEH.Attach())
+		{
+			Logging::Log("[ERROR] Code = CRASHHANDLERDETOURFAIL. Failed to attach to Unreal Exception Handler.\n");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Initialize()
+	{
+		if(!HookGame())
+		{
+			// Close the game and get the crashrpt dialog to come up in the hope that
+			// the user will tell us what went wrong.
+			CrashRptHelper::SoftCrash();
 			return false;
 		}
 

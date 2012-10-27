@@ -62,7 +62,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\lib;..\..\thirdparty;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>CrashRpt1400d.lib;Lua521d.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Lua521d.lib;detours.lib;version.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -98,6 +98,7 @@
     <ClCompile Include="..\..\src\BL2SDK\CrashRptHelper.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\CSigScan.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Settings.cpp" />
+    <ClCompile Include="..\..\src\BL2SDK\Util.cpp" />
     <ClCompile Include="..\..\src\Commands\ConCommand.cpp" />
     <ClCompile Include="..\..\src\Commands\ConCmdManager.cpp" />
     <ClCompile Include="..\..\src\Commands\LuaCommands.cpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="..\..\src\BL2SDK\CrashRptHelper.h" />
     <ClInclude Include="..\..\src\BL2SDK\CSigScan.h" />
     <ClInclude Include="..\..\src\BL2SDK\Settings.h" />
+    <ClInclude Include="..\..\src\BL2SDK\Util.h" />
     <ClInclude Include="..\..\src\Commands\ConCommand.h" />
     <ClInclude Include="..\..\src\Commands\ConCmdManager.h" />
     <ClInclude Include="..\..\src\Detours\CSimpleDetour.h" />

@@ -83,7 +83,7 @@ namespace Logging
 
 	bool InitializeFile(std::wstring &fileName)
 	{
-		hLogFile = CreateFile(fileName.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		hLogFile = CreateFile(fileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if(hLogFile == INVALID_HANDLE_VALUE)
 		{
 			return false;
@@ -119,6 +119,7 @@ namespace Logging
 	{
 		if(hLogFile != INVALID_HANDLE_VALUE)
 		{
+			FlushFileBuffers(hLogFile);
 			CloseHandle(hLogFile);
 		}
 	}

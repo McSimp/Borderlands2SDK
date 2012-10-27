@@ -1,104 +1,67 @@
 #include "BL2SDK/CSigScan.h"
- 
-/* There is no ANSI ustrncpy */
-unsigned char* ustrncpy(unsigned char *dest, const unsigned char *src, int len) {
-    while(len--)
-        dest[len] = src[len];
- 
-    return dest;
-}
- 
-/* //////////////////////////////////////
-    CSigScan Class
-    ////////////////////////////////////// */
-unsigned char* CSigScan::base_addr;
-size_t CSigScan::base_len;
-void* CSigScan::module_handle;
 
-/* Initialize the Signature Object */
-int CSigScan::Init(unsigned char *sig, char *mask, size_t len) {
-    is_set = 0;
- 
-    sig_len = len;
+// Based off CSigScan from AlliedModders
 
-	if ( sig_str )
-		delete[] sig_str;
+CSigScan::CSigScan(wchar_t* moduleName)
+{
+	m_isReady = false;
+	m_moduleHandle = GetModuleHandle(moduleName);
+	if(m_moduleHandle == NULL)
+		return;
 
-    sig_str = new unsigned char[sig_len];
-    ustrncpy(sig_str, sig, sig_len);
- 
-	if ( sig_mask )
-		delete[] sig_mask;
-
-    sig_mask = new char[sig_len/*+1*/];
-    strncpy(sig_mask, mask, sig_len);
-    //sig_mask[sig_len+1] = 0;
- 
-    if(!base_addr)
-        return 2; // GetDllMemInfo() Failed
- 
-    if((sig_addr = FindSignature()) == NULL)
-        return 1; // FindSignature() Failed
- 
-    is_set = 1;
-    // SigScan Successful!
-
-	return 0;
-}
- 
-/* Destructor frees sig-string allocated memory */
-CSigScan::~CSigScan(void) {
-    delete[] sig_str;
-    delete[] sig_mask;
-}
- 
-/* Get base address of the server module (base_addr) and get its ending offset (base_len) */
-bool CSigScan::GetModuleMemInfo(void) {
-    void *pAddr = module_handle;
-	base_addr = 0;
-    base_len = 0;
+	void* pAddr = m_moduleHandle;
  
     MEMORY_BASIC_INFORMATION mem;
  
-    if(!pAddr)
-        return false; // GetDllMemInfo failed!pAddr
- 
     if(!VirtualQuery(pAddr, &mem, sizeof(mem)))
-        return false;
+        return;
  
-    base_addr = (unsigned char*)mem.AllocationBase;
+	m_pModuleBase = (unsigned char*)mem.AllocationBase;
+	if(m_pModuleBase == NULL)
+		return;
+
+    IMAGE_DOS_HEADER* dos = (IMAGE_DOS_HEADER*)mem.AllocationBase;
+    IMAGE_NT_HEADERS* pe = (IMAGE_NT_HEADERS*)((unsigned long)dos+(unsigned long)dos->e_lfanew);
  
-    IMAGE_DOS_HEADER *dos = (IMAGE_DOS_HEADER*)mem.AllocationBase;
-    IMAGE_NT_HEADERS *pe = (IMAGE_NT_HEADERS*)((unsigned long)dos+(unsigned long)dos->e_lfanew);
+    if(pe->Signature != IMAGE_NT_SIGNATURE)
+        return; // Constructor failed: pe points to a bad location
  
-    if(pe->Signature != IMAGE_NT_SIGNATURE) {
-        base_addr = 0;
-        return false; // GetDllMemInfo failedpe points to a bad location
-    }
- 
-    base_len = (size_t)pe->OptionalHeader.SizeOfImage;
- 
-    return true;
+	m_moduleLen = (size_t)pe->OptionalHeader.SizeOfImage;
+
+	m_isReady = true;
 }
- 
-/* Scan for the signature in memory then return the starting position's address */
-void* CSigScan::FindSignature(void) {
-    unsigned char *pBasePtr = base_addr;
-    unsigned char *pEndPtr = base_addr+base_len;
-    size_t i;
- 
-    while(pBasePtr < pEndPtr) {
-        for(i = 0;i < sig_len;i++) {
-            if((sig_mask[i] != '?') && (sig_str[i] != pBasePtr[i]))
+
+void* CSigScan::Scan(unsigned char* sig, char* mask)
+{
+	int sigLength = strlen(mask);
+	return Scan(sig, mask, sigLength);
+}
+
+void* CSigScan::Scan(unsigned char* sig, char* mask, int sigLength)
+{
+	if(!m_isReady)
+		return NULL;
+
+	unsigned char *pData = m_pModuleBase;
+	unsigned char *pEnd = m_pModuleBase + m_moduleLen;
+
+    while(pData < pEnd) 
+	{
+		int i;
+        for(i = 0; i < sigLength; i++)
+		{
+            if(mask[i] != '?' && sig[i] != pData[i])
                 break;
         }
 
-        // If 'i' reached the end, we know we have a match!
-        if(i == sig_len)
-            return (void*)pBasePtr;
- 
-        pBasePtr++;
+		// The for loop finished on its own accord
+        if(i == sigLength)
+		{            
+			return (void*)pData;
+		}
+
+        pData++;
     }
- 
-    return NULL;
+
+	return NULL;
 }

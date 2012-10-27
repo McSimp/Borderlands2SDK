@@ -9,6 +9,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua521", "Lua521\Lua521.vcxproj", "{EDA83C37-464B-4DD8-885C-2705704FB678}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher", "Launcher\Launcher.csproj", "{856ACDD6-46D1-48C1-BFBD-96EE159C7CEE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{312030EA-3158-47A8-A9EC-4C28FDBF0F3E} = {312030EA-3158-47A8-A9EC-4C28FDBF0F3E}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GWEN-Static", "GWEN-Static\GWEN-Static.vcxproj", "{DA10CAE2-85BC-4B80-89A0-62C3FC3AFE38}"
 EndProject

@@ -6,27 +6,26 @@ CSimpleDetour::CSimpleDetour(void **old, void *replacement)
 	m_fnReplacement = replacement;
 }
 
-void CSimpleDetour::Attach()
+bool CSimpleDetour::Attach()
 {
 	DetourTransactionBegin();
 	DetourUpdateThread(GetCurrentThread());
 
 	DetourAttach(m_fnOld, m_fnReplacement);
 
-	DetourTransactionCommit();
-
-	m_bAttached = true;
+	m_bAttached = (DetourTransactionCommit() == NO_ERROR);
+	return m_bAttached;
 }
 
-void CSimpleDetour::Detach()
+bool CSimpleDetour::Detach()
 {
-	if (!m_bAttached)
-		return;
+	if(!m_bAttached)
+		return false;
 
 	DetourTransactionBegin();
 	DetourUpdateThread(GetCurrentThread());
 
 	DetourDetach(m_fnOld, m_fnReplacement);
 
-	DetourTransactionCommit();
+	return (DetourTransactionCommit() == NO_ERROR);
 }

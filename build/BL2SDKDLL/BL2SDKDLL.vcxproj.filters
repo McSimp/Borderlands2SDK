@@ -138,6 +138,9 @@
     <ClCompile Include="..\..\src\BL2SDK\Settings.cpp">
       <Filter>Source Files\BL2SDK</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\BL2SDK\Util.cpp">
+      <Filter>Source Files\BL2SDK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Logging\Logging.h">
@@ -300,6 +303,9 @@
       <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\BL2SDK\Settings.h">
+      <Filter>Header Files\BL2SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BL2SDK\Util.h">
       <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
   </ItemGroup>

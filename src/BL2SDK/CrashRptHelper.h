@@ -6,6 +6,9 @@ namespace CrashRptHelper
 {
 	bool Initialize();
 	void Cleanup();
+	//int InstallThread();
+	bool SoftCrash();
+	bool GenerateReport(unsigned int code, PEXCEPTION_POINTERS ep);
 }
 
 #endif
