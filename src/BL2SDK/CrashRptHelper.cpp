@@ -6,9 +6,12 @@
 
 // Am I a horrible person for using this?
 #define CRASHRPTFUNC(func) p##func = (p##func##t)GetProcAddress(hCrashRpt, #func)
+#define CRASHRPT_ERROR(name) TCHAR (##name)[256]; pcrGetLastErrorMsgW(##name, 256)
 
 namespace CrashRptHelper
 {
+	// Surely there must be a better way to do this.
+
 	typedef int (WINAPI *pcrInstallWt)(PCR_INSTALL_INFOW);
 	typedef int (WINAPI *pcrUninstallt)();
 	typedef int (WINAPI *pcrGetLastErrorMsgWt)(LPWSTR pszBuffer, UINT uBuffSize);
@@ -16,6 +19,7 @@ namespace CrashRptHelper
 	//typedef int (WINAPI *pcrInstallToCurrentThread2t)(DWORD dwFlags);
 	typedef int (WINAPI *pcrGenerateErrorReportt)(CR_EXCEPTION_INFO* pExceptionInfo);
 	typedef int (WINAPI *pcrAddPropertyWt)(LPCWSTR pszPropName, LPCWSTR pszPropValue);
+	typedef int (WINAPI *pcrAddRegKeyWt)(LPCWSTR pszRegKey, LPCWSTR pszDstFileName, DWORD dwFlags);
 
 	HMODULE hCrashRpt = NULL;
 	pcrInstallWt pcrInstallW = NULL; 
@@ -25,6 +29,7 @@ namespace CrashRptHelper
 	//pcrInstallToCurrentThread2t pcrInstallToCurrentThread2 = NULL;
 	pcrGenerateErrorReportt pcrGenerateErrorReport = NULL;
 	pcrAddPropertyWt pcrAddPropertyW = NULL;
+	pcrAddRegKeyWt pcrAddRegKeyW = NULL;
 
 	bool GetGameVersion(std::wstring& appVersion)
 	{
@@ -35,7 +40,7 @@ namespace CrashRptHelper
 		DWORD dwSize = GetFileVersionInfoSize(szFilename, &dwDummy);
 		if(dwSize == 0)
 		{
-			Logging::Log("[CrashRpt] GetFileVersionInfoSize failed with error %d\n", GetLastError());
+			Logging::Log("[CrashRpt] ERROR: GetFileVersionInfoSize failed with error %d\n", GetLastError());
 			return false;
 		}
 		
@@ -44,7 +49,7 @@ namespace CrashRptHelper
 		// Load the version info
 		if(!GetFileVersionInfo(szFilename, NULL, dwSize, &lpVersionInfo[0]))
 		{
-			Logging::Log("[CrashRpt] GetFileVersionInfo failed with error %d\n", GetLastError());
+			Logging::Log("[CrashRpt] ERROR: GetFileVersionInfo failed with error %d\n", GetLastError());
 			return false;
 		}
 
@@ -54,7 +59,7 @@ namespace CrashRptHelper
 
 		if(!VerQueryValue(&lpVersionInfo[0], L"\\", (LPVOID*)&lpFfi, &iProductVersionLen))
 		{
-			Logging::Log("[CrashRpt] Can't obtain FixedFileInfo from resources\n");
+			Logging::Log("[CrashRpt] ERROR: Can't obtain FixedFileInfo from resources\n");
 			return false;
 		}
 
@@ -88,7 +93,7 @@ namespace CrashRptHelper
 		hCrashRpt = LoadLibrary(dllPath.c_str());
 		if(hCrashRpt == NULL)
 		{
-			Logging::Log("[CrashRpt] Failed to load CrashRpt library\n");
+			Logging::Log("[CrashRpt] ERROR: Failed to load CrashRpt library\n");
 			return false;
 		}
 
@@ -100,10 +105,12 @@ namespace CrashRptHelper
 		//CRASHRPTFUNC(crInstallToCurrentThread2);
 		CRASHRPTFUNC(crGenerateErrorReport);
 		CRASHRPTFUNC(crAddPropertyW);
+		CRASHRPTFUNC(crAddRegKeyW);
 
-		if(!pcrInstallW || !pcrUninstall || !pcrGetLastErrorMsgW || !pcrAddFile2W /*|| !pcrInstallToCurrentThread2*/ || !pcrGenerateErrorReport || !pcrAddPropertyW)
+		// TOOD: Merge this into CRASHRPTFUNC which I should probably make inline
+		if(!pcrInstallW || !pcrUninstall || !pcrGetLastErrorMsgW || !pcrAddFile2W /*|| !pcrInstallToCurrentThread2*/ || !pcrGenerateErrorReport || !pcrAddPropertyW || !pcrAddRegKeyW)
 		{
-			Logging::Log("[CrashRpt] Failed to find all CrashRpt functions\n");
+			Logging::Log("[CrashRpt] ERROR: Failed to find all CrashRpt functions\n");
 			return false;
 		}
 		
@@ -125,9 +132,8 @@ namespace CrashRptHelper
 		if(result != 0)
 		{    
 			// Something goes wrong. Get error message.
-			TCHAR szErrorMsg[256];        
-			pcrGetLastErrorMsgW(szErrorMsg, 256);    
-			Logging::Log("[CrashRpt] Failed to install CrashRpt. Result = %i, Error = %ls\n", result, szErrorMsg);
+			CRASHRPT_ERROR(szErrorMsg);
+			Logging::Log("[CrashRpt] ERROR: Failed to install CrashRpt. Result = %i, Error = %ls\n", result, szErrorMsg);
 			return false;
 		} 
 		
@@ -139,6 +145,15 @@ namespace CrashRptHelper
 		if(GetGameVersion(gameVer))
 		{
 			pcrAddPropertyW(L"BL2VER", gameVer.c_str());
+		}
+
+		// Add the BL2SDK registry key
+		int regResult = pcrAddRegKeyW(L"HKEY_CURRENT_USER\\Software\\BL2SDK", L"regkey.xml", 0);
+		if(regResult != 0)
+		{
+			CRASHRPT_ERROR(szErrorMsg);
+			Logging::Log("[CrashRpt] ERROR: Failed to add registry key to crashrpt. Result = %i, Error = %ls\n", regResult, szErrorMsg);
+			return false;
 		}
 
 		return true;
@@ -178,9 +193,8 @@ namespace CrashRptHelper
 		int result = pcrGenerateErrorReport(&ei);
 		if(result != 0)
 		{
-			TCHAR szErrorMsg[256];
-			pcrGetLastErrorMsgW(szErrorMsg, 256);
-			Logging::Log("[CrashRpt] Failed to generate report. Result = %i, Error = %ls\n", result, szErrorMsg);
+			CRASHRPT_ERROR(szErrorMsg);
+			Logging::Log("[CrashRpt] ERROR: Failed to generate report. Result = %i, Error = %ls\n", result, szErrorMsg);
 			return false;
 		}
 		else

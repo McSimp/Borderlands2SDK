@@ -4,6 +4,7 @@
 
 #include "BL2SDK/BL2SDK.h"
 #include "Logging/Logging.h"
+#include "BL2SDK/Util.h"
 
 namespace Logging
 {
@@ -13,7 +14,7 @@ namespace Logging
 	bool				bLogToGameConsole		= false;
 	UWillowConsole*		pGameConsole			= NULL;
 
-	void LogToFile(char *szBuff, int len)
+	void LogToFile(const char *szBuff, int len)
 	{
 		if(hLogFile != INVALID_HANDLE_VALUE)
 		{
@@ -23,7 +24,7 @@ namespace Logging
 		}
 	}
 
-	void LogWinConsole(char *szBuff, int len)
+	void LogWinConsole(const char *szBuff, int len)
 	{
 		HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 		DWORD dwBytesWritten = 0;
@@ -34,41 +35,25 @@ namespace Logging
 	{
 		va_list args;
 		va_start(args, szFmt);
-
-		int buffSize = _vscprintf(szFmt, args) + 1;
-
-		if (buffSize <= 1)
-			return;
-
-		char *szBuff = new char[buffSize];
-		memset(szBuff, 0, buffSize);
-
-		int len = vsprintf_s(szBuff, buffSize, szFmt, args);
-
-		szBuff[buffSize - 1] = 0;
+		std::string formatted = Util::Format(szFmt, args); 
+		va_end(args);
 
 		if(bLogToExternalConsole)
-			LogWinConsole(szBuff, len);
+			LogWinConsole(formatted.c_str(), formatted.length());
 
 		if(bLogToFile)
-			LogToFile(szBuff, len);
-
+			LogToFile(formatted.c_str(), formatted.length());
+		
 		if(bLogToGameConsole)
 		{
 			if(pGameConsole != NULL)
 			{
 				// TODO: Abstract away char -> wchar conversion (perhaps use Boost::widen)
-				wchar_t* wa = new wchar_t[buffSize];
-				memset(wa, 0, buffSize);
-				mbstowcs(wa, szBuff, len);
-				wa[buffSize - 1] = 0;
+				std::wstring wfmt = Util::Widen(formatted);
 				BL2SDK::InjectedCallNext();
-				pGameConsole->eventOutputText(FString(wa));
-				delete[] wa;
+				pGameConsole->eventOutputText(FString((wchar_t*)wfmt.c_str()));
 			}
 		}
-
-		delete[] szBuff;
 	}
 
 	bool InitializeExtern()
@@ -106,7 +91,7 @@ namespace Logging
 		}
 		else
 		{
-			Log("[LOGGING] Attempted to hook game console but 'WillowConsole WillowGameEngine.WillowGameViewportClient.WillowConsole' was not found.\n");
+			Log("[Logging] ERROR: Attempted to hook game console but 'WillowConsole WillowGameEngine.WillowGameViewportClient.WillowConsole' was not found.\n");
 		}
 	}
 

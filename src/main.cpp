@@ -99,14 +99,14 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 		case DLL_PROCESS_ATTACH:
 			DisableThreadLibraryCalls(hModule);	
 			CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)onAttach, NULL, 0, NULL);
-			return true;
+			return TRUE;
 		break;
 
 		case DLL_PROCESS_DETACH:
 			// TODO: Graceful detach
 			Logging::Cleanup();
 			CrashRptHelper::Cleanup();
-			return true;
+			return FALSE;
 		break;
 	}
 }

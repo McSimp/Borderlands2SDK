@@ -118,7 +118,7 @@ namespace BL2SDK
 		}
 		else
 		{
-			Logging::Log("[Engine Hooks] Failed to remove hook for \"%s\"\n", pFunction->GetFullName());
+			Logging::Log("[Engine Hooks] ERROR: Failed to remove hook for \"%s\"\n", pFunction->GetFullName());
 		}
 	}
 
@@ -153,7 +153,7 @@ namespace BL2SDK
 
 		if(!sigscan.IsReady())
 		{
-			Logging::Log("[ERROR] Code = SDKMEMBASEERR. Failed to find base of Borderlands2.exe\n");
+			Logging::Log("[Internal] ERROR: Code = SDKMEMBASEERR. Failed to find base of Borderlands2.exe\n");
 			return false;
 		}
 
@@ -161,36 +161,42 @@ namespace BL2SDK
 		unsigned char* pGObjects = (unsigned char*)sigscan.Scan((unsigned char*)GObjects_Pattern, GObjects_Mask);
 		if(pGObjects == NULL)
 		{
-			Logging::Log("[ERROR] Code = GOBJSIGFAIL. Failed to sigscan for GObjects.\n");	
+			Logging::Log("[Internal] ERROR: Code = GOBJSIGFAIL. Failed to sigscan for GObjects.\n");	
 			return false;
 		}
+
 		pGObjects += MOV_OP_OFFSET;
 		addrGObjects = *(unsigned long*)pGObjects;
+		Logging::Log("[Internal] GObjects = 0x%X\n", addrGObjects);
 
 		// Sigscan for GNames
 		unsigned char* pGNames = (unsigned char*)sigscan.Scan((unsigned char*)GNames_Pattern, GNames_Mask);
 		if(pGNames == NULL)
 		{
-			Logging::Log("[ERROR] Code = GNAMESSIGFAIL. Failed to sigscan for GNames.\n");	
+			Logging::Log("[Internal] ERROR: Code = GNAMESSIGFAIL. Failed to sigscan for GNames.\n");	
 			return false;
 		}
+
 		pGNames += MOV_OP_OFFSET;
 		addrGNames = *(unsigned long*)pGNames;
+		Logging::Log("[Internal] GNames = 0x%X\n", addrGNames);
 
 		// Sigscan for UObject::ProcessEvent which will be used for pretty much everything
 		void* addrProcEvent = sigscan.Scan((unsigned char*)ProcessEvent_Pattern, ProcessEvent_Mask);
 		if(addrProcEvent == NULL)
 		{
-			Logging::Log("[ERROR] Code = PROCEVENTSIGFAIL. Failed to sigscan for UObject::ProcessEvent().\n");	
+			Logging::Log("[Internal] ERROR: Code = PROCEVENTSIGFAIL. Failed to sigscan for UObject::ProcessEvent().\n");	
 			return false;
 		}
+
 		pProcessEvent = reinterpret_cast<tProcessEvent>(addrProcEvent);
-		
+		Logging::Log("[Internal] UObject::ProcessEvent() = 0x%X\n", pProcessEvent);
+
 		// Detour UObject::ProcessEvent()
 		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkRawProcessEvent);
 		if(!detProcessEvent.Attach())
 		{
-			Logging::Log("[ERROR] Code = PROCEVENTDETOURFAIL. Failed to attach to UObject::ProcessEvent().\n");
+			Logging::Log("[Internal] ERROR: Code = PROCEVENTDETOURFAIL. Failed to attach to UObject::ProcessEvent().\n");
 			return false;
 		}
 
@@ -198,17 +204,17 @@ namespace BL2SDK
 		void* addrUnrealEH = sigscan.Scan((unsigned char*)CrashHandler_Pattern, CrashHandler_Mask);
 		if(addrUnrealEH == NULL)
 		{
-			Logging::Log("[ERROR] Code = CRASHHANDLERSIGFAIL. Failed to sigscan for Unreal Exception Handler.\n");	
+			Logging::Log("[Internal] ERROR: Code = CRASHHANDLERSIGFAIL. Failed to sigscan for Unreal Exception Handler.\n");	
 			return false;
 		}
 
-		Logging::Log("Unreal Crash handler = 0x%X\n", addrUnrealEH);
+		Logging::Log("[Internal] Unreal Crash handler = 0x%X\n", addrUnrealEH);
 
 		// Detour Unreal exception handler
 		SETUP_SIMPLE_DETOUR(detUnrealEH, addrUnrealEH, UnrealExceptionHandler);
 		if(!detUnrealEH.Attach())
 		{
-			Logging::Log("[ERROR] Code = CRASHHANDLERDETOURFAIL. Failed to attach to Unreal Exception Handler.\n");
+			Logging::Log("[Internal] ERROR: Code = CRASHHANDLERDETOURFAIL. Failed to attach to Unreal Exception Handler.\n");
 			return false;
 		}
 
