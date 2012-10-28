@@ -39,7 +39,6 @@ namespace Util
 		return str;
 	}
 
-	// TODO: Fix this
 	std::wstring Format(const wchar_t* fmt, ...)
 	{
 		va_list args;

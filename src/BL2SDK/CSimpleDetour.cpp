@@ -1,4 +1,4 @@
-#include "Detours/CSimpleDetour.h"
+#include "BL2SDK/CSimpleDetour.h"
 
 CSimpleDetour::CSimpleDetour(void **old, void *replacement)
 {

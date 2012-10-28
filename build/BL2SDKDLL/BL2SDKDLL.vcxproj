@@ -56,13 +56,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;BL2SDKDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src;..\..\thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src;..\..\thirdparty;..\..\thirdparty\gwen\include;$(DXSDK_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\lib;..\..\thirdparty;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Lua521d.lib;detours.lib;version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\lib;..\..\thirdparty;$(DXSDK_DIR)\Lib\x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Lua521d.lib;detours.lib;version.lib;d3d9.lib;d3dx9.lib;gwenstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -78,15 +78,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;BL2SDKDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src;..\..\thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src;..\..\thirdparty;..\..\thirdparty\gwen\include;$(DXSDK_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\lib;..\..\thirdparty;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>CrashRpt1400.lib;Lua521.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\lib;..\..\thirdparty;$(DXSDK_DIR)\Lib\x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Lua521.lib;detours.lib;version.lib;d3d9.lib;d3dx9.lib;gwenstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -103,7 +103,7 @@
     <ClCompile Include="..\..\src\Commands\ConCmdManager.cpp" />
     <ClCompile Include="..\..\src\Commands\LuaCommands.cpp" />
     <ClCompile Include="..\..\src\Commands\SlotMachines.cpp" />
-    <ClCompile Include="..\..\src\Detours\CSimpleDetour.cpp" />
+    <ClCompile Include="..\..\src\BL2SDK\CSimpleDetour.cpp" />
     <ClCompile Include="..\..\src\GameSDK\AkAudio_functions.cpp" />
     <ClCompile Include="..\..\src\GameSDK\Core_functions.cpp" />
     <ClCompile Include="..\..\src\GameSDK\Engine_functions.cpp" />
@@ -115,6 +115,9 @@
     <ClCompile Include="..\..\src\GameSDK\WillowGame_functions.cpp" />
     <ClCompile Include="..\..\src\GameSDK\WinDrv_functions.cpp" />
     <ClCompile Include="..\..\src\GameSDK\XAudio2_functions.cpp" />
+    <ClCompile Include="..\..\src\GUI\D3D9Hook.cpp" />
+    <ClCompile Include="..\..\src\GUI\DirectX9.cpp" />
+    <ClCompile Include="..\..\src\GUI\GwenManager.cpp" />
     <ClCompile Include="..\..\src\Logging\Logging.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\LUObject.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\LUObjects.cpp" />
@@ -129,8 +132,8 @@
     <ClInclude Include="..\..\src\BL2SDK\Util.h" />
     <ClInclude Include="..\..\src\Commands\ConCommand.h" />
     <ClInclude Include="..\..\src\Commands\ConCmdManager.h" />
-    <ClInclude Include="..\..\src\Detours\CSimpleDetour.h" />
-    <ClInclude Include="..\..\src\Detours\detours.h" />
+    <ClInclude Include="..\..\src\BL2SDK\CSimpleDetour.h" />
+    <ClInclude Include="..\..\src\BL2SDK\detours.h" />
     <ClInclude Include="..\..\src\GameSDK\AkAudio_classes.h" />
     <ClInclude Include="..\..\src\GameSDK\AkAudio_f_structs.h" />
     <ClInclude Include="..\..\src\GameSDK\AkAudio_structs.h" />
@@ -166,6 +169,8 @@
     <ClInclude Include="..\..\src\GameSDK\XAudio2_classes.h" />
     <ClInclude Include="..\..\src\GameSDK\XAudio2_f_structs.h" />
     <ClInclude Include="..\..\src\GameSDK\XAudio2_structs.h" />
+    <ClInclude Include="..\..\src\GUI\D3D9Hook.h" />
+    <ClInclude Include="..\..\src\GUI\GwenManager.h" />
     <ClInclude Include="..\..\src\Logging\Logging.h" />
     <ClInclude Include="..\..\src\LuaInterface\LuaInterface.h" />
     <ClInclude Include="..\..\src\LuaInterface\LUObject.h" />

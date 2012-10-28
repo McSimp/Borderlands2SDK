@@ -3,7 +3,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
-#include "Detours/detours.h"
+#include "BL2SDK/detours.h"
 
 class CSimpleDetour
 {

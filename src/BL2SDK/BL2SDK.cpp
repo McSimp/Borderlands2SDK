@@ -1,5 +1,5 @@
 #include "BL2SDK/BL2SDK.h"
-#include "Detours/CSimpleDetour.h"
+#include "BL2SDK/CSimpleDetour.h"
 #include "Logging/Logging.h"
 #include "BL2SDK/CSigScan.h"
 #include "BL2SDK/CrashRptHelper.h"

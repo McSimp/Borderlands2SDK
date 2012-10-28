@@ -16,14 +16,8 @@
     <Filter Include="Source Files\Logging">
       <UniqueIdentifier>{4072eddc-3f0c-4bac-b2d3-e90bae5ba6d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Detours">
-      <UniqueIdentifier>{32aa7d9c-9bfb-4064-bece-33c75ada9835}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Logging">
       <UniqueIdentifier>{845e7694-df46-444f-b2a8-57f0e581c558}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Detours">
-      <UniqueIdentifier>{11b10924-ee24-411a-b86e-cce0982e284c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\GameSDK">
       <UniqueIdentifier>{4ef315b5-b08b-4c21-84c0-d34735521771}</UniqueIdentifier>
@@ -58,13 +52,16 @@
     <Filter Include="Header Files\Third Party\Crashrpt">
       <UniqueIdentifier>{c23ea6ef-c8de-40f8-873b-903173f61285}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GUI">
+      <UniqueIdentifier>{55774d1c-95c3-4f69-a059-bd50b32fdf0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GUI">
+      <UniqueIdentifier>{de52e3cf-a5e0-4a44-bda6-ddaa9973971c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Logging\Logging.cpp">
       <Filter>Source Files\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Detours\CSimpleDetour.cpp">
-      <Filter>Source Files\Detours</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\GameSDK\WinDrv_functions.cpp">
       <Filter>Source Files\GameSDK</Filter>
@@ -138,16 +135,22 @@
     <ClCompile Include="..\..\src\BL2SDK\Util.cpp">
       <Filter>Source Files\BL2SDK</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\BL2SDK\CSimpleDetour.cpp">
+      <Filter>Source Files\BL2SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\D3D9Hook.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\GwenManager.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\DirectX9.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Logging\Logging.h">
       <Filter>Header Files\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Detours\CSimpleDetour.h">
-      <Filter>Header Files\Detours</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Detours\detours.h">
-      <Filter>Header Files\Detours</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\GameSDK\AkAudio_structs.h">
       <Filter>Header Files\GameSDK</Filter>
@@ -301,6 +304,18 @@
     </ClInclude>
     <ClInclude Include="..\..\src\BL2SDK\Util.h">
       <Filter>Header Files\BL2SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BL2SDK\CSimpleDetour.h">
+      <Filter>Header Files\BL2SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BL2SDK\detours.h">
+      <Filter>Header Files\BL2SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\GwenManager.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\D3D9Hook.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,6 +8,7 @@
 #include "BL2SDK/Settings.h"
 #include "BL2SDK/CrashRptHelper.h"
 #include "BL2SDK/Util.h"
+#include "GUI/D3D9Hook.h"
 
 // TODO: Get these out of here
 CON_COMMAND(CrashMe)
@@ -84,11 +85,18 @@ DWORD WINAPI onAttach(LPVOID lpParameter)
 	{
 		// This usually wouldn't run because CrashRpt should handle things.
 		// If CrashRpt doesn't install properly for some reason, this will have to do.
-		Util::Popup(L"SDK ERROR", L"An error occurred while loading the SDK. Please check the logfile for details.");	
+		Util::Popup(L"SDK ERROR", L"An error occurred while hooking into the game. Please check the logfile for details.");	
 		return 0;
 	}
 
-	BL2SDK::RegisterHook("Function WillowGame.WillowGameInfo.InitGame", &GameReady);	
+	if(!D3D9Hook::Initialize())
+	{
+		// Same goes as above
+		Util::Popup(L"SDK ERROR", L"An error occurred while hooking DirectX. Please check the logfile for details.");	
+		return 0;
+	}
+
+	BL2SDK::RegisterHook("Function WillowGame.WillowGameInfo.InitGame", &GameReady);
 	return 0;
 }
 

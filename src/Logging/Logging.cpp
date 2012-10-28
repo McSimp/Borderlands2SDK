@@ -66,7 +66,7 @@ namespace Logging
 		return result;
 	}
 
-	bool InitializeFile(std::wstring &fileName)
+	bool InitializeFile(const std::wstring& fileName)
 	{
 		hLogFile = CreateFile(fileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if(hLogFile == INVALID_HANDLE_VALUE)
