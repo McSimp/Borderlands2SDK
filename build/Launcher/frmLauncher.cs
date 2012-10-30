@@ -6,14 +6,26 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.ComponentModel;
+using System.Threading;
 
 namespace Launcher
 {
     public partial class frmLauncher : Form
     {
+        private Thread InjectorThread;
+        private string GamePath;
+
         public frmLauncher()
         {
+            CreateInjectorThread();
+
             InitializeComponent();
+        }
+
+        private void CreateInjectorThread()
+        {
+            this.InjectorThread = new Thread(new ThreadStart(this.WaitAndInject));
+            this.InjectorThread.IsBackground = true;
         }
 
         private string GetStartPath()
@@ -100,8 +112,87 @@ namespace Launcher
             }
         }
 
+        private void ResetButton()
+        {
+            btnLaunch.Invoke(new MethodInvoker(
+                delegate
+                {
+                    btnLaunch.Text = "Launch Game";
+                    btnLaunch.Enabled = true;
+                }
+            ));
+        }
+
+        private void WaitAndInject()
+        {
+            DateTime start = DateTime.Now;
+            string procName = Path.GetFileNameWithoutExtension(this.GamePath);
+
+            // Wait 30 seconds for Steam to get its shit together
+            while ((DateTime.Now - start).Seconds < 30)
+            {
+                Process[] procs = Process.GetProcessesByName(procName);
+                if (procs[0] == null)
+                {
+                    continue;
+                }
+
+                Process bl2Proc = procs[0];
+
+                string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+                // Yuck.
+                try
+                {
+                    Injector.Inject(Path.Combine(currentDir, "BL2SDKDLL.dll"), bl2Proc);
+                }
+                catch (Win32Exception e)
+                {
+                    MessageBox.Show("Failed to inject SDK into Borderlands 2. Exception Message = " + e.Message + " Code = " + e.NativeErrorCode, "Failed to launch", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    //Win32.TerminateProcess(lpProcessInformation.hProcess, 0);
+                    bl2Proc.Kill();
+
+                    ResetButton();
+                    return;
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Failed to inject SDK into Borderlands 2. Exception = " + e.Message, "Failed to launch", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    //Win32.TerminateProcess(lpProcessInformation.hProcess, 0);
+                    bl2Proc.Kill();
+
+                    ResetButton();
+                    return;
+                }
+
+                foreach (ProcessThread thread in bl2Proc.Threads)
+                {
+                    IntPtr hThread = Win32.OpenThread(
+                        Win32.ThreadAccessFlags.SuspendResume,
+                        false,
+                        (uint)thread.Id);
+
+                    Win32.ResumeThread(hThread);
+                    Win32.CloseHandle(hThread);
+                }
+
+                return;
+            }
+
+            MessageBox.Show("Failed to find game after 30 seconds", "Failed to launch", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ResetButton();
+        }
+
         private void btnLaunch_Click(object sender, EventArgs ea)
         {
+            if (this.InjectorThread.ThreadState == System.Threading.ThreadState.Stopped)
+            {
+                // Need to remake the thread
+                CreateInjectorThread();
+            }
+
             SetupRegistry();
             
             string gamePath = txtGamePath.Text;
@@ -117,6 +208,7 @@ namespace Launcher
                 return;
             }
 
+            this.GamePath = gamePath;
             string gameDir = Path.GetDirectoryName(gamePath);
 
             Win32.STARTUPINFO lpStartupInfo = new Win32.STARTUPINFO();
@@ -143,53 +235,10 @@ namespace Launcher
                 btnLaunch.Enabled = false;
                 btnLaunch.Text = "Injecting into Borderlands 2...";
 
-                string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                Process bl2Proc = Process.GetProcessById(lpProcessInformation.dwProcessId);
+                this.InjectorThread.Start();
 
-                // Yuck.
-                try
-                {
-                    Injector.Inject(Path.Combine(currentDir, "BL2SDKDLL.dll"), bl2Proc);
-                }
-                catch (Win32Exception e)
-                {
-                    MessageBox.Show("Failed to inject SDK into Borderlands 2. Exception Message = " + e.Message + " Code = " + e.NativeErrorCode, "Failed to launch", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    Win32.TerminateProcess(lpProcessInformation.hProcess, 0);
-                    
-                    btnLaunch.Enabled = true;
-                    btnLaunch.Text = "Launch Game";
-                    return;
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show("Failed to inject SDK into Borderlands 2. Exception = " + e.Message, "Failed to launch", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    Win32.TerminateProcess(lpProcessInformation.hProcess, 0);
-
-                    btnLaunch.Enabled = true;
-                    btnLaunch.Text = "Launch Game";
-                    return;
-                }
-                finally
-                {
-                    Win32.CloseHandle(lpProcessInformation.hProcess);
-                    Win32.CloseHandle(lpProcessInformation.hThread);
-                }
-
-                foreach (ProcessThread thread in bl2Proc.Threads)
-                {
-                    IntPtr hThread = Win32.OpenThread(
-                        Win32.ThreadAccessFlags.SuspendResume,
-                        false,
-                        (uint)thread.Id);
-
-                    Win32.ResumeThread(hThread);
-                    Win32.CloseHandle(hThread);
-                }
-
-                btnLaunch.Enabled = true;
-                btnLaunch.Text = "Injected";
+                Win32.CloseHandle(lpProcessInformation.hProcess);
+                Win32.CloseHandle(lpProcessInformation.hThread);
             }
             else
             {

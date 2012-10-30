@@ -22,9 +22,9 @@ namespace GwenManager
 		pSkin->Init("DefaultSkin.png"); // TODO: Load from GWEN location in registry
 
 		pCanvas = new Gwen::Controls::Canvas(pSkin);
-		pCanvas->SetSize(1024, 768);
-		pCanvas->SetDrawBackground(true);
-		pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 255));
+		pCanvas->SetSize(1024, 768); // TODO: Set Size dynamically
+		//pCanvas->SetDrawBackground(true);
+		//pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 255));
 
 		Logging::Log("[Gwen] Ready\n");
 		return true;

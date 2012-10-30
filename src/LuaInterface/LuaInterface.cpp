@@ -48,7 +48,7 @@ namespace LuaInterface
 			Logging::Log("Registering LUObjects\n");
 			LUObjects::Register(L);
 			lua_gc(L, LUA_GCRESTART, 0);
-
+			/*
 			int status = luaL_loadfile(L, "lua/includes/modules/concommand.lua");
 			if(status)
 			{
@@ -62,6 +62,7 @@ namespace LuaInterface
 				Logging::Log("[Lua] Error loading concommand module: %s\n", lua_tostring(L, -1));
 				return;
 			}
+			*/
 		}
 	}
 

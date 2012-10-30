@@ -88,7 +88,7 @@ namespace ConCmdManager
 			console->eventOutputText(FString((wchar_t*)s.str().c_str()));
 			iConCommands->second(cmd); // Run the concommand
 		}
-		else if(!issueLuaCommand(cmd)) // Maybe Lua handles it, it'll do it's thing
+		else if(/*!issueLuaCommand(cmd)*/ true) // Maybe Lua handles it, it'll do it's thing
 		{
 			Logging::Log("[ConCmd] Command not recognized by SDK, passing to engine\n");
 			BL2SDK::InjectedCallNext();

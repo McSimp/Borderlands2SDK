@@ -120,7 +120,7 @@ namespace CrashRptHelper
 		info.cb = sizeof(CR_INSTALL_INFO);    
 		info.pszAppName = L"Borderlands 2 SDK";  
 		info.pszAppVersion = BL2SDK::VersionW.c_str();
-		info.pszUrl = L"http://localhost/crash/crashrpt.php";  
+		info.pszUrl = L"http://mcsi.mp/cr/crashrpt.php";  
 		info.pfnCrashCallback = CrashCallback;   
 		info.uPriorities[CR_HTTP] = 1;
 		info.dwFlags |= CR_INST_ALL_POSSIBLE_HANDLERS;
