@@ -9,6 +9,7 @@
 #include "BL2SDK/CrashRptHelper.h"
 #include "BL2SDK/Util.h"
 #include "GUI/D3D9Hook.h"
+#include "BL2SDK/EngineHooks.h"
 
 // TODO: Get these out of here
 CON_COMMAND(CrashMe)
@@ -65,7 +66,7 @@ bool GameReady(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResu
 
 	ConCmdManager::Initialize();
 
-	BL2SDK::RemoveHook(pFunction);
+	EngineHooks::RemoveStaticHook(pFunction, "StartupSDK");
 	return true;
 }
 
@@ -96,7 +97,7 @@ DWORD WINAPI onAttach(LPVOID lpParameter)
 		return 0;
 	}
 
-	BL2SDK::RegisterHook("Function WillowGame.WillowGameInfo.InitGame", &GameReady);
+	EngineHooks::Register("Function WillowGame.WillowGameInfo.InitGame", "StartupSDK", &GameReady);	
 	return 0;
 }
 

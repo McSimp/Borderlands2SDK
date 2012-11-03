@@ -97,6 +97,7 @@
     <ClCompile Include="..\..\src\BL2SDK\BL2SDK.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\CrashRptHelper.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\CSigScan.cpp" />
+    <ClCompile Include="..\..\src\BL2SDK\EngineHooks.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Settings.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Util.cpp" />
     <ClCompile Include="..\..\src\Commands\ConCommand.cpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="..\..\src\BL2SDK\BL2SDK.h" />
     <ClInclude Include="..\..\src\BL2SDK\CrashRptHelper.h" />
     <ClInclude Include="..\..\src\BL2SDK\CSigScan.h" />
+    <ClInclude Include="..\..\src\BL2SDK\EngineHooks.h" />
     <ClInclude Include="..\..\src\BL2SDK\Settings.h" />
     <ClInclude Include="..\..\src\BL2SDK\Util.h" />
     <ClInclude Include="..\..\src\Commands\ConCommand.h" />

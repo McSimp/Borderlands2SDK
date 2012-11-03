@@ -1,6 +1,7 @@
 #include "BL2SDK/BL2SDK.h"
 #include "Logging/Logging.h"
 #include "Commands/ConCommand.h"
+#include <map>
 
 enum SlotsPrizes
 {

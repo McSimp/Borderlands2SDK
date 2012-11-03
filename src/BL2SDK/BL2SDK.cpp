@@ -3,13 +3,12 @@
 #include "Logging/Logging.h"
 #include "BL2SDK/CSigScan.h"
 #include "BL2SDK/CrashRptHelper.h"
+#include "BL2SDK/EngineHooks.h"
 
 namespace BL2SDK
 {
 	bool										bInjectedCallNext = false;
 	bool										bLogAllEvents = false;
-	std::list<tFuncNameHookPair>				FuncsToFind;
-	std::map<UFunction*, tProcessEventHook*>	HookedFunctions;
 
 	unsigned long								addrGObjects;
 	unsigned long								addrGNames;
@@ -23,53 +22,29 @@ namespace BL2SDK
 		if(bInjectedCallNext)
 		{
 			bInjectedCallNext = false;
+			// Sooooo tempted to use a goto here
 			_asm popad;
 			pProcessEvent(pCaller, pFunction, pParms, pResult);
 			return;
 		}
 
-		// There might be a better way to do this, I don't know C++ very well
-		std::string CallerName = pCaller->GetFullName();
-		std::string FunctionName = pFunction->GetFullName();
-
 		if(bLogAllEvents)
 		{
+			std::string CallerName = pCaller->GetFullName();
+			std::string FunctionName = pFunction->GetFullName();
+
 			Logging::Log("===== ProcessEvent called =====\n");
 			Logging::Log("pCaller Name = %s\n", CallerName.c_str());
 			Logging::Log("pFunction Name = %s\n", FunctionName.c_str());
 		}
-
-		// Resolve the functions names that need to be hooked into function pointers for later
-		std::list<tFuncNameHookPair>::iterator iFuncsToFind;
-		//for(iFuncsToFind = FuncsToFind.begin(); iFuncsToFind != FuncsToFind.end(); iFuncsToFind++)
-		iFuncsToFind = FuncsToFind.begin();
-		while(iFuncsToFind != FuncsToFind.end())
+		
+		if(!EngineHooks::ProcessHooks(pCaller, pFunction, pParms, pResult))
 		{
-			tFuncNameHookPair p = *iFuncsToFind;
-			if(!p.first.compare(FunctionName))
-			{
-				Logging::Log("[Engine Hooks] Hook created for \"%s\"\n", FunctionName.c_str());
-				HookedFunctions.insert(std::make_pair(pFunction, p.second));
-				iFuncsToFind = FuncsToFind.erase(iFuncsToFind);
-			}
-			else
-			{
-				iFuncsToFind++;
-			}
+			// The engine hook manager told us not to pass this function to the engine
+			_asm popad;
+			return;
 		}
-
-		// Call the function hook (if any) for this pFunction
-		std::map<UFunction*, tProcessEventHook*>::iterator iHookedFunctions = HookedFunctions.find(pFunction);
-		if(iHookedFunctions != HookedFunctions.end())
-		{
-			if(!iHookedFunctions->second(pCaller, pFunction, pParms, pResult))
-			{
-				// If the hook returns false, then don't call ProcessEvent in the engine
-				_asm popad;
-				return;
-			}
-		}
-
+		
 		_asm popad;
 		pProcessEvent(pCaller, pFunction, pParms, pResult);
 		return;
@@ -99,28 +74,7 @@ namespace BL2SDK
 	void LogAllEvents(bool enabled)
 	{
 		bLogAllEvents = enabled;
-	}
-
-	void RegisterHook(const std::string& funcName, tProcessEventHook* funcHook)
-	{
-		tFuncNameHookPair pair = std::make_pair(funcName, funcHook);
-		FuncsToFind.push_back(pair);
-	}
-
-	void RemoveHook(UFunction* pFunction)
-	{
-		int origSize = HookedFunctions.size();
-		HookedFunctions.erase(pFunction);
-		int newSize = HookedFunctions.size();
-		if(newSize < origSize)
-		{
-			Logging::Log("[Engine Hooks] Hook removed for \"%s\"\n", pFunction->GetFullName());
-		}
-		else
-		{
-			Logging::Log("[Engine Hooks] ERROR: Failed to remove hook for \"%s\"\n", pFunction->GetFullName());
-		}
-	}
+	}	
 
 	unsigned long GObjects()
 	{

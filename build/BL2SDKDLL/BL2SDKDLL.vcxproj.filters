@@ -147,6 +147,9 @@
     <ClCompile Include="..\..\src\GUI\DirectX9.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\BL2SDK\EngineHooks.cpp">
+      <Filter>Source Files\BL2SDK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Logging\Logging.h">
@@ -316,6 +319,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\GUI\D3D9Hook.h">
       <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BL2SDK\EngineHooks.h">
+      <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,6 +3,7 @@
 #include "Commands/ConCmdManager.h"
 #include "Commands/ConCommand.h"
 #include "LuaInterface/LuaInterface.h"
+#include "BL2SDK/EngineHooks.h"
 
 #include <map>
 #include <sstream>
@@ -14,7 +15,7 @@ namespace ConCmdManager
 	typedef std::map<std::string, tConCommand*> tConCmdMap;
 	tConCmdMap ConCommands;
 
-	tArgsList &split(const std::string &s, char delim, tArgsList &elems) {
+	tArgsList& split(const std::string& s, char delim, tArgsList& elems) {
 		std::stringstream ss(s);
 		std::string item;
 		while(std::getline(ss, item, delim)) {
@@ -23,7 +24,7 @@ namespace ConCmdManager
 		return elems;
 	}
 
-	tArgsList split(const std::string &s, char delim) {
+	tArgsList split(const std::string& s, char delim) {
 		tArgsList elems;
 		return split(s, delim, elems);
 	}
@@ -101,7 +102,7 @@ namespace ConCmdManager
 	void Initialize()
 	{
 		// Hook into the engine's concmd system
-		BL2SDK::RegisterHook(std::string("Function Engine.Console.ConsoleCommand"), &ConCmdManager::eventConCommand);
+		EngineHooks::Register("Function Engine.Console.ConsoleCommand", "SDKConcmd", &ConCmdManager::eventConCommand);
 		ConCommand::RegisterCommands();
 	}
 
