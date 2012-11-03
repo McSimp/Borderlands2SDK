@@ -10,13 +10,17 @@
 CON_COMMAND(CrashMe)
 {
 	Logging::Log("Thread: %i\n", GetCurrentThreadId());
+	abort();
+	/*
 	// Define the infinite loop where some processing will be done 
 	for(;;)
 	{
 		// There is a hidden error somewhere inside of the loop...
 		int* p = NULL;
 		*p = 13; // This results in Access Violation
-	}  
+	}
+	*/
+	
 }
 
 CON_COMMAND(PrintSDKVersion)

@@ -6,10 +6,11 @@
 #include <iterator>
 #include <sstream>
 
-using LuaInterface::Lua;
+//using LuaInterface::Lua;
 
 CON_COMMAND(lua_run_cl)
 {
+	/*
 	std::stringstream ss;
 	std::copy(args.begin()+1, args.end(), std::ostream_iterator<std::string>(ss, " "));
 	std::string result = ss.str(); // There's a trailing space but lua shouldn't give a shit
@@ -35,10 +36,12 @@ CON_COMMAND(lua_run_cl)
 	{
 		Logging::Log("[Lua] Error: Lua state not initialized\n");
 	}
+	*/
 }
 
 CON_COMMAND(lua_openscript_cl)
 {
+	/*
 	std::stringstream ss;
 	std::copy(args.begin()+1, args.end(), std::ostream_iterator<std::string>(ss, " "));
 	std::string result = ss.str(); // There's a trailing space but lua shouldn't give a shit
@@ -63,4 +66,5 @@ CON_COMMAND(lua_openscript_cl)
 	{
 		Logging::Log("[Lua] Error: Lua state not initialized\n");
 	}
+	*/
 }

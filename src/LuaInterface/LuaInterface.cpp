@@ -26,28 +26,29 @@ namespace LuaInterface
 
 	int luaopen_BL2SDK(lua_State* L)
 	{
-		luaL_newlib(L, SDKLib);
+		//luaL_newlib(L, SDKLib);
 		return 1;
 	}
 
 	// We want Lua to only be in the game's main thread, so only call from ProcessEvent
 	void Initialize()
 	{
-		if(!L)
-		{
-			L = luaL_newstate();
-			luaL_openlibs(L);
+
+		//if(!L)
+		//{
+			//L = luaL_newstate();
+			//luaL_openlibs(L);
 
 			// Add in our BL2SDK module
-			luaL_requiref(L, "BL2SDK", luaopen_BL2SDK, 1);
+			//luaL_requiref(L, "BL2SDK", luaopen_BL2SDK, 1);
 			//lua_pop(L, 1);
 
 			// Register shit
-			Logging::Log("Registering LUObject\n");
-			LUObject::Register(L);
-			Logging::Log("Registering LUObjects\n");
-			LUObjects::Register(L);
-			lua_gc(L, LUA_GCRESTART, 0);
+			//Logging::Log("Registering LUObject\n");
+			//LUObject::Register(L);
+			//Logging::Log("Registering LUObjects\n");
+			//LUObjects::Register(L);
+			//lua_gc(L, LUA_GCRESTART, 0);
 			/*
 			int status = luaL_loadfile(L, "lua/includes/modules/concommand.lua");
 			if(status)
@@ -63,16 +64,16 @@ namespace LuaInterface
 				return;
 			}
 			*/
-		}
+		//}
 	}
 
 	void Shutdown()
 	{
-		if(L)
-		{
-			lua_close(L);
-			L = NULL;
-		}
+		//if(L)
+		//{
+		//	lua_close(L);
+		//	L = NULL;
+		//}
 	}
 
 	void StackDump(lua_State* L)

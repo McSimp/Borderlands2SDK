@@ -2,7 +2,7 @@
 #define LUAINTERFACE_H
 
 #include "BL2SDK/BL2SDK.h"
-#include "lua521/lua.hpp"
+#include "LuaInterface/CBaseLuaInterface.h"
 
 #define EngineUObject "BL2SDK.UObject"
 #define EngineUFunction "BL2SDK.UFunction"

@@ -8,7 +8,7 @@
 #include <map>
 #include <sstream>
 
-using LuaInterface::Lua;
+//using LuaInterface::Lua;
 
 namespace ConCmdManager
 {
@@ -31,6 +31,8 @@ namespace ConCmdManager
 
 	bool issueLuaCommand(const std::vector<std::string> &args)
 	{
+		return false;
+		/*
 		// Get the InjectConsoleCommand func and call it
 		lua_getglobal(Lua(), "InjectConsoleCommand");
 		
@@ -54,6 +56,7 @@ namespace ConCmdManager
 		lua_pop(Lua(), 1);
 
 		return result;
+		*/
 	}
 
 	bool eventConCommand(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)

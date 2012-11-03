@@ -150,6 +150,9 @@
     <ClCompile Include="..\..\src\BL2SDK\EngineHooks.cpp">
       <Filter>Source Files\BL2SDK</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\LuaInterface\CBaseLuaInterface.cpp">
+      <Filter>Source Files\LuaInterface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Logging\Logging.h">
@@ -322,6 +325,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\BL2SDK\EngineHooks.h">
       <Filter>Header Files\BL2SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\CBaseLuaInterface.h">
+      <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
