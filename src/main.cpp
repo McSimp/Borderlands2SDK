@@ -2,14 +2,9 @@
 #include <Windows.h>
 #include "BL2SDK/BL2SDK.h"
 #include "Logging/Logging.h"
-#include "Commands/ConCmdManager.h"
 #include "Commands/ConCommand.h"
-#include "LuaInterface/LuaInterface.h"
-#include "BL2SDK/Settings.h"
 #include "BL2SDK/CrashRptHelper.h"
 #include "BL2SDK/Util.h"
-#include "GUI/D3D9Hook.h"
-#include "BL2SDK/EngineHooks.h"
 
 // TODO: Get these out of here
 CON_COMMAND(CrashMe)
@@ -51,53 +46,16 @@ CON_COMMAND(SetDNCycleRate)
 	Logging::Log("Day/Night cycle rate changed to %f\n", rate);
 }
 
-// This function is used to ensure that everything gets called in the game thread once the game itself has loaded
-bool GameReady(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult) 
-{
-	Logging::Log("[GameReady] Thread: %i\n", GetCurrentThreadId());
-	
-	CrashRptHelper::Initialize();
-
-	Logging::InitializeExtern();
-	Logging::InitializeGameConsole();
-	Logging::PrintLogHeader();
-	
-	LuaInterface::Initialize();
-
-	ConCmdManager::Initialize();
-
-	EngineHooks::RemoveStaticHook(pFunction, "StartupSDK");
-	return true;
-}
-
 DWORD WINAPI onAttach(LPVOID lpParameter)
 {	
-	if(Settings::Initialize() != ERROR_SUCCESS)
-	{
-		Util::Popup(L"SDK Error", L"Could not locate settings in registry. Did you use the Launcher?");
-		return 0;
-	}
-
-	Logging::InitializeFile(Settings::GetLogFilePath());
-	Logging::Log("[Internal] Injecting SDK...\n");
-
-	// Figure out GObjects and GNames
 	if(!BL2SDK::Initialize())
 	{
 		// This usually wouldn't run because CrashRpt should handle things.
 		// If CrashRpt doesn't install properly for some reason, this will have to do.
-		Util::Popup(L"SDK ERROR", L"An error occurred while hooking into the game. Please check the logfile for details.");	
-		return 0;
+		Util::Popup(L"SDK Error", L"An error occurred initializing the BL2 SDK, please check the logfile for details.");
+		Util::CloseGame();
 	}
 
-	if(!D3D9Hook::Initialize())
-	{
-		// Same goes as above
-		Util::Popup(L"SDK ERROR", L"An error occurred while hooking DirectX. Please check the logfile for details.");	
-		return 0;
-	}
-
-	EngineHooks::Register("Function WillowGame.WillowGameInfo.InitGame", "StartupSDK", &GameReady);	
 	return 0;
 }
 

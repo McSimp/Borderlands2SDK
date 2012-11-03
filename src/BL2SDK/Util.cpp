@@ -90,4 +90,9 @@ namespace Util
 	{
 		MessageBox(NULL, strText.c_str(), strName.c_str(), MB_OK | MB_ICONASTERISK);
 	}
+
+	void CloseGame()
+	{
+		TerminateProcess(GetCurrentProcess(), 1);
+	}
 }

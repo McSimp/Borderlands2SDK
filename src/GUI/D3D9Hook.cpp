@@ -1,5 +1,6 @@
 #include "GUI/D3D9Hook.h"
 #include "GUI/GwenManager.h"
+#include "Logging/Logging.h"
 #include "BL2SDK/CrashRptHelper.h"
 #include <d3d9.h>
 #include <d3dx9.h>
@@ -39,21 +40,31 @@ namespace D3D9Hook
 			pCreateDevice = NULL;
 
 			if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), dwProtect, &dwProtect) == 0)
-				return D3DERR_INVALIDCALL;
+			{
+				Logging::Log("[DirectX Hooking] VirtualProtect failed for removing CreateDevice hook\n");
+				return D3DERR_INVALIDCALL;	
+			}
 		}
 		else
 		{
+			Logging::Log("[DirectX Hooking] VirtualProtect failed for removing CreateDevice hook\n");
 			return D3DERR_INVALIDCALL;
 		}
 
 		if(result != D3D_OK)
+		{
+			Logging::Log("[DirectX Hooking] Call to CreateDevice failed (Return = 0x%X)\n", result);
 			return result;
+		}
 
 		D3DDVTable = (PDWORD)*(PDWORD)*ppReturnedDeviceInterface;
 		pD3DDev = *ppReturnedDeviceInterface;
 
+		// TODO: May need to VirtualProtect here
 		*(PDWORD)&pEndScene = (DWORD)D3DDVTable[ENDSCENE_IDX];
 		*(PDWORD)&D3DDVTable[ENDSCENE_IDX] = (DWORD)EndScene_Detour; // This may need a more aggressive set (ie. check every second and overwrite)
+		
+		Logging::Log("[DirectX Hooking] EndScene hooked successfully\n");
 
 		GwenManager::Initialize(pD3DDev);
 
@@ -65,7 +76,10 @@ namespace D3D9Hook
 	{
 		IDirect3D9* d3d = Direct3DCreate9(D3D_SDK_VERSION);
 		if(d3d == NULL)
+		{
+			Logging::Log("[DirectX Hooking] Failed to call Direct3DCreate9\n");
 			return false;
+		}
 
 		D3DVTable = (PDWORD)*(PDWORD)d3d;
 		d3d->Release();
@@ -79,13 +93,18 @@ namespace D3D9Hook
 			*(PDWORD)&D3DVTable[CREATEDEVICE_IDX] = (DWORD)hkCreateDevice;
 
 			if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), dwProtect, &dwProtect) == 0)
+			{
+				Logging::Log("[DirectX Hooking] VirtualProtect failed for adding CreateDevice hook\n");
 				return false;
+			}
 		}
 		else
 		{
+			Logging::Log("[DirectX Hooking] VirtualProtect failed for adding CreateDevice hook\n");
 			return false;
 		}
 
+		Logging::Log("[DirectX Hooking] CreateDevice hooked successfully\n");
 		return true;
 	}
 

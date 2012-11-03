@@ -4,6 +4,11 @@
 #include "BL2SDK/CSigScan.h"
 #include "BL2SDK/CrashRptHelper.h"
 #include "BL2SDK/EngineHooks.h"
+#include "BL2SDK/Settings.h"
+#include "BL2SDK/Util.h"
+#include "Commands/ConCmdManager.h"
+#include "GUI/D3D9Hook.h"
+#include "LuaInterface/LuaInterface.h"
 
 namespace BL2SDK
 {
@@ -90,7 +95,7 @@ namespace BL2SDK
 	{
 		if(CrashRptHelper::GenerateReport(code, ep))
 		{
-			TerminateProcess(GetCurrentProcess(), 1);
+			Util::CloseGame();
 		}
 		else
 		{
@@ -175,15 +180,54 @@ namespace BL2SDK
 		return true;
 	}
 
+	// This function is used to ensure that everything gets called in the game thread once the game itself has loaded
+	bool GameReady(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult) 
+	{
+		Logging::Log("[GameReady] Thread: %i\n", GetCurrentThreadId());
+	
+		Logging::InitializeExtern();
+		Logging::InitializeGameConsole();
+		Logging::PrintLogHeader();
+	
+		LuaInterface::Initialize();
+
+		ConCmdManager::Initialize();
+
+		EngineHooks::RemoveStaticHook(pFunction, "StartupSDK");
+		return true;
+	}
+
 	bool Initialize()
 	{
+		if(Settings::Initialize() != ERROR_SUCCESS)
+		{
+			// Can't use Crashrpt because it won't be started. This error shouldn't
+			// ever really happen though.
+			Util::Popup(L"SDK Error", L"Could not locate settings in registry. Did you use the Launcher?");
+			return false;
+		}
+
+		Logging::InitializeFile(Settings::GetLogFilePath());
+		Logging::Log("[Internal] Launching SDK...\n");
+
+		CrashRptHelper::Initialize();
+
 		if(!HookGame())
 		{
 			// Close the game and get the crashrpt dialog to come up in the hope that
 			// the user will tell us what went wrong.
+			Logging::Log("[Internal] Failed to hook game, terminating process\n");
 			CrashRptHelper::SoftCrash();
 			return false;
 		}
+
+		if(!D3D9Hook::Initialize())
+		{
+			Logging::Log("[DirectX Hooking] Failed to hook DirectX, terminating process\n");
+			return false;
+		}
+
+		EngineHooks::Register("Function WillowGame.WillowGameInfo.InitGame", "StartupSDK", &GameReady);	
 
 		return true;
 	}

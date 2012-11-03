@@ -31,6 +31,8 @@ namespace CrashRptHelper
 	pcrAddPropertyWt pcrAddPropertyW = NULL;
 	pcrAddRegKeyWt pcrAddRegKeyW = NULL;
 
+	bool crashRptReady = false;
+
 	bool GetGameVersion(std::wstring& appVersion)
 	{
 		wchar_t* szFilename = L"Borderlands2.exe";
@@ -156,11 +158,14 @@ namespace CrashRptHelper
 			return false;
 		}
 
+		crashRptReady = true;
 		return true;
 	}
 
 	void Cleanup()
 	{
+		if(!crashRptReady) return;
+
 		pcrUninstall();
 		FreeLibrary(hCrashRpt);
 	}
@@ -172,18 +177,35 @@ namespace CrashRptHelper
 	}
 	*/
 
-	bool SoftCrash()
+	void SoftCrash()
 	{
+		if(!crashRptReady)
+		{
+			Logging::Log("[CrashRpt] Cannot cause crash - CrashRpt is not initialized properly\n");
+			return;
+		}
+
 		CR_EXCEPTION_INFO ei;
 		memset(&ei, 0, sizeof(CR_EXCEPTION_INFO));
 		ei.cb = sizeof(CR_EXCEPTION_INFO);
 		ei.exctype = CR_CPP_SIGTERM;
 		ei.bManual = true;
-		return (pcrGenerateErrorReport(&ei) == 0);
+		if(pcrGenerateErrorReport(&ei) != 0)
+		{
+			Util::Popup(L"SDK Error", L"An error occurred in the BL2 SDK, please check the logfile for details.");
+		}
+
+		Util::CloseGame();
 	}
 
 	bool GenerateReport(unsigned int code, PEXCEPTION_POINTERS ep)
 	{
+		if(!crashRptReady)
+		{
+			Logging::Log("[CrashRpt] Cannot generate report - CrashRpt is not initialized properly\n");
+			return false;	
+		}
+
 		CR_EXCEPTION_INFO ei;
 		memset(&ei, 0, sizeof(CR_EXCEPTION_INFO));
 		ei.cb = sizeof(CR_EXCEPTION_INFO);
