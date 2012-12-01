@@ -50,6 +50,27 @@ CON_COMMAND(SetDNCycleRate)
 	Logging::Log("Day/Night cycle rate changed to %f\n", rate);
 }
 
+CON_COMMAND(Derp)
+{
+	Logging::Log("=== OBJECT DUMP ===\n");
+	Logging::Log("%40s | %10s\n", "Name", "ArrayDim");
+	for(int i = 0; i < UObject::GObjObjects()->Count; i++) 
+	{ 
+		UObject* Object = UObject::GObjObjects()->Data[i];
+		if(Object->IsA(UProperty::StaticClass()))
+		{
+			UProperty* prop = (UProperty*)Object;
+			if(prop->ArrayDim > 1 || prop->IsA(UArrayProperty::StaticClass()))
+			{
+				Logging::Log(" %40s | %10i | %10i\n", prop->Name.GetName(), prop->ArrayDim, prop->IsA(UArrayProperty::StaticClass()));
+			}
+		}
+		
+	} 
+	Logging::Log("=== END OBJECT DUMP ===\n");
+}
+
+
 DWORD WINAPI onAttach(LPVOID lpParameter)
 {	
 	if(!BL2SDK::Initialize())

@@ -8,7 +8,7 @@
 #include "BL2SDK/Util.h"
 #include "Commands/ConCmdManager.h"
 #include "GUI/D3D9Hook.h"
-#include "LuaInterface/LuaInterface.h"
+#include "LuaInterface/LuaManager.h"
 
 namespace BL2SDK
 {
@@ -189,7 +189,7 @@ namespace BL2SDK
 		Logging::InitializeGameConsole();
 		Logging::PrintLogHeader();
 	
-		LuaInterface::Initialize();
+		LuaManager::Initialize();
 
 		ConCmdManager::Initialize();
 

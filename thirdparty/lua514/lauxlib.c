@@ -66,7 +66,7 @@ LUALIB_API int luaL_typerror (lua_State *L, int narg, const char *tname) {
 
 
 static void tag_error (lua_State *L, int narg, int tag) {
-  luaL_typerror(L, narg, lua_typename(L, tag));
+  luaL_typerror(L, narg, lua_typename(L, tag, 0));
 }
 
 
@@ -108,6 +108,7 @@ LUALIB_API int luaL_checkoption (lua_State *L, int narg, const char *def,
                        lua_pushfstring(L, "invalid option " LUA_QS, name));
 }
 
+int g_iMetaTypeNum = 0;
 
 LUALIB_API int luaL_newmetatable (lua_State *L, const char *tname) {
   lua_getfield(L, LUA_REGISTRYINDEX, tname);  /* get registry.name */
@@ -117,7 +118,27 @@ LUALIB_API int luaL_newmetatable (lua_State *L, const char *tname) {
   lua_newtable(L);  /* create metatable */
   lua_pushvalue(L, -1);
   lua_setfield(L, LUA_REGISTRYINDEX, tname);  /* registry.name = metatable */
+  
+  // BL2SDK MODIFICATION - Based on garry's implementation
+  lua_pushstring(L, "MetaName");
+  lua_pushstring(L, tname);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "MetaID");
+  lua_pushnumber(L, g_iMetaTypeNum);
+  lua_settable(L, -3);
+  
   return 1;
+}
+
+LUALIB_API int luaL_newmetatable_type (lua_State *L, const char *tname, int type) {
+	int result;
+
+	g_iMetaTypeNum = type;
+	result = luaL_newmetatable(L, tname);
+	g_iMetaTypeNum = 0;
+
+	return result;
 }
 
 

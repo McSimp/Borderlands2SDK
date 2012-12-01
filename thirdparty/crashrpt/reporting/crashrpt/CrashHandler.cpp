@@ -47,9 +47,7 @@ CCrashHandler::CCrashHandler()
     m_nSmtpProxyPort = 2525;
     memset(&m_uPriorities, 0, 3*sizeof(UINT));    
     m_lpfnCallback = NULL;
-	m_pfnCallback2W = NULL;
-	m_pfnCallback2A = NULL;
-    m_bAddScreenshot = FALSE;	
+	m_bAddScreenshot = FALSE;	
     m_dwScreenshotFlags = 0;    
     m_nJpegQuality = 95;
 	m_bAddVideo = FALSE;
@@ -62,8 +60,11 @@ CCrashHandler::CCrashHandler()
 	m_hEvent2 = NULL;
     m_pCrashDesc = NULL;
 	m_hSenderProcess = NULL;
-	m_nCallbackRetCode = CR_CB_DODEFAULT;
-	m_bContinueExecution = FALSE;
+	m_pfnCallback2W = NULL;
+	m_pfnCallback2A = NULL;    
+	m_pCallbackParam = NULL;
+	m_nCallbackRetCode = CR_CB_NOTIFY_NEXT_STAGE;
+	m_bContinueExecution = TRUE;
 
     // Init exception handler pointers
     InitPrevExceptionHandlerPointers();
@@ -95,9 +96,7 @@ int CCrashHandler::Init(
         LPCTSTR lpcszSmtpProxy,
         LPCTSTR lpcszCustomSenderIcon,
 		LPCTSTR lpcszSmtpLogin,
-		LPCTSTR lpcszSmtpPassword,
-		PFNCRASHCALLBACKW pfnCallback2W,
-		PFNCRASHCALLBACKA pfnCallback2A)
+		LPCTSTR lpcszSmtpPassword)
 { 
     crSetErrorMsg(_T("Unspecified error."));
 
@@ -107,11 +106,9 @@ int CCrashHandler::Init(
     // Save minidump type  
     m_MinidumpType = MiniDumpType;
 
-    // Save user supplied callback
+    // Save user supplied callback (obsolete)
     m_lpfnCallback = lpfnCallback;
-	m_pfnCallback2W = pfnCallback2W;
-	m_pfnCallback2A = pfnCallback2A;
-
+	
     // Save application name
     m_sAppName = lpcszAppName;
 
@@ -367,26 +364,7 @@ int CCrashHandler::Init(
         FreeLibrary((HMODULE)hDbgHelpDll);
         hDbgHelpDll = NULL;
     }
-
-    // Generate unique GUID for this crash report.
-    if(0!=Utility::GenerateGUID(m_sCrashGUID))
-    {
-        ATLASSERT(0);
-        crSetErrorMsg(_T("Couldn't generate crash GUID."));
-        return 1; 
-    }
-
-    // Create event that will be used to synchronize with CrashSender.exe process
-    CString sEventName;
-    sEventName.Format(_T("Local\\CrashRptEvent_%s"), m_sCrashGUID);
-    m_hEvent = CreateEvent(NULL, FALSE, FALSE, sEventName);
-    if(m_hEvent==NULL)
-    {
-        ATLASSERT(m_hEvent!=NULL);
-        crSetErrorMsg(_T("Couldn't create synchronization event."));
-        return 1; 
-    }
-
+	
     if(lpcszErrorReportSaveDir==NULL)
     {
         // Create %LOCAL_APPDATA%\CrashRpt\UnsentCrashReports\AppName_AppVer folder.
@@ -409,6 +387,13 @@ int CCrashHandler::Init(
         return 1; 
     }
 
+	// Init some fields that should be reinited before each crash.
+	if(0!=PerCrashInit())
+		return 1;
+
+	// Associate this handler with the caller process
+    m_pProcessCrashHandler =  this;
+
     // Set exception handlers with initial values (NULLs)
     InitPrevExceptionHandlerPointers();
 
@@ -429,14 +414,7 @@ int CCrashHandler::Init(
         crSetErrorMsg(_T("Couldn't set C++ exception handlers for main execution thread."));
         return 1;
     }
-
-    // Associate this handler with the caller process
-    m_pProcessCrashHandler =  this;
-
-    // Pack configuration info to shared memory.
-    // It will be passed to CrashSender.exe later.
-    m_pCrashDesc = PackCrashInfoIntoSharedMem(&m_SharedMem, FALSE);
-
+	    
     // If user wants us to send pending error reports that were queued recently,
     // launch the CrashSender.exe and make it to alert user and send the reports.
     if(dwFlags&CR_INST_SEND_QUEUED_REPORTS)
@@ -488,6 +466,22 @@ int CCrashHandler::Init(
     m_bInitialized = TRUE;
     crSetErrorMsg(_T("Success."));
     return 0;
+}
+
+int CCrashHandler::SetCrashCallbackW(PFNCRASHCALLBACKW pfnCallback, LPVOID pUserParam)
+{
+	m_pfnCallback2W = pfnCallback;
+	m_pCallbackParam = pUserParam;
+	
+	return 0;
+}
+
+int CCrashHandler::SetCrashCallbackA(PFNCRASHCALLBACKA pfnCallback, LPVOID pUserParam)
+{
+	m_pfnCallback2A = pfnCallback;
+	m_pCallbackParam = pUserParam;
+	
+	return 0;
 }
 
 // Packs config info to shared mem.
@@ -661,7 +655,22 @@ int CCrashHandler::Destroy()
         return 1;
     }  
 
-	// Free event
+	// If we are recording video, we need to notify the CrashSender.exe about
+	// our exit.
+	if(m_bAddVideo)
+	{
+		// Set event 2, so CrashSender.exe will exit from video recording loop
+		SetEvent(m_hEvent2);
+
+		// Wait until CrashSender.exe completes its task
+		WaitForSingleObject(m_hEvent, INFINITE);		
+	}
+
+	// Free handle to CrashSender.exe process.
+	if(m_hSenderProcess!=NULL)
+		CloseHandle(m_hSenderProcess);
+
+	// Free events
 	if(m_hEvent)
 	{
 		CloseHandle(m_hEvent);
@@ -1168,7 +1177,7 @@ int CCrashHandler::AddVideo(DWORD dwFlags, int nDuration, int nFrameInterval,
 		crSetErrorMsg(_T("Couldn't launch CrashSender.exe process."));
         return 6;
     }
-	
+
 	// OK
 	crSetErrorMsg(_T("Success."));
 	return 0;
@@ -1228,11 +1237,19 @@ int CCrashHandler::GenerateErrorReport(
 
     // If error report is being generated manually, disable app restart.
     if(pExceptionInfo->bManual)
+	{
+		// Prepare for the next crash
+		PerCrashInit();
+
         m_pCrashDesc->m_dwInstallFlags &= ~CR_INST_APP_RESTART;
+	}
 
     // Let client know about the crash via the crash callback function. 
     if (m_lpfnCallback!=NULL && m_lpfnCallback(NULL)==FALSE)
     {
+		// Prepare for the next crash
+		PerCrashInit();
+
         crSetErrorMsg(_T("The operation was cancelled by client."));
         return 2;
     }
@@ -1240,6 +1257,9 @@ int CCrashHandler::GenerateErrorReport(
 	// New-style callback
 	if(CR_CB_CANCEL==CallBack(CR_CB_STAGE_PREPARE, pExceptionInfo))
 	{
+		// Prepare for the next crash
+		PerCrashInit();
+
         crSetErrorMsg(_T("The operation was cancelled by client."));
         return 2;
     }	
@@ -1271,31 +1291,19 @@ int CCrashHandler::GenerateErrorReport(
 		// Free event (it is not needed since now).
 		CloseHandle(m_hEvent2);
 		m_hEvent2 = NULL;
+
+		// Return handle to CrashSender.exe process to the caller.		
+		pExceptionInfo->hSenderProcess = m_hSenderProcess;
 	}
     
 	// New-style callback
 	CallBack(CR_CB_STAGE_FINISH, pExceptionInfo);
 	
-	// Generate new GUID for new crash report 
-	// (if, for example, user will generate new error report manually).
-    if(0!=Utility::GenerateGUID(m_sCrashGUID))
-    {
-        ATLASSERT(0);
-        crSetErrorMsg(_T("Couldn't generate crash GUID."));
-        return 1; 
-    }
-
-	// And recreate the event that will be used to synchronize with CrashSender.exe process
-	CloseHandle(m_hEvent); // Free old event
-    CString sEventName;
-    sEventName.Format(_T("Local\\CrashRptEvent_%s"), m_sCrashGUID);
-    m_hEvent = CreateEvent(NULL, FALSE, FALSE, sEventName);
-    if(m_hEvent==NULL)
-    {
-        ATLASSERT(m_hEvent!=NULL);
-        crSetErrorMsg(_T("Couldn't create synchronization event."));
-        return 1; 
-    }
+	if(m_bContinueExecution)
+	{
+		// Prepare for the next crash
+		PerCrashInit();
+	}
 
 	// Check the result of launching the crash sender process
 	if(result!=0)
@@ -1525,15 +1533,28 @@ void CCrashHandler::CrashLock(BOOL bLock)
         m_csCrashLock.Unlock();
 }
 
-int CCrashHandler::CallBack(int nStage, CR_EXCEPTION_INFO* pExInfo)
-{	
-	// This method calls the crash callback function.
+int CCrashHandler::PerCrashInit()
+{
+	// Asume the next crash non-critical
+	m_bContinueExecution = TRUE;
 
-	strconv_t strconv;
+	// Set default ret code for callback func	
+	m_nCallbackRetCode = CR_CB_NOTIFY_NEXT_STAGE;
 
-	if(m_nCallbackRetCode!=CR_CB_NOTIFY_NEXT_STAGE)
-		return CR_CB_DODEFAULT;
+	// Reset video flag to let user add new videos
+	m_bAddVideo = FALSE;
 
+	// Generate new GUID for new crash report 
+	// (if, for example, user will generate new error report manually).
+    Utility::GenerateGUID(m_sCrashGUID);
+    
+	// And recreate the event that will be used to synchronize with CrashSender.exe process
+	if(m_hEvent!=NULL)
+		CloseHandle(m_hEvent); // Free old event
+    CString sEventName;
+    sEventName.Format(_T("Local\\CrashRptEvent_%s"), m_sCrashGUID);
+    m_hEvent = CreateEvent(NULL, FALSE, FALSE, sEventName);
+    
 	// Format error report dir name.
 	CString sErrorReportDirName;
 	sErrorReportDirName.Format(_T("%s\\%s_%s\\%s"), 
@@ -1543,6 +1564,33 @@ int CCrashHandler::CallBack(int nStage, CR_EXCEPTION_INFO* pExInfo)
 		m_sCrashGUID.GetBuffer(0)
 		);
 
+	strconv_t strconv;
+	m_sErrorReportDirW = strconv.t2w(sErrorReportDirName);
+	m_sErrorReportDirA = strconv.t2a(sErrorReportDirName);
+
+	// Reset shared memory
+	if(m_SharedMem.IsInitialized())
+	{
+		m_SharedMem.Destroy();
+		m_pCrashDesc = NULL;
+	}
+
+	// Pack configuration info to shared memory.
+    // It will be passed to CrashSender.exe later.
+    m_pCrashDesc = PackCrashInfoIntoSharedMem(&m_SharedMem, FALSE);
+	
+	return 0;
+}
+
+int CCrashHandler::CallBack(int nStage, CR_EXCEPTION_INFO* pExInfo)
+{	
+	// This method calls the crash callback function.
+
+	strconv_t strconv;
+
+	if(m_nCallbackRetCode!=CR_CB_NOTIFY_NEXT_STAGE)
+		return CR_CB_DODEFAULT;
+	
 	if(m_pfnCallback2W!=NULL)
 	{
 		// Call the wide-char version of the callback function.
@@ -1551,7 +1599,9 @@ int CCrashHandler::CallBack(int nStage, CR_EXCEPTION_INFO* pExInfo)
 		cci.cb = sizeof(CR_CRASH_CALLBACK_INFOW);
 		cci.nStage = nStage;
 		cci.pExceptionInfo = pExInfo;
-		cci.pszErrorReportFolder = strconv.t2w(sErrorReportDirName);
+		cci.pUserParam = m_pCallbackParam;
+		cci.pszErrorReportFolder = m_sErrorReportDirW.c_str();
+		cci.bContinueExecution = m_bContinueExecution;
 
 		m_nCallbackRetCode = m_pfnCallback2W(&cci);
 
@@ -1566,7 +1616,9 @@ int CCrashHandler::CallBack(int nStage, CR_EXCEPTION_INFO* pExInfo)
 		cci.cb = sizeof(CR_CRASH_CALLBACK_INFOA);
 		cci.nStage = nStage;
 		cci.pExceptionInfo = pExInfo;
-		cci.pszErrorReportFolder = strconv.t2a(sErrorReportDirName);
+		cci.pUserParam = m_pCallbackParam;
+		cci.pszErrorReportFolder = m_sErrorReportDirA.c_str();
+		cci.bContinueExecution = m_bContinueExecution;
 
 		m_nCallbackRetCode = m_pfnCallback2A(&cci);
 
@@ -1605,6 +1657,9 @@ LONG WINAPI CCrashHandler::SehHandler(PEXCEPTION_POINTERS pExceptionPtrs)
 		// Acquire lock to avoid other threads (if exist) to crash while we are 
 		// inside. 
 		pCrashHandler->CrashLock(TRUE);
+
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
 
 		// Generate error report.
 		CR_EXCEPTION_INFO ei;
@@ -1645,6 +1700,9 @@ DWORD WINAPI CCrashHandler::StackOverflowThreadFunction(LPVOID lpParameter)
 		// Acquire lock to avoid other threads (if exist) to crash while we	are inside.
 		pCrashHandler->CrashLock(TRUE);
 		
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
+
 		// Generate error report.
 		CR_EXCEPTION_INFO ei;
 		memset(&ei, 0, sizeof(CR_EXCEPTION_INFO));
@@ -1680,6 +1738,9 @@ void __cdecl CCrashHandler::TerminateHandler()
         // inside. We do not unlock, because process is to be terminated.
         pCrashHandler->CrashLock(TRUE);
 
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
+
         // Fill in the exception info
         CR_EXCEPTION_INFO ei;
         memset(&ei, 0, sizeof(CR_EXCEPTION_INFO));
@@ -1713,6 +1774,9 @@ void __cdecl CCrashHandler::UnexpectedHandler()
         // Acquire lock to avoid other threads (if exist) to crash while we are 
         // inside. We do not unlock, because process is to be terminated.
         pCrashHandler->CrashLock(TRUE);
+
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
 
         // Fill in the exception info
         CR_EXCEPTION_INFO ei;
@@ -1748,6 +1812,9 @@ void __cdecl CCrashHandler::PureCallHandler()
         // Acquire lock to avoid other threads (if exist) to crash while we are 
         // inside. We do not unlock, because process is to be terminated.
         pCrashHandler->CrashLock(TRUE);
+
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
 
         // Fill in the exception info
         CR_EXCEPTION_INFO ei;
@@ -1787,6 +1854,9 @@ void __cdecl CCrashHandler::SecurityHandler(int code, void *x)
         // Acquire lock to avoid other threads (if exist) to crash while we are 
         // inside. We do not unlock, because process is to be terminated.
         pCrashHandler->CrashLock(TRUE);
+
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
 
         // Fill in the exception info
         CR_EXCEPTION_INFO ei;
@@ -1830,6 +1900,9 @@ void __cdecl CCrashHandler::InvalidParameterHandler(
         // inside. We do not unlock, because process is to be terminated.
         pCrashHandler->CrashLock(TRUE);
 
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
+
         // Fill in the exception info
         CR_EXCEPTION_INFO ei;
         memset(&ei, 0, sizeof(CR_EXCEPTION_INFO));
@@ -1870,6 +1943,9 @@ int __cdecl CCrashHandler::NewHandler(size_t)
         // inside. We do not unlock, because process is to be terminated.
         pCrashHandler->CrashLock(TRUE);
 
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
+
         // Fill in the exception info
         CR_EXCEPTION_INFO ei;
         memset(&ei, 0, sizeof(CR_EXCEPTION_INFO));
@@ -1909,6 +1985,9 @@ void CCrashHandler::SigabrtHandler(int)
         // inside. We do not unlock, because process is to be terminated.
         pCrashHandler->CrashLock(TRUE);
 
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
+
         // Fill in the exception info
         CR_EXCEPTION_INFO ei;
         memset(&ei, 0, sizeof(CR_EXCEPTION_INFO));
@@ -1941,6 +2020,9 @@ void CCrashHandler::SigfpeHandler(int /*code*/, int subcode)
         // Acquire lock to avoid other threads (if exist) to crash while we are 
         // inside. We do not unlock, because process is to be terminated.
         pCrashHandler->CrashLock(TRUE);
+
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
 
         // Fill in the exception info
         CR_EXCEPTION_INFO ei;
@@ -1978,6 +2060,9 @@ void CCrashHandler::SigillHandler(int)
         // inside. We do not unlock, because process is to be terminated.
         pCrashHandler->CrashLock(TRUE);
 
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
+
         // Fill in the exception info
         CR_EXCEPTION_INFO ei;
         memset(&ei, 0, sizeof(CR_EXCEPTION_INFO));
@@ -2012,6 +2097,9 @@ void CCrashHandler::SigintHandler(int)
         // inside. We do not unlock, because process is to be terminated.
         pCrashHandler->CrashLock(TRUE);
 
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
+
         // Fill in the exception info
         CR_EXCEPTION_INFO ei;
         memset(&ei, 0, sizeof(CR_EXCEPTION_INFO));
@@ -2044,6 +2132,9 @@ void CCrashHandler::SigsegvHandler(int)
         // Acquire lock to avoid other threads (if exist) to crash while we are 
         // inside. We do not unlock, because process is to be terminated.
         pCrashHandler->CrashLock(TRUE);
+
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
 
         // Fill in exception info
         CR_EXCEPTION_INFO ei;
@@ -2079,6 +2170,9 @@ void CCrashHandler::SigtermHandler(int)
         // Acquire lock to avoid other threads (if exist) to crash while we are 
         // inside. We do not unlock, because process is to be terminated.
         pCrashHandler->CrashLock(TRUE);
+
+		// Treat this type of crash critical by default
+		pCrashHandler->m_bContinueExecution = FALSE;
 
         // Fill in the exception info
         CR_EXCEPTION_INFO ei;

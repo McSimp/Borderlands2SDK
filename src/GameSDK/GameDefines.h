@@ -86,7 +86,7 @@ struct FName
 
 	~FName() {}; 
 
-	FName ( char* FindName ) 
+	FName ( const char* FindName ) 
 	{ 
 		static TArray< int > NameCache; 
 

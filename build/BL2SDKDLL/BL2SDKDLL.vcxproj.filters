@@ -114,16 +114,10 @@
     <ClCompile Include="..\..\src\Commands\SlotMachines.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\LuaInterface\LuaInterface.cpp">
-      <Filter>Source Files\LuaInterface</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Commands\LuaCommands.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\LuaInterface\LUObjects.cpp">
-      <Filter>Source Files\LuaInterface</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\LuaInterface\LUObject.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\BL2SDK\CrashRptHelper.cpp">
@@ -150,7 +144,16 @@
     <ClCompile Include="..\..\src\BL2SDK\EngineHooks.cpp">
       <Filter>Source Files\BL2SDK</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\LuaInterface\CBaseLuaInterface.cpp">
+    <ClCompile Include="..\..\src\LuaInterface\CLuaInterface.cpp">
+      <Filter>Source Files\LuaInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\LuaInterface\CLuaObject.cpp">
+      <Filter>Source Files\LuaInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\LuaInterface\CLuaUObject.cpp">
+      <Filter>Source Files\LuaInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\LuaInterface\LuaManager.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
   </ItemGroup>
@@ -275,13 +278,7 @@
     <ClInclude Include="..\..\src\BL2SDK\CSigScan.h">
       <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\LuaInterface\LuaInterface.h">
-      <Filter>Header Files\LuaInterface</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\LuaInterface\LUObjects.h">
-      <Filter>Header Files\LuaInterface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\LuaInterface\LUObject.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\thirdparty\lua521\lauxlib.h">
@@ -326,7 +323,22 @@
     <ClInclude Include="..\..\src\BL2SDK\EngineHooks.h">
       <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\LuaInterface\CBaseLuaInterface.h">
+    <ClInclude Include="..\..\src\LuaInterface\UserData.h">
+      <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\CLuaInterface.h">
+      <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\ILuaTable.h">
+      <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\CLuaObject.h">
+      <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\CLuaUObject.h">
+      <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\LuaManager.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
   </ItemGroup>

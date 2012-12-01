@@ -2,7 +2,7 @@
 #include "Logging/Logging.h"
 #include "Commands/ConCmdManager.h"
 #include "Commands/ConCommand.h"
-#include "LuaInterface/LuaInterface.h"
+#include "LuaInterface/LuaManager.h"
 #include "BL2SDK/EngineHooks.h"
 
 #include <map>

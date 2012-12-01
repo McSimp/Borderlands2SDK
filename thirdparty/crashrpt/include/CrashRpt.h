@@ -232,11 +232,17 @@ typedef CR_EXCEPTION_INFO* PCR_EXCEPTION_INFO;
 *
 *    This field contains a pointer to \ref CR_EXCEPTION_INFO structure.
 *
+*  \b pUserParam [in, optional]
+*
+*    This is a pointer to user-specified data passed to the crSetCrashCallback() function
+*    as \b pUserParam argument.
+*
 *  \b bContinueExecution [in, out]
 *
 *    This field is set to FALSE by default. The crash callback function may set it
 *    to true if it wants to continue its execution after crash report generation 
 *    (otherwise the program will be terminated).
+*
 *
 *  \ref CR_CRASH_CALLBACK_INFOW and \ref CR_CRASH_CALLBACK_INFOA are 
 *  wide-character and multi-byte character versions of \ref CR_CRASH_CALLBACK_INFO
@@ -251,13 +257,13 @@ typedef struct tagCR_CRASH_CALLBACK_INFOW
 	int nStage;                         //!< Stage.
 	LPCWSTR pszErrorReportFolder;       //!< Directory where crash report files are located.
     CR_EXCEPTION_INFO* pExceptionInfo;  //!< Pointer to information about the crash.
-	BOOL bContinueExecution;            //!< Whether to terminate the process (the default) or to continue program execution.
+	LPVOID pUserParam;                  //!< Pointer to user-defined data.
+	BOOL bContinueExecution;            //!< Whether to terminate the process (the default) or to continue program execution.	
 }
 CR_CRASH_CALLBACK_INFOW;
 
 /*! \ingroup CrashRptStructs
 *  \struct CR_CRASH_CALLBACK_INFOA
-*  \brief This structure contains information passed to crash callback function.
 *  \copydoc CR_CRASH_CALLBACK_INFOW
 */
 typedef struct tagCR_CRASH_CALLBACK_INFOA
@@ -266,7 +272,8 @@ typedef struct tagCR_CRASH_CALLBACK_INFOA
 	int nStage;                         //!< Stage.
 	LPCSTR pszErrorReportFolder;        //!< Directory where crash report files are located.
     CR_EXCEPTION_INFO* pExceptionInfo;  //!< Pointer to information about the crash.
-	BOOL bContinueExecution;            //!< Whether to terminate the process (the default) or to continue program execution.
+	LPVOID pUserParam;                  //!< Pointer to user-defined data.
+	BOOL bContinueExecution;            //!< Whether to terminate the process (the default) or to continue program execution.	
 }
 CR_CRASH_CALLBACK_INFOA;
 
@@ -307,7 +314,7 @@ typedef CR_CRASH_CALLBACK_INFOA CR_CRASH_CALLBACK_INFO;
 *  properties (see crAddProperty()), desktop screenshots (see crAddScreenshot2())
 *  and registry keys (see crAddRegKey()) inside of the crash callback function.
 *
-*  By default, CrashRpt terminanates the client application after crash report generation and
+*  By default, CrashRpt terminates the client application after crash report generation and
 *  launching the <i>CrashSender.exe</i> process. However, it is possible to continue program
 *  execution after crash report generation by seting \ref CR_CRASH_CALLBACK_INFO::bContinueExecution
 *  structure field to \a TRUE.
@@ -371,12 +378,11 @@ typedef CR_CRASH_CALLBACK_INFOA CR_CRASH_CALLBACK_INFO;
 *  }
 *  \endcode
 *
-*  \sa CR_CRASH_CALLBACK_INFO, crAddFile2(), crAddProperty(), crAddScreenshot2(), crAddRegKey()
+*  \sa CR_CRASH_CALLBACK_INFO, crSetCrashCallback(), crAddFile2(), crAddProperty(), crAddScreenshot2(), crAddRegKey()
 */
 typedef int (CALLBACK *PFNCRASHCALLBACKW) (CR_CRASH_CALLBACK_INFOW* pInfo);
 
 /*! \ingroup CrashRptAPI
-*  \brief Client crash callback function prototype (multi-byte version).
 *  \copydoc PFNCRASHCALLBACKW()
 */
 typedef int (CALLBACK *PFNCRASHCALLBACKA) (CR_CRASH_CALLBACK_INFOA* pInfo);
@@ -389,6 +395,54 @@ typedef PFNCRASHCALLBACKW PFNCRASHCALLBACK;
 #else
 typedef PFNCRASHCALLBACKA PFNCRASHCALLBACK;
 #endif // UNICODE
+
+/*! \ingroup CrashRptAPI  
+*  \brief Sets the crash callback function.
+* 
+*  \return This function returns zero if succeeded. Use crGetLastErrorMsg() to retrieve the error message on fail.
+*
+*  \param[in] pfnCallbackFunc  Pointer to the crash callback function.
+*  \param[in] lpParam          User defined parameter. Optional. 
+*  
+*  \remarks 
+*
+*  Use this to set the crash callback function that will be called on crash. This function
+*  is available since v.1.4.0.
+*
+*  For the crash callback function prototype, see documentation for PFNCRASHCALLBACK().
+*
+*  Optional \b lpParam parameter can be a pointer to user-defined data. It will be passed to the 
+*  crash callback function as \ref CR_CRASH_CALLBACK_INFO::pUserParam structure member.
+*
+*  \sa
+*   PFNCRASHCALLBACK()
+*/
+
+CRASHRPTAPI(int)
+crSetCrashCallbackW(   
+             PFNCRASHCALLBACKW pfnCallbackFunc,
+			 LPVOID lpParam
+             );
+
+
+/*! \ingroup CrashRptAPI
+*  \copydoc crSetCrashCallbackW()
+*/
+CRASHRPTAPI(int)
+crSetCrashCallbackA(   
+             PFNCRASHCALLBACKA pfnCallbackFunc,
+			 LPVOID lpParam
+             );
+
+
+/*! \brief Character set-independent mapping of crSetCrashCallbackW() and crSetCrashCallbackA() functions. 
+*  \ingroup CrashRptAPI
+*/
+#ifdef UNICODE
+#define crSetCrashCallback crSetCrashCallbackW
+#else
+#define crSetCrashCallback crSetCrashCallbackA
+#endif //UNICODE
 
 // Array indices for CR_INSTALL_INFO::uPriorities.
 #define CR_HTTP 0  //!< Send error report via HTTP (or HTTPS) connection.
@@ -415,11 +469,10 @@ typedef PFNCRASHCALLBACKA PFNCRASHCALLBACK;
 #define CR_INST_SIGTERM_HANDLER                0x1000 //!< Install SIGTERM signal handler.  
 
 #define CR_INST_ALL_POSSIBLE_HANDLERS          0x1FFF //!< Install all possible exception handlers.
-#define CR_INST_ALL_EXCEPTION_HANDLERS         0      //!< Deprecated, not recommended to use. Use \ref CR_INST_ALL_POSSIBLE_HANDLERS instead.
 #define CR_INST_CRT_EXCEPTION_HANDLERS         0x1FFE //!< Install exception handlers for the linked CRT module.
 
 #define CR_INST_NO_GUI                         0x2000 //!< Do not show GUI, send report silently (use for non-GUI apps only).
-#define CR_INST_HTTP_BINARY_ENCODING           0x4000 //!< Use multi-part HTTP uploads with binary attachment encoding.
+#define CR_INST_HTTP_BINARY_ENCODING           0x4000 //!< Deprecated, do not use.
 #define CR_INST_DONT_SEND_REPORT               0x8000 //!< Don't send error report immediately, just save it locally.
 #define CR_INST_APP_RESTART                   0x10000 //!< Restart the application on crash.
 #define CR_INST_NO_MINIDUMP                   0x20000 //!< Do not include minidump file to crash report.
@@ -489,11 +542,6 @@ typedef PFNCRASHCALLBACKA PFNCRASHCALLBACK;
 *       sending the error report. If this is NULL, it is assumed that CrashSender.exe is located in
 *       the same directory as CrashRpt.dll.
 *
-*    \b pfnCrashCallback2 [in, optional] 
-*
-*       This can be a pointer to the \ref PFNCRASHCALLBACK() crash callback function. The crash callback function is
-*       called by CrashRpt when crash occurs and allows the client application to be notified about the crash.
-*       If this is NULL, crash callback function is not called.
 *
 *    \b uPriorities [in, optional]
 *
@@ -533,14 +581,6 @@ typedef PFNCRASHCALLBACKA PFNCRASHCALLBACK;
 * 
 *             It is not recommended to use this flag for regular GUI-based applications. 
 *             Use this only for services that have no GUI.
-*    <tr><td> \ref CR_INST_HTTP_BINARY_ENCODING     
-*        <td> <b>Available since v.1.2.2</b> This affects the way of sending reports over HTTP. 
-*             By specifying this flag, you enable usage of multi-part HTTP uploads with binary encoding instead 
-*             of the legacy way (Base64-encoded form data). 
-*
-*             It is recommended to always specify this flag, because it is more suitable for large error reports. The legacy way
-*             is supported for backwards compatibility and not recommended to use.
-*             For additional information, see \ref sending_error_reports.
 *    <tr><td> \ref CR_INST_DONT_SEND_REPORT     
 *        <td> <b>Available since v.1.2.2</b> This parameter means 'do not send error report immediately on crash, just save it locally'. 
 *             Use this if you have direct access to the machine where crash happens and do not need 
@@ -599,8 +639,7 @@ typedef PFNCRASHCALLBACKA PFNCRASHCALLBACK;
 *
 *     It is recommended to set this 
 *     parameter with zero (equivalent of MiniDumpNormal constant). Other values may increase the minidump 
-*     size significantly. If you plan to use values other than zero, also specify the 
-*     \ref CR_INST_HTTP_BINARY_ENCODING flag for \a dwFlags parameter.
+*     size significantly. 
 *
 *   \b pszErrorReportSaveDir [in, optional] 
 *
@@ -671,7 +710,7 @@ typedef struct tagCR_INSTALL_INFOW
     LPCWSTR pszEmailSubject;        //!< Subject of crash report e-mail. 
     LPCWSTR pszUrl;                 //!< URL of server-side script (used in HTTP connection).
     LPCWSTR pszCrashSenderPath;     //!< Directory name where CrashSender.exe is located.
-    LPGETLOGFILE pfnCrashCallback;  //!< Deprecated, use \b pfnCrashCallback2 instead.
+    LPGETLOGFILE pfnCrashCallback;  //!< Deprecated, do not use.
     UINT uPriorities[5];            //!< Array of error sending transport priorities.
     DWORD dwFlags;                  //!< Flags.
     LPCWSTR pszPrivacyPolicyURL;    //!< URL of privacy policy agreement.
@@ -684,8 +723,7 @@ typedef struct tagCR_INSTALL_INFOW
     LPCWSTR pszSmtpProxy;           //!< Network address and port to be used as SMTP proxy.
     LPCWSTR pszCustomSenderIcon;    //!< Custom icon used for Error Report dialog.
 	LPCWSTR pszSmtpLogin;           //!< Login name used for SMTP authentication when sending error report as E-mail.
-	LPCWSTR pszSmtpPassword;        //!< Password used for SMTP authentication when sending error report as E-mail.
-	PFNCRASHCALLBACKW pfnCrashCallback2; //!< Crash callback function.
+	LPCWSTR pszSmtpPassword;        //!< Password used for SMTP authentication when sending error report as E-mail.	
 }
 CR_INSTALL_INFOW;
 
@@ -693,7 +731,6 @@ typedef CR_INSTALL_INFOW* PCR_INSTALL_INFOW;
 
 /*! \ingroup CrashRptStructs
 *  \struct CR_INSTALL_INFOA
-*  \brief This structure defines the general information used by crInstallA() function.
 *  \copydoc CR_INSTALL_INFOW
 */
 
@@ -706,7 +743,7 @@ typedef struct tagCR_INSTALL_INFOA
     LPCSTR pszEmailSubject;        //!< Subject of crash report e-mail. 
     LPCSTR pszUrl;                 //!< URL of server-side script (used in HTTP connection).
     LPCSTR pszCrashSenderPath;     //!< Directory name where CrashSender.exe is located.
-    LPGETLOGFILE pfnCrashCallback; //!< Deprecated, use \b pfnCrashCallback2 instead.
+    LPGETLOGFILE pfnCrashCallback; //!< Deprecated, do not use.
     UINT uPriorities[5];           //!< Array of error sending transport priorities.
     DWORD dwFlags;                 //!< Flags.
     LPCSTR pszPrivacyPolicyURL;    //!< URL of privacy policy agreement.
@@ -1146,14 +1183,16 @@ crAddScreenshot2(
 *  
 *  \remarks 
 *
+*  This function is available as of v.1.4.0.
+*
 *  \b dwFlags can be a combination of the following constants:
 *
-*    use one of the following constants to specify what part of virtual screen to capture:
+*   - use one of the following constants to specify what part of virtual screen to capture:
 *    - \ref CR_AV_VIRTUAL_SCREEN  Use this to capture the whole desktop (virtual screen). This is the default.
-*    - \ref CR_AV_MAIN_WINDOW     Use this to capture the main application main window.
+*    - \ref CR_AV_MAIN_WINDOW     Use this to capture the application's main window.
 *    - \ref CR_AV_PROCESS_WINDOWS Use this to capture all visible windows that belong to the process.
 * 
-*    use one of the following constants to define the desired video encoding quality:
+*   - use one of the following constants to define the desired video encoding quality:
 *    - \ref CR_AV_QUALITY_LOW     Low-quality video encoding. This is the default.
 *    - \ref CR_AV_QUALITY_GOOD    Good encoding quality, larger file.
 *    - \ref CR_AV_QUALITY_BEST    The best encoding quality, the largest file.
@@ -1266,11 +1305,12 @@ crAddVideo(
 *  User-added properties are listed under \<CustomProps\> tag of the XML file.
 *  In the XML file properties are ordered by names in alphabetic order.
 *
-*  The following example shows how to add information about the amount of free disk space to the crash
-*  description XML file:
+*  The following example shows how to add information about the amount of free disk space 
+*  to the crash description XML file:
+*
 *  \code
-*  // It is assumed that you already calculated the amount of free disk space, converted it to text
-*  // and store it as szFreeSpace string.
+*  // It is assumed that you already calculated the amount of free disk space, 
+*  // converted it to text and stored it as szFreeSpace string.
 *  LPCTSTR szFreeSpace = _T("0 Kb");
 *  crAddProperty(_T("FreeDiskSpace"), szFreeSpace);
 *
@@ -1328,7 +1368,7 @@ crAddPropertyA(
 *
 *  The \a dwFlags parameter is reserved for future use and should be set to zero.
 *
-*  The following example shows how to dump two registry keys to \b regkey.xml file:
+*  The following example shows how to dump two registry keys to a single \a regkey.xml file:
 *
 *  \code
 *  
@@ -1416,6 +1456,49 @@ CRASHRPTAPI(int)
 crGenerateErrorReport(   
                       __in_opt CR_EXCEPTION_INFO* pExceptionInfo
                       );
+
+/*! \ingroup CrashRptAPI
+*  \brief Can be used as a SEH exception filter.
+*
+*  \return This function returns \c EXCEPTION_EXECUTE_HANDLER if succeeds; otherwise \c EXCEPTION_CONTINUE_SEARCH.
+*
+*  \param[in] code Exception code.
+*  \param[in] ep   Exception pointers.
+*
+*  \remarks
+*
+*     This function can be called instead of a SEH exception filter
+*     inside of __try{}__except(Expression){} construction. The function generates an error report
+*     and returns control to the exception handler block.
+*
+*     The exception code is usually retrieved with \b GetExceptionCode() intrinsic function
+*     and the exception pointers are retrieved with \b GetExceptionInformation() intrinsic 
+*     function.
+*
+*     If an error occurs, this function returns \c EXCEPTION_CONTINUE_SEARCH.
+*     Use crGetLastErrorMsg() to retrieve the error message on fail.
+*
+*     The following example shows how to use crExceptionFilter().
+*    
+*     \code
+*     int* p = NULL;   // pointer to NULL
+*     __try
+*     {
+*        *p = 13; // causes an access violation exception;
+*     }
+*     __except(crExceptionFilter(GetExceptionCode(), GetExceptionInformation()))
+*     {   
+*       // Terminate program
+*       ExitProcess(1);
+*     }
+*
+*     \endcode 
+*/
+
+CRASHRPTAPI(int)
+crExceptionFilter(
+                  unsigned int code, 
+                  __in_opt struct _EXCEPTION_POINTERS* ep);
 
 
 // Flags used by crEmulateCrash() function

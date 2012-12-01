@@ -6,6 +6,10 @@ REM rmdir /S /Q "crashrpt\bin"
 REM call "crashrpt\clean.bat"
 del "..\bin\Debug\CrashRpt1400d.dll"
 del "..\bin\Release\CrashRpt1400.dll"
+del "..\bin\Debug\crashrpt_lang.ini"
+del "..\bin\Release\crashrpt_lang.ini"
+del "..\bin\Debug\CrashSender1400d.exe"
+del "..\bin\Release\CrashSender1400.exe"
 del "..\lib\CrashRpt1400*.lib"
 
 REM Build Crashrpt in Debug and Release

@@ -125,8 +125,6 @@ int CMFCDemoApp::Run()
   info.pszUrl = _T("http://someserver.com/crashrpt.php");                    
   // Install all available exception handlers.
   info.dwFlags |= CR_INST_ALL_POSSIBLE_HANDLERS; 
-  // Use binary encoding for HTTP uploads (recommended).
-  info.dwFlags |= CR_INST_HTTP_BINARY_ENCODING;     
   // Provide privacy policy URL
   info.pszPrivacyPolicyURL = _T("http://someserver.com/privacy.html");
 
@@ -142,7 +140,7 @@ int CMFCDemoApp::Run()
   // Take screenshot of the app window at the moment of crash
   crAddScreenshot2(CR_AS_MAIN_WINDOW|CR_AS_USE_JPEG_FORMAT, 95);
 
-  BOOL bRun;
+  BOOL bRun = TRUE;
   BOOL bExit=FALSE;
   while(!bExit)
   {

@@ -1,23 +1,41 @@
-#include "LuaInterface/LUObject.h"
+#include "LuaInterface/CLuaUObject.h"
 #include "BL2SDK/BL2SDK.h"
+#include "LuaInterface/CLuaInterface.h"
+
+#include <map>
+#include <string>
 
 namespace LuaInterface
 {
-	namespace LUObject
+	class CLuaUObject
 	{
-		UProperty* FindProperty(UClass* pClass, const char* pPropertyName)
+		UObject* m_pObject;
+		CLuaInterface* m_pLua;
+		//std::map<std::string, UProperty*> m_propCache; Benchmarking needed
+
+		UProperty* FindProperty(const char* propertyName)
 		{
+			// Basic algorithm:
+			// (-> Resolve the property name from Lua to an FName for faster lookup)
+			// ^ On second thoughts, this would probably result in more string comparisons and be SLOWER.
+			// -> Start with the outermost class. 
+			// -> Go through all of the fields in this class to see if it matches the one we want
+			// -> If no match found, repeat with the next inherited class.
+			// -> If we reach the highest level and we haven't found a match, we failed.
+			
 			UProperty* pProperty = NULL;
-			while(pClass && !pProperty) // While there are still super classes and we haven't found the property
+			UClass* pCurClass = m_pObject->Class;
+
+			while(pCurClass && !pProperty) // While there are still super classes and we haven't found the property
 			{
-				UField* pField = pClass->Children;
+				UField* pField = pCurClass->Children;
 				while(pField) // Check all of this class' fields to see if it's the property we want
 				{
 					if(pField->IsA(UFunction::StaticClass()) || pField->IsA(UProperty::StaticClass())) // Is it a function/property?
 					{
-						if(!strcmp(pPropertyName, pField->Name.GetName()))
+						if(!strcmp(propertyName, pField->Name.GetName()))
 						{
-							pProperty = (UProperty*)pField;
+							pProperty = (UProperty*)pField; // UFunction technically doesn't fit this, but good enough
 							break;
 						}
 					}
@@ -25,11 +43,31 @@ namespace LuaInterface
 					pField = pField->Next;
 				}
 
-				pClass = (UClass*)pClass->SuperField;
+				pCurClass = (UClass*)pCurClass->SuperField; // The property wasn't found in the outer class, go to the next one in.
 			}
 
 			return pProperty;
 		}
+
+		void PushProperty(UProperty* pProperty)
+		{
+			// Property types:
+			// UByteProperty, UIntProperty, UFloatProperty, UBoolProperty, UStrProperty, UNameProperty
+			// UDelegateProperty, UObjectProperty, UClassProperty, UInterfaceProperty, UStructProperty
+			// UArrayProperty, UMapProperty
+			// and UFunction
+
+			if(pProperty->IsA(UFunction::StaticClass()))
+			{
+
+			}
+		}
+	};
+}
+
+	/*
+	namespace LUObject
+	{
 
 		void GetProperty(lua_State* L, UObject* pObject, UProperty* pProperty, char* pData, int index)
 		{
@@ -278,7 +316,8 @@ namespace LuaInterface
 			UObjectData* pObjectData = (UObjectData*)luaL_checkudata(L, 1, EngineUObject);
 			const char* pPropertyName = lua_tostring(L, 2);
 
-			UProperty* pProperty = FindProperty(pObjectData->pClass, pPropertyName);
+			//UProperty* pProperty = FindProperty(pObjectData->pClass, pPropertyName);
+			UProperty* pProperty = NULL;
 
 			GetProperty(L, pObjectData->pObject, pProperty, pObjectData->pData, NO_INDEX);
 
@@ -290,7 +329,9 @@ namespace LuaInterface
 			UObjectData* pObjectData = (UObjectData*)luaL_checkudata(L, 1, EngineUObject);
 			const char* pPropertyName = lua_tostring(L, 2);
 
-			UProperty* pProperty = FindProperty(pObjectData->pClass, pPropertyName);
+			//UProperty* pProperty = FindProperty(pObjectData->pClass, pPropertyName);
+			UProperty* pProperty = NULL;
+
 			SetProperty(L, pProperty, pObjectData->pData, NO_INDEX);
 
 			return 0;
@@ -311,4 +352,4 @@ namespace LuaInterface
 			lua_pop(L, 1);
 		}
 	}
-}
+	*/

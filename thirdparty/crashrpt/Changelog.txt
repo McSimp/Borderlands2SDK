@@ -1,5 +1,16 @@
 ======= Change History ========
 
+--- Ver. 1.4.1 ---
+
+
+- New: Added back the crExceptionFilter() function removed previously as deprecated. 
+       It seems that some users require that function. (issue 175).
+
+- Fixed: Update italian language file (issue 174)
+- Fixed again: HTTPS certificate problem (issue 151)
+- Fixed: Custom property cleared by adding other property (issue 176)
+
+
 --- Ver. 1.4.0 ---
 
 - New: CrashRpt is now able to capture end user's desktop and record what happened 
@@ -12,6 +23,21 @@
        and add the file to crash report.
 
 - New: Added code of Theora video codec and OGG container (libtheora and libogg).
+
+- New: New-style crash callback replacing the obsolete LPGETLOGFILE() callback.
+       Added PFNCRASHCALLBACK() callback function prototype, CR_CRASH_CALLBACK_INFO
+       structure and crSetCrashCallback() function.
+
+- New: Added an ability to continue program execution after crash. This can be performed
+       through crash callback (see CR_CRASH_CALLBACK_INFO::bContinueExecution structure
+       member). This partially implements feature request in issue 125.
+
+- New: Removed deprecated constant CR_INST_ALL_EXCEPTION_HANDLERS, use CR_INST_ALL_POSSIBLE_HANDLERS
+       constant instead.
+
+- New: Removed legacy method of error report delivery as Base-64-encoded data.
+       Now binary-encoded HTTP uploads are always used instead. This makes the
+       constant CR_INST_HTTP_BINARY_ENCODING useless.
 
 - Fixed: Memory Leak (or rather memory not deallocated before program exit) (issue 169)
 - Fixed: Can not restart application. Use CR_INST_APP_RESTART flag (issue 165)

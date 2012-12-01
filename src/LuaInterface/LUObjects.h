@@ -1,7 +1,7 @@
 #ifndef LUOBJECTS_H
 #define LUOBJECTS_H
 
-#include "LuaInterface/LuaInterface.h"
+#include "LuaInterface/LuaManager.h"
 
 namespace LuaInterface
 {

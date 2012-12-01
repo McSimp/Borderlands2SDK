@@ -120,10 +120,11 @@
     <ClCompile Include="..\..\src\GUI\DirectX9.cpp" />
     <ClCompile Include="..\..\src\GUI\GwenManager.cpp" />
     <ClCompile Include="..\..\src\Logging\Logging.cpp" />
-    <ClCompile Include="..\..\src\LuaInterface\CBaseLuaInterface.cpp" />
-    <ClCompile Include="..\..\src\LuaInterface\LUObject.cpp" />
+    <ClCompile Include="..\..\src\LuaInterface\CLuaInterface.cpp" />
+    <ClCompile Include="..\..\src\LuaInterface\CLuaObject.cpp" />
+    <ClCompile Include="..\..\src\LuaInterface\CLuaUObject.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\LUObjects.cpp" />
-    <ClCompile Include="..\..\src\LuaInterface\LuaInterface.cpp" />
+    <ClCompile Include="..\..\src\LuaInterface\LuaManager.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -175,10 +176,13 @@
     <ClInclude Include="..\..\src\GUI\D3D9Hook.h" />
     <ClInclude Include="..\..\src\GUI\GwenManager.h" />
     <ClInclude Include="..\..\src\Logging\Logging.h" />
-    <ClInclude Include="..\..\src\LuaInterface\CBaseLuaInterface.h" />
-    <ClInclude Include="..\..\src\LuaInterface\LuaInterface.h" />
-    <ClInclude Include="..\..\src\LuaInterface\LUObject.h" />
+    <ClInclude Include="..\..\src\LuaInterface\CLuaInterface.h" />
+    <ClInclude Include="..\..\src\LuaInterface\CLuaObject.h" />
+    <ClInclude Include="..\..\src\LuaInterface\ILuaTable.h" />
+    <ClInclude Include="..\..\src\LuaInterface\CLuaUObject.h" />
+    <ClInclude Include="..\..\src\LuaInterface\LuaManager.h" />
     <ClInclude Include="..\..\src\LuaInterface\LUObjects.h" />
+    <ClInclude Include="..\..\src\LuaInterface\UserData.h" />
     <ClInclude Include="..\..\thirdparty\crashrpt\include\CrashRpt.h" />
     <ClInclude Include="..\..\thirdparty\lua521\lauxlib.h" />
     <ClInclude Include="..\..\thirdparty\lua521\lua.h" />
