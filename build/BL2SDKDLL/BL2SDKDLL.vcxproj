@@ -123,7 +123,7 @@
     <ClCompile Include="..\..\src\LuaInterface\CLuaInterface.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\CLuaObject.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\CLuaUObject.cpp" />
-    <ClCompile Include="..\..\src\LuaInterface\LUObjects.cpp" />
+    <ClCompile Include="..\..\src\LuaInterface\CLuaUObjectTable.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\LuaManager.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>
@@ -181,7 +181,7 @@
     <ClInclude Include="..\..\src\LuaInterface\ILuaTable.h" />
     <ClInclude Include="..\..\src\LuaInterface\CLuaUObject.h" />
     <ClInclude Include="..\..\src\LuaInterface\LuaManager.h" />
-    <ClInclude Include="..\..\src\LuaInterface\LUObjects.h" />
+    <ClInclude Include="..\..\src\LuaInterface\CLuaUObjectTable.h" />
     <ClInclude Include="..\..\src\LuaInterface\UserData.h" />
     <ClInclude Include="..\..\thirdparty\crashrpt\include\CrashRpt.h" />
     <ClInclude Include="..\..\thirdparty\lua521\lauxlib.h" />

@@ -199,7 +199,7 @@ public:
 	char* GetNameCPP(); 
 	char* GetFullName(); 
 
-	template< class T > static T* FindObject ( char* ObjectFullName ) 
+	template< class T > static T* FindObject ( const char* ObjectFullName ) 
 	{ 
 		while ( ! UObject::GObjObjects() ) 
 			Sleep ( 100 ); 

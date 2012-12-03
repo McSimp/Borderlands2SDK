@@ -1,6 +1,6 @@
 // This file is based on garry's implementation as well as BlackAwps' backwards headers
 #include "LuaInterface/CLuaInterface.h"
-#include "UserData.h"
+#include "LuaInterface/UserData.h"
 #include "Logging/Logging.h"
 
 static int luabl2_print (lua_State *L) {
