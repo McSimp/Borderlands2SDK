@@ -56,6 +56,7 @@ void StackDump(lua_State* L)
 	Logging::Log("--------------- Stack Dump Finished ---------------\n" );
 }
 
+// VIRT
 CLuaInterface::CLuaInterface()
 {
 	m_pState = luaL_newstate();
@@ -77,6 +78,7 @@ CLuaInterface::CLuaInterface()
 	//m_pErrorNoHalt = GetGlobal( "ErrorNoHalt" );
 }
 
+// VIRT
 CLuaInterface::~CLuaInterface()
 {
 	m_pG->UnReference();
@@ -87,11 +89,13 @@ CLuaInterface::~CLuaInterface()
 	lua_close(m_pState);
 }
 
+// VIRT
 lua_State* CLuaInterface::GetLuaState()
 {
 	return m_pState;
 }
 
+// BASE DONE
 void CLuaInterface::PushSpecial(int type)
 {
 	int index;
@@ -110,42 +114,45 @@ void CLuaInterface::PushSpecial(int type)
 	else
 	{
 		Logging::Log("[CLuaInterface] ERROR: PushSpecial - type %i is not a valid special table\n", type);
-		return;
+		index = LUA_REFNIL; // Check
 	}
 
 	lua_pushvalue(m_pState, index);
 }
 
+// VIRT
 CLuaObject* CLuaInterface::Global()
 {
 	return m_pG;
 }
 
+// VIRT
 CLuaObject* CLuaInterface::Registry()
 {
 	return m_pR;
 }
 
+// VIRT
 CLuaObject* CLuaInterface::Environment()
 {
 	//return m_pE;
 	return NULL;
 }
 
-// DONE
+// VIRT
 CLuaObject* CLuaInterface::GetNewTable()
 {
 	this->NewTable();
 	return new CLuaObject(this, this->CreateReference());
 }
 
-// DONE
+// VIRT (Direct to base) DONE
 void CLuaInterface::NewTable()
 {
 	lua_newtable(m_pState);
 }
 
-// DONE
+// BASE DONE (TODO: Give type that SetTable is trying to set)
 void CLuaInterface::SetTable(int i)
 {
 	if(!lua_istable(m_pState, i))
@@ -156,34 +163,34 @@ void CLuaInterface::SetTable(int i)
 	lua_settable(m_pState, i);
 }
 
-// DONE
+// BASE DONE
 void CLuaInterface::GetField(int i, const char* name)
 {
 	lua_getfield(m_pState, i, name);
 }
 
-// DONE
+// VIRT
 CLuaObject* CLuaInterface::NewTemporaryObject()
 {
 	this->PushNil();
 	return new CLuaObject(this, this->CreateReference());
 }
 
-// DONE
+// VIRT
 CLuaObject* CLuaInterface::NewUserData(CLuaObject* metaT)
 {
 	UserData* data = (UserData*)lua_newuserdata(m_pState, sizeof(UserData));
 	CLuaObject* obj = new CLuaObject(this, this->CreateReference());
 
 	obj->Push();
-	metaT->Push();
-	this->SetMetaTable(-2);
+		metaT->Push();
+		this->SetMetaTable(-2);
 	this->Pop();
 
 	return obj;
 }
 
-// DONE
+// VIRT
 void CLuaInterface::PushUserData(CLuaObject* metaT, void* v, unsigned char type)
 {
 	if(!metaT)
@@ -196,28 +203,28 @@ void CLuaInterface::PushUserData(CLuaObject* metaT, void* v, unsigned char type)
 	int iRef = this->CreateReference();
 
 	this->PushReference(iRef);
-	metaT->Push();
-	this->SetMetaTable(-2);
+		metaT->Push();
+		this->SetMetaTable(-2);
 
 	this->FreeReference(iRef);
 }
 
-// DONE
+// BASE DONE
 void CLuaInterface::PushUserData(void* data)
 {
 	lua_pushlightuserdata(m_pState, data);
 }
 
-// DONE
+// VIRT
 void CLuaInterface::Error(const char* strError, ...)
 {
-	char buff[ 1024 ];
+	char buff[1024];
 	va_list argptr;
-	va_start( argptr, strError );
-	vsprintf_s( buff, strError, argptr );
-	va_end( argptr );
+	va_start(argptr, strError);
+	vsprintf_s(buff, strError, argptr);
+	va_end(argptr);
 
-	luaL_error(m_pState, "%s", buff);
+	this->ThrowError(buff);
 }
 
 /*
@@ -235,39 +242,49 @@ void CLuaInterface::ErrorNoHalt( const char* strError, ... )
 }
 */
 
-// DONE
+// VIRT (Direct to base) DONE
 void CLuaInterface::LuaError(const char* strError, int argument)
 {
 	luaL_argerror(m_pState, argument, strError);
 }
 
-// DONE
+// BASE DONE
 void CLuaInterface::ThrowError(const char* error)
 {
 	luaL_error(m_pState, "%s", error);
 }
 
-// DONE
+// VIRT
+CLuaObject* CLuaInterface::GetGlobal(const char* name)
+{
+	this->PushSpecial(Lua::SPECIAL_GLOB);
+		this->GetField(-1, name);
+		CLuaObject* o = new CLuaObject(this, this->CreateReference());
+	this->Pop();
+	return o;
+}
+
+// VIRT
 void CLuaInterface::RemoveGlobal(const char* name)
 {
 	this->PushSpecial(Lua::SPECIAL_GLOB);
-	this->Push(name);
-	this->PushNil();
-	this->SetTable(-3);
-	this->Pop(); // pop the PushSpecial
+		this->Push(name);
+		this->PushNil();
+		this->SetTable(-3);
+	this->Pop();
 }
 
-// DONE
+// VIRT
 void CLuaInterface::NewGlobalTable(const char* name)
 {
 	this->PushSpecial(Lua::SPECIAL_GLOB);
-	this->Push(name);
-	this->NewTable();
-	this->SetTable(-3);
-	this->Pop(); // pop the PushSpecial
+		this->Push(name);
+		this->NewTable();
+		this->SetTable(-3);
+	this->Pop();
 }
 
-// DONE
+// VIRT
 CLuaObject* CLuaInterface::GetObject(int i)
 {
 	if(i != 0)
@@ -275,7 +292,7 @@ CLuaObject* CLuaInterface::GetObject(int i)
 	return new CLuaObject(this, this->CreateReference());
 }
 
-// DONE
+// VIRT (Direct to base) DONE
 const char* CLuaInterface::GetString(int i, unsigned int* iLen)
 {
 	unsigned int len;
@@ -287,45 +304,53 @@ const char* CLuaInterface::GetString(int i, unsigned int* iLen)
 	return result;
 }
 
-// DONE
+// VIRT
 int CLuaInterface::GetInteger(int i)
 {
 	return (int)this->GetNumber(i);
 }
 
-// DONE
+// VIRT (Direct to base) DONE
 double CLuaInterface::GetNumber(int i)
 {
 	return lua_tonumber(m_pState, i);
 }
 
-// DONE
+// VIRT
 double CLuaInterface::GetDouble(int i)
 {
 	return this->GetNumber(i);
 }
 
-// DONE
+// VIRT (Direct to base) DONE
 bool CLuaInterface::GetBool(int i)
 {
 	return lua_toboolean(m_pState, i) != 0;
 }
 
-// DONE
+// BASE of GetUserdata DONE
+void* CLuaInterface::GetBaseUserData(int i)
+{
+	return lua_touserdata(m_pState, i);
+}
+
+// VIRT
 void** CLuaInterface::GetUserDataPtr(int i)
 {
 	UserData* data = (UserData*)lua_touserdata(m_pState, i);
 	return &data->data; // Not sure if this is correct
 }
 
-// DONE
+// VIRT
 void* CLuaInterface::GetUserData(int i)
 {
 	UserData* data = (UserData*)lua_touserdata(m_pState, i);
 	return data->data;
 }
 
-// DONE
+
+
+// BASE (Unknown VIRT) DONE
 void CLuaInterface::GetTable(int i)
 {
 	if(!lua_istable(m_pState, i))
@@ -337,32 +362,38 @@ void CLuaInterface::GetTable(int i)
 	lua_gettable(m_pState, i);
 }
 
-// DONE
+// VIRT
 const char* CLuaInterface::GetStringOrError(int i)
 {
 	this->CheckType(i, Lua::TYPE_STRING);
 	return this->GetString(i);
 }
 
-// DONE
+// VIRT DONE
 CUtlLuaVector* CLuaInterface::GetAllTableMembers(int i)
 {
 	if(i != 0)
 		this->Push(i);
 
+	if(this->IsType(-1, Lua::TYPE_TABLE))
+    {
+		this->ThrowError("ILuaInterface::GetAllTableMembers, object not a table !");
+        return NULL;
+    }
+
 	CUtlLuaVector* tableMembers = new CUtlLuaVector();
 
 	this->PushNil();
-	while(this->Next(i - 2) != 0)
+	while(this->Next(-2) != 0) // ???
 	{
 		LuaKeyValue keyValues;
 
-		keyValues.pKey = GetObject(-2);
-		keyValues.pValue = GetObject(-1);
+		keyValues.pKey = this->GetObject(-2);
+		keyValues.pValue = this->GetObject(-1);
 
 		tableMembers->push_back(keyValues);
 
-		this->Pop();
+		keyValues.pKey->Push(); // Push key back for next loop
 	}
 
 	if(i != 0)
@@ -378,7 +409,7 @@ CUtlLuaVector* CLuaInterface::GetAllTableMembers(int i)
 	return tableMembers;
 }
 
-// DONE
+// VIRT
 void CLuaInterface::DeleteLuaVector(CUtlLuaVector* pVector)
 {
 	FOR_LOOP( pVector, i )
@@ -396,13 +427,12 @@ void CLuaInterface::DeleteLuaVector(CUtlLuaVector* pVector)
 		delete pVector;
 }
 
-// DONE
 int CLuaInterface::CreateReference()
 {
 	return luaL_ref(m_pState, LUA_REGISTRYINDEX);
 }
 
-// DONE
+// VIRT
 int CLuaInterface::GetReference(int i)
 {
 	if(i != 0)
@@ -411,19 +441,17 @@ int CLuaInterface::GetReference(int i)
 	return this->CreateReference();
 }
 
-// DONE
 void CLuaInterface::FreeReference(int i)
 {
-	luaL_unref(m_pState, LUA_REGISTRYINDEX, i);
+	lua_unref(m_pState, i);
 }
 
-// DONE
 void CLuaInterface::PushReference(int i)
 {
-	lua_rawgeti(m_pState, LUA_REGISTRYINDEX, i);
+	lua_getref(m_pState, i);
 }
 
-// DONE
+// BASE AND VIRT (Calls base) DONE
 void CLuaInterface::Pop(int i)
 {
 	int top = this->Top();
@@ -436,29 +464,35 @@ void CLuaInterface::Pop(int i)
 	lua_pop(m_pState, i);
 }
 
-// DONE
+// BASE AND VIRT (Calls base) DONE
 int CLuaInterface::Top()
 {
 	return lua_gettop(m_pState);
 }
 
-// Done
+// BASE DONE
 int CLuaInterface::Next(int i)
 {
 	return lua_next(m_pState, i);
 }
 
-// DONE
+// THIS IS THE BASE FUNCTION PUSH
+void CLuaInterface::PushCopy(int i)
+{
+	return lua_pushvalue(m_pState, i);
+}
+
+// VIRT
 void CLuaInterface::Push(CLuaObject* o)
 {
 	o->Push();
 }
 
-// DONE
+// VIRT (Direct to base) DONE
 void CLuaInterface::Push(const char* str, unsigned int iLen)
 {
 	if(str == NULL)
-		str = "NULL";
+		str = "NULL"; // This is a problem waiting to happen.
 
 	if(!iLen)
 		iLen = strlen(str);
@@ -466,7 +500,7 @@ void CLuaInterface::Push(const char* str, unsigned int iLen)
 	lua_pushlstring(m_pState, str, iLen);
 }
 
-// DONE
+// VIRT DONE
 void CLuaInterface::PushVA(const char* str, ...)
 {
 	char buff[1024];
@@ -478,61 +512,71 @@ void CLuaInterface::PushVA(const char* str, ...)
 	this->Push(buff, len);
 }
 
-// DONE
+// VIRT DONE
 void CLuaInterface::Push(double d)
 {
 	lua_pushnumber(m_pState, d);
 }
 
-// DONE
+// VIRT DONE
 void CLuaInterface::Push(bool b)
 {
 	lua_pushboolean(m_pState, (int)b);
 }
 
-// DONE
+// VIRT DONE
 void CLuaInterface::Push(lua_CFunction f)
 {
 	lua_pushcfunction(m_pState, f);
 }
 
-// DONE
+// VIRT (Direct to base) DONE
 void CLuaInterface::Push(int i)
 {
 	lua_pushnumber(m_pState, i);
 }
 
-// DONE
+// VIRT DONE
 void CLuaInterface::Push(float f)
 {
 	lua_pushnumber(m_pState, f);
 }
 
-// DONE
+// VIRT DONE
 void CLuaInterface::PushLong(int i)
 {
 	lua_pushnumber(m_pState, i);
 }
 
-// DONE
 void CLuaInterface::PushNil()
 {
 	lua_pushnil(m_pState);
 }
 
-// DONE, check this does what we want
+// BASE AND VIRT DONE
 void CLuaInterface::CheckType(int i, int iType)
 {
 	luaL_checktype(m_pState, i, iType);
 }
 
-// DONE, but TODO change lua_type for new metatable
+// BASE AND VIRT (DO SAME THING) DONE, but TODO check this works
 int CLuaInterface::GetType(int iStackPos)
 {
-	return lua_type(m_pState, iStackPos);
+	int type = lua_type(m_pState, iStackPos);
+	if(type >= Lua::TYPE_USERDATA && type != Lua::TYPE_THREAD)
+	{
+		UserData* data = (UserData*)lua_touserdata(m_pState, iStackPos);
+		int udType = data->type;
+		if(udType >= Lua::TYPE_COUNT)
+		{
+			return udType;
+		}
+	}
+	
+	return type;
 }
 
-// DONE
+// BASE AND VIRT DONE
 const char* CLuaInterface::GetTypeName(int iType)
 {
 	if(iType < 0 || iType >= Lua::TYPE_COUNT)
@@ -544,18 +588,35 @@ const char* CLuaInterface::GetTypeName(int iType)
 	return Lua::TypeName[iType];
 }
 
-// DONE
+// BASE DONE BUT NEEDS TO BE CHECKED!
 bool CLuaInterface::IsType(int i, int iType)
 {
-	return lua_type(m_pState, i) == iType;
+	int type = lua_type(m_pState, i);
+	if(type != iType)
+	{
+		// Maybe it's some custom userdata
+		if(iType >= Lua::TYPE_USERDATA && type >= Lua::TYPE_USERDATA)
+		{
+			return this->GetType(i) == iType;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return true;
+	}
 }
 
+// VIRT
 CLuaObject* CLuaInterface::GetReturn( int iNum )
 {
-	return GetObject( iNum );
+	return this->GetObject( iNum );
 }
 
-// DONE
+// BASE AND VIRT DONE
 void CLuaInterface::Call(int args, int returns)
 {
 	int funcStackPos = -(args)-1;
@@ -568,7 +629,7 @@ void CLuaInterface::Call(int args, int returns)
 	lua_call(m_pState, args, returns);
 }
 
-// DONE
+// BASE AND VIRT DONE
 int CLuaInterface::PCall(int args, int returns, int iErrorFunc)
 {
 	int funcStackPos = -(args)-1;
@@ -580,19 +641,21 @@ int CLuaInterface::PCall(int args, int returns, int iErrorFunc)
 
 	if(iErrorFunc && !lua_isfunction(m_pState, iErrorFunc))
 	{
-		Logging::Log("[CLuaInterface] ERROR: PCall - stack pos %i (for error func) is not a function\n", funcStackPos);
+		Logging::Log("[CLuaInterface] ERROR: PCall - stack pos %i (for error func) is not a function\n", iErrorFunc);
 		return -1;
 	}
 
 	return lua_pcall(m_pState, args, returns, iErrorFunc);
 }
 
+// BASE AND VIRT DONE (TODO: Check luaL_newmetatable_type is doing what it's meant to
 CLuaObject* CLuaInterface::GetMetaTable(const char* strName, int iType)
 {
 	luaL_newmetatable_type(m_pState, strName, iType);
 	return new CLuaObject(this, this->CreateReference());
 }
 
+// VIRT (Calls base correctly) DONE
 CLuaObject* CLuaInterface::GetMetaTable(int i)
 {
 	if(lua_getmetatable(m_pState, i) != 0)
@@ -605,6 +668,7 @@ CLuaObject* CLuaInterface::GetMetaTable(int i)
 	}
 }
 
+// BASE DONE
 void CLuaInterface::SetMetaTable(int i)
 {
 	if(!lua_istable(m_pState, -1))

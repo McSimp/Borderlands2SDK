@@ -96,6 +96,7 @@ public:
 	double			GetDouble( int i = -1 );
 	//float			GetFloat( int i = -1 );
 	bool			GetBool( int i = -1 );
+	void*			GetBaseUserData( int i = -1 );
 	void**			GetUserDataPtr( int i = -1 );
 	void*			GetUserData( int i = -1 );
 	void			GetTable( int i = -1 );
@@ -113,6 +114,7 @@ public:
 	int				Top();
 	int				Next( int i );
 
+	void			PushCopy( int i );
 	void			Push( CLuaObject* o );
 	void			Push( const char* str, unsigned int iLen = 0 );
 	void			PushVA( const char* str, ... );

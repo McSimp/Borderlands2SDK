@@ -36,7 +36,7 @@ void CLuaObject::SetFromStack( int i ) // ???
 	if ( m_iRef )
 		m_pLua->FreeReference( m_iRef );
 		
-	m_pLua->Push( i );
+	m_pLua->PushCopy( i );
 	m_iRef = m_pLua->CreateReference();
 }
 
@@ -59,6 +59,7 @@ int CLuaObject::GetType()
 	return ret;
 }
 
+// This is going to cause problems
 const char* CLuaObject::GetTypeName()
 {
 	Push(); // +1
@@ -110,7 +111,7 @@ bool CLuaObject::GetBool( void )
 void* CLuaObject::GetUserData( void )
 {
 	Push(); // +1
-		UserData* data = (UserData*) m_pLua->GetUserData( -1 );
+		UserData* data = (UserData*) m_pLua->GetBaseUserData( -1 );
 	m_pLua->Pop(); // -1
 	return data->data;
 }
@@ -141,7 +142,6 @@ CUtlLuaVector* CLuaObject::GetMembers()
 		tableMembers->push_back( keyValues );
 		
 		m_pLua->PushReference( iKey ); // Push key back for next loop
-
 	}
 	
 	m_pLua->Pop();
@@ -405,8 +405,7 @@ void* CLuaObject::GetMemberUserData( const char* name, void* u )
 void CLuaObject::SetUserData( void* obj, unsigned char type )
 {
 	Push(); // +1
-		UserData *data = (UserData*) m_pLua->GetUserData();
-
+		UserData *data = (UserData*) m_pLua->GetBaseUserData();
 		data->data = obj;
 		data->type = type;
 	m_pLua->Pop(); // -1
@@ -425,7 +424,7 @@ void* CLuaObject::GetMemberUserDataLite( const char* name, void* u )
 {
 	Push(); // +1
 		m_pLua->GetField( -1, name ); // +1
-		void* r  = ( m_pLua->GetType(-1) != Lua::TYPE_NIL ) ? m_pLua->GetUserData(-1) : u;
+		void* r  = ( m_pLua->GetType(-1) != Lua::TYPE_NIL ) ? m_pLua->GetBaseUserData(-1) : u;
 	m_pLua->Pop(2); // -2
 	return r;
 }
