@@ -2,9 +2,13 @@
 
 --- Ver. 1.4.1 ---
 
+- New: Added an ability to preview OGG video files in Error Report Details dialog.
+       To preview a file, select it in the list of files.
 
 - New: Added back the crExceptionFilter() function removed previously as deprecated. 
        It seems that some users require that function. (issue 175).
+
+- New: Extended unit tests (added ExceptionHandlerTests) (issue 114)
 
 - Fixed: Update italian language file (issue 174)
 - Fixed again: HTTPS certificate problem (issue 151)
