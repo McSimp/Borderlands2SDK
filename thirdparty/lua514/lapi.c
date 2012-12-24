@@ -232,42 +232,22 @@ LUA_API void lua_pushvalue (lua_State *L, int idx) {
   lua_unlock(L);
 }
 
+
+
 /*
 ** access functions (stack -> C)
 */
+
 
 LUA_API int lua_type (lua_State *L, int idx) {
   StkId o = index2adr(L, idx);
   return (o == luaO_nilobject) ? LUA_TNONE : ttype(o);
 }
 
-char type_name_buf[128];
 
-// BL2 SDK MODIFICATION - based on garry's implementation
-LUA_API const char *lua_getusertype (lua_State *L, int idx) {
-  if (lua_getmetatable(L, idx)) {
-    lua_pushstring(L, "MetaName");
-    lua_gettable(L, -2);
-
-    if (lua_isstring(L, -1)) {
-      const char *name = lua_tostring(L, -1);
-      strncpy(type_name_buf, name, sizeof(type_name_buf));
-      lua_pop(L, 1);
-	  return type_name_buf;
-    } else {
-      assert(0);
-      lua_pop(L, 1);
-    }
-  }
-
-  return "UserData";
-}
-
-LUA_API const char *lua_typename (lua_State *L, int t, int idx) {
-  if (idx && t == LUA_TUSERDATA)
-    return lua_getusertype(L, idx);
-  else
-    return (t == LUA_TNONE) ? "no value" : luaT_typenames[t];
+LUA_API const char *lua_typename (lua_State *L, int t) {
+  UNUSED(L);
+  return (t == LUA_TNONE) ? "no value" : luaT_typenames[t];
 }
 
 

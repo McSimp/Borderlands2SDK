@@ -48,7 +48,7 @@ void StackDump(lua_State* L)
 			Logging::Log("%d: %g\n",  i, lua_tonumber(L, i));
 			break;
 		default: 
-			Logging::Log("%d: %s\n", i, lua_typename(L, t, i));
+			Logging::Log("%d: %s\n", i, lua_typename(L, t));
 			break;
 		}
 		i--;
@@ -183,8 +183,9 @@ CLuaObject* CLuaInterface::NewUserData(CLuaObject* metaT)
 	CLuaObject* obj = new CLuaObject(this, this->CreateReference());
 
 	obj->Push();
-		metaT->Push();
-		this->SetMetaTable(-2);
+	metaT->Push();
+	this->SetMetaTable(-2);
+
 	this->Pop();
 
 	return obj;
@@ -252,6 +253,12 @@ void CLuaInterface::LuaError(const char* strError, int argument)
 void CLuaInterface::ThrowError(const char* error)
 {
 	luaL_error(m_pState, "%s", error);
+}
+
+// VIRT
+void CLuaInterface::TypeError(const char* expectedTypeName, int iStackPos)
+{
+	luaL_typerror(m_pState, iStackPos, expectedTypeName);
 }
 
 // VIRT
@@ -347,8 +354,6 @@ void* CLuaInterface::GetUserData(int i)
 	UserData* data = (UserData*)lua_touserdata(m_pState, i);
 	return data->data;
 }
-
-
 
 // BASE (Unknown VIRT) DONE
 void CLuaInterface::GetTable(int i)
@@ -556,14 +561,19 @@ void CLuaInterface::PushNil()
 // BASE AND VIRT DONE
 void CLuaInterface::CheckType(int i, int iType)
 {
-	luaL_checktype(m_pState, i, iType);
+	int luaType = this->GetType(i);
+	if(luaType != iType)
+	{
+		const char* typeName = this->GetTypeNameEx(i);
+		this->TypeError(typeName, i);
+	}
 }
 
 // BASE AND VIRT (DO SAME THING) DONE, but TODO check this works
 int CLuaInterface::GetType(int iStackPos)
 {
 	int type = lua_type(m_pState, iStackPos);
-	if(type >= Lua::TYPE_USERDATA && type != Lua::TYPE_THREAD)
+	if(type == Lua::TYPE_USERDATA)
 	{
 		UserData* data = (UserData*)lua_touserdata(m_pState, iStackPos);
 		int udType = data->type;
@@ -576,7 +586,7 @@ int CLuaInterface::GetType(int iStackPos)
 	return type;
 }
 
-// BASE AND VIRT DONE
+// BASE AND VIRT DONE, but this won't really work
 const char* CLuaInterface::GetTypeName(int iType)
 {
 	if(iType < 0 || iType >= Lua::TYPE_COUNT)
@@ -588,26 +598,41 @@ const char* CLuaInterface::GetTypeName(int iType)
 	return Lua::TypeName[iType];
 }
 
-// BASE DONE BUT NEEDS TO BE CHECKED!
-bool CLuaInterface::IsType(int i, int iType)
+const char* CLuaInterface::GetTypeNameEx(int iStackPos)
 {
-	int type = lua_type(m_pState, i);
-	if(type != iType)
+	int luaType = lua_type(m_pState, iStackPos);
+	if(luaType == Lua::TYPE_USERDATA)
 	{
-		// Maybe it's some custom userdata
-		if(iType >= Lua::TYPE_USERDATA && type >= Lua::TYPE_USERDATA)
+		if(lua_getmetatable(m_pState, iStackPos))
 		{
-			return this->GetType(i) == iType;
+			lua_pushstring(m_pState, "__type");
+			lua_rawget(m_pState, -2);
+			if(lua_isstring(m_pState, -1))
+			{
+				const char* name = lua_tostring(m_pState, -1); // This could be asking for trouble
+				lua_pop(m_pState, 1);
+				return name;
+			}
+			else
+			{
+				Logging::Log("[CLuaInterface] Userdata without metatable?\n");
+				lua_pop(m_pState, 1);
+			}
 		}
-		else
-		{
-			return false;
-		}
+
+		return "UnknownUserData";
 	}
 	else
 	{
-		return true;
+		return this->GetTypeName(luaType);
 	}
+}
+
+// BASE DONE BUT NEEDS TO BE CHECKED!
+bool CLuaInterface::IsType(int i, int iType)
+{
+	int type = this->GetType(i);
+	return type == iType;
 }
 
 // VIRT
@@ -648,10 +673,14 @@ int CLuaInterface::PCall(int args, int returns, int iErrorFunc)
 	return lua_pcall(m_pState, args, returns, iErrorFunc);
 }
 
-// BASE AND VIRT DONE (TODO: Check luaL_newmetatable_type is doing what it's meant to
-CLuaObject* CLuaInterface::GetMetaTable(const char* strName, int iType)
+// VIRT DONE
+CLuaObject* CLuaInterface::GetMetaTable(const char* strName)
 {
-	luaL_newmetatable_type(m_pState, strName, iType);
+	if(luaL_newmetatable(m_pState, strName) == 1) // Means that a new metatable had to be created
+	{
+		lua_pushstring(m_pState, strName);
+		lua_setfield(m_pState, -2, "__type");
+	}
 	return new CLuaObject(this, this->CreateReference());
 }
 

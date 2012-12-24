@@ -84,6 +84,24 @@ namespace ConCmdManager
 		tConCmdMap::iterator iConCommands = ConCommands.find(cmd[0]); // cmd[0] is the command
 		if(iConCommands != ConCommands.end())
 		{
+			// Add command to history
+			/*
+			if(console->HistoryTop == 0 ? wcscmp(console->History[16 - 1].Data, temp.c_str()) : wcscmp(console->History[console->HistoryTop - 1].Data, temp.c_str()))
+			{
+				BL2SDK::InjectedCallNext();
+				console->PurgeCommandFromHistory(FString((wchar_t*)temp.c_str()));
+
+				console->History[console->HistoryTop] = FString((wchar_t*)temp.c_str());
+				console->HistoryTop = (console->HistoryTop + 1) % 16;
+
+				if(console->HistoryBot == -1 || console->HistoryBot == console->HistoryTop)
+				{
+					console->HistoryBot = (console->HistoryBot + 1) % 16;
+				}
+			}
+			console->HistoryCur = console->HistoryTop;
+			*/
+
 			// My god UTF-16 is the biggest PITA
 			std::wstringstream s;
 			s << L"\n>>> " << temp.c_str() << L" <<<\n"; 

@@ -1,4 +1,5 @@
 #include "LuaInterface/CLuaUObject.h"
+#include "Logging/Logging.h"
 
 const char* CLuaUObject::MetaName = "UObject";
 const int CLuaUObject::MetaID = 100;
@@ -8,9 +9,10 @@ void CLuaUObject::Register(CLuaInterface* pLua)
 {
 	m_Lua = pLua;
 
-	CLuaObject* metaT = m_Lua->GetMetaTable(MetaName, MetaID);
+	CLuaObject* metaT = m_Lua->GetMetaTable(MetaName);
 		metaT->SetMember("__index", CLuaUObject::Index);
 		metaT->SetMember("__tostring", CLuaUObject::ToString);
+		metaT->SetMember("__gc", CLuaUObject::GC);
 	metaT->UnReference();
 }
 
@@ -39,6 +41,19 @@ int CLuaUObject::ToString(lua_State* L)
 	m_Lua->PushVA("%s: %s", MetaName, obj->m_pObject->GetFullName());
 
 	return 1;
+}
+
+int CLuaUObject::GC(lua_State* L)
+{
+	m_Lua->CheckType(1, MetaID);
+
+	CLuaUObject* obj = (CLuaUObject*)m_Lua->GetUserData(1);
+
+	Logging::Log("GC called for UObject %s\n", obj->m_pObject->GetFullName());
+
+	delete obj;
+
+	return 0;
 }
 
 CLuaUObject::CLuaUObject(UObject* pObject)

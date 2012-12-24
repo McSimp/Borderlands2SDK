@@ -10,10 +10,11 @@ void CLuaUObjectTable::Register(CLuaInterface* pLua)
 {
 	m_Lua = pLua;
 
-	CLuaObject* metaT = m_Lua->GetMetaTable(MetaName, MetaID);
-		metaT->SetMember("__index", CLuaUObjectTable::Index);
+	CLuaObject* metaT = m_Lua->GetMetaTable(MetaName);
+	metaT->SetMember("__index", CLuaUObjectTable::Index);
 
 	CLuaObject* ud = m_Lua->NewUserData(metaT);
+	ud->SetUserData(NULL, MetaID);
 
 	m_Lua->Global()->SetMember("UObjects", ud);
 	
@@ -23,25 +24,19 @@ void CLuaUObjectTable::Register(CLuaInterface* pLua)
 
 int CLuaUObjectTable::Index(lua_State* L)
 {
-	Logging::Log("Entering index\n");
 	// Currently I'm designing everything such that there is only ever 1 Lua state. This could change.
-	int type = m_Lua->GetType(1);
-	Logging::Log("Type = %i\n", type);
 	m_Lua->CheckType(1, MetaID);
 	
-	Logging::Log("Type checked\n");
 	UObject* pObject = NULL;
 
 	if(m_Lua->IsType(2, Lua::TYPE_STRING))
 	{
-		Logging::Log("Arg is a string\n");
 		pObject = FindObject(m_Lua->GetString(2));
 	}
 	else if(m_Lua->IsType(2, Lua::TYPE_NUMBER))
 	{
 		int index = m_Lua->GetInteger(2);
-		Logging::Log("Arg is an int\n");
-		if(index < UObject::GObjObjects()->Count)
+		if(index < UObject::GObjObjects()->Count && index >= 0)
 		{
 			pObject = UObject::GObjObjects()->Data[index];
 		}
@@ -72,11 +67,10 @@ int CLuaUObjectTable::Index(lua_State* L)
 	}
 	else
 	{
-		// Isn't this a problem with local variables?
-		CLuaUObject luaObj(pObject);
+		CLuaUObject* luaObj = new CLuaUObject(pObject);
 
-		CLuaObject* metaT = m_Lua->GetMetaTable(CLuaUObject::MetaName, CLuaUObject::MetaID);
-			m_Lua->PushUserData(metaT, &luaObj, CLuaUObject::MetaID);
+		CLuaObject* metaT = m_Lua->GetMetaTable(CLuaUObject::MetaName);
+			m_Lua->PushUserData(metaT, luaObj, CLuaUObject::MetaID);
 		metaT->UnReference();
 	}
 
@@ -87,6 +81,7 @@ UObject* CLuaUObjectTable::FindObject(const char* name)
 {
 	return UObject::FindObject<UObject>(name);
 }
+
 //#include "LuaInterface/LUObjects.h"
 //#include "BL2SDK/BL2SDK.h"
 //#include "Logging/Logging.h"

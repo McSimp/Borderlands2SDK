@@ -84,6 +84,7 @@ public:
 	//void			ErrorNoHalt( const char* strError, ... );
 	void			LuaError( const char* strError, int argument = -1 );
 	void			ThrowError( const char* error );
+	void			TypeError( const char* expectedTypeName, int iStackPos );
 
 	CLuaObject*		GetGlobal( const char* name );
 	void			RemoveGlobal( const char* name );
@@ -129,6 +130,7 @@ public:
 	void			CheckType( int i, int iType );
 	int				GetType( int iStackPos );
 	const char*		GetTypeName( int iType );
+	const char*		GetTypeNameEx( int iStackPos );
 	bool			IsType( int i, int iType );
 
 	CLuaObject*		GetReturn( int iNum );
@@ -136,7 +138,7 @@ public:
 	void			Call( int args, int returns = 0 );
 	int				PCall( int args, int returns = 0, int iErrorFunc = 0 );
 
-	CLuaObject*		GetMetaTable( const char* strName, int iType );
+	CLuaObject*		GetMetaTable( const char* strName );
 	CLuaObject*		GetMetaTable( int i );
 	void			SetMetaTable( int i );
 

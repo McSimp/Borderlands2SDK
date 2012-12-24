@@ -63,7 +63,7 @@ int CLuaObject::GetType()
 const char* CLuaObject::GetTypeName()
 {
 	Push(); // +1
-		const char* ret = m_pLua->GetTypeName( m_pLua->GetType( -1 ) );
+		const char* ret = m_pLua->GetTypeNameEx( -1 );
 	m_pLua->Pop(); // -1
 	return ret;
 }

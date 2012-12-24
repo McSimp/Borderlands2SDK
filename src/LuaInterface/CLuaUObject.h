@@ -21,6 +21,7 @@ public:
 	static void Register(CLuaInterface* pLua);
 	static int Index(lua_State* L);
 	static int ToString(lua_State* L);
+	static int GC(lua_State* L);
 };
 
 #endif
