@@ -63,7 +63,7 @@ namespace Logging
 		{
 			bLogToExternalConsole = true;
 		}
-		return result;
+		return result != 0;
 	}
 
 	bool InitializeFile(const std::wstring& fileName)
