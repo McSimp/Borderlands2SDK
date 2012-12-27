@@ -28,7 +28,7 @@ function VS-Env($envvar, $name)
 	
 	Write-Host $name "tools found, loading environment variables..."
 	Get-Batchfile $BatchFile
-	Write-Host "Environment variables loaded successfully" -foregroundcolor green -backgroundcolor black
+	Write-Host "Environment variables loaded successfully"
 	
 	return $true
 }
@@ -51,12 +51,12 @@ function Cleanup-File($path)
 	}
 }
 
-function Move-Built-File($path, $to)
+function Copy-Built-File($path, $to)
 {
 	try
 	{
-		Move-Item $path $to
-		Write-Host $path "moved"
+		Copy-Item $path $to
+		Write-Host $path "copied"
 	}
 	catch [Exception]
 	{
@@ -105,14 +105,52 @@ Log-Action "Building CrashRpt in Release..."
 Run-MSBuild "crashrpt\CrashRpt_vs2010.sln" "/p:Configuration=Release /m"
 
 Log-Action "Moving built files to SDK..."
-Move-Built-File "crashrpt\bin\CrashRpt1400d.dll" "..\bin\Debug\CrashRpt1400d.dll"
-Move-Built-File "crashrpt\bin\CrashRpt1400.dll" "..\bin\Release\CrashRpt1400.dll"
+Copy-Built-File "crashrpt\bin\CrashRpt1400d.dll" "..\bin\Debug\CrashRpt1400d.dll"
+Copy-Built-File "crashrpt\bin\CrashRpt1400.dll" "..\bin\Release\CrashRpt1400.dll"
 
-Move-Built-File "crashrpt\bin\crashrpt_lang.ini" "..\bin\Debug\crashrpt_lang.ini"
-Move-Built-File "crashrpt\bin\crashrpt_lang.ini" "..\bin\Release\crashrpt_lang.ini"
+Copy-Built-File "crashrpt\lang_files\crashrpt_lang_EN.ini" "..\bin\Debug\crashrpt_lang.ini"
+Copy-Built-File "crashrpt\lang_files\crashrpt_lang_EN.ini" "..\bin\Release\crashrpt_lang.ini"
 
-Move-Built-File "crashrpt\bin\CrashSender1400d.exe" "..\bin\Debug\CrashSender1400d.exe"
-Move-Built-File "crashrpt\bin\CrashSender1400.exe" "..\bin\Release\CrashSender1400.exe"
+Copy-Built-File "crashrpt\bin\CrashSender1400d.exe" "..\bin\Debug\CrashSender1400d.exe"
+Copy-Built-File "crashrpt\bin\CrashSender1400.exe" "..\bin\Release\CrashSender1400.exe"
 
-Move-Built-File "crashrpt\lib\CrashRpt1400d.lib" "..\lib\CrashRpt1400d.lib"
-Move-Built-File "crashrpt\lib\CrashRpt1400.lib" "..\lib\CrashRpt1400.lib"
+Copy-Built-File "crashrpt\lib\CrashRpt1400d.lib" "..\lib\CrashRpt1400d.lib"
+Copy-Built-File "crashrpt\lib\CrashRpt1400.lib" "..\lib\CrashRpt1400.lib"
+
+if(Test-Path "gwen\gwen\Projects\windows")
+{
+	Log-Action "Removing old GWEN project files..."
+	Remove-Item -Recurse -Force "gwen\gwen\Projects\windows"
+	Write-Host "GWEN project files removed"
+}
+
+Log-Action "Fixing runtime library in GWEN premake config..."
+(Get-Content "gwen\gwen\Projects\premake4.lua") | Foreach-Object {
+	$_ -replace '"StaticRuntime", ', ''
+} | Set-Content "gwen\gwen\Projects\premake4.lua"
+
+
+Log-Action "Creating GWEN project files..."
+Push-Location gwen\gwen\Projects
+cmd /c Build.bat
+Pop-Location
+
+Log-Action "Removing GWEN from SDK..."
+Cleanup-File "..\lib\gwen_staticd.lib"
+Cleanup-File "..\lib\gwen_static.lib"
+
+Log-Action "Cleaning GWEN solution..."
+Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "/p:Configuration=Debug /t:Clean /m"
+Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "/p:Configuration=Release /t:Clean /m"
+
+Log-Action "Building GWEN in Debug..."
+Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "/p:Configuration=Debug /m"
+
+Log-Action "Bulding GWEN in Release..."
+Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "/p:Configuration=Release /m"
+
+Log-Action "Moving built files to SDK..."
+Copy-Built-File "gwen\gwen\lib\windows\vs2010\gwen_staticd" "..\lib\gwen_staticd.lib"
+Copy-Built-File "gwen\gwen\lib\windows\vs2010\gwen_static.lib" "..\lib\gwen_static.lib"
+
+Write-Host "All thirdparty libraries successfully built and copied to SDK" -foregroundcolor green -backgroundcolor black
