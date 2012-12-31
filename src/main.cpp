@@ -58,14 +58,15 @@ CON_COMMAND(Derp)
 	for(int i = 0; i < UObject::GObjObjects()->Count; i++) 
 	{ 
 		UObject* Object = UObject::GObjObjects()->Data[i];
-		if(Object->IsA(UProperty::StaticClass()))
+		Logging::Log("%d | 0x%X | %s\n", i, Object, Object->GetFullName()); 
+		/*if(Object->IsA(UProperty::StaticClass()))
 		{
 			UProperty* prop = (UProperty*)Object;
 			if(prop->ArrayDim > 1 || prop->IsA(UArrayProperty::StaticClass()))
 			{
 				Logging::Log(" %40s | %10i | %10i\n", prop->Name.GetName(), prop->ArrayDim, prop->IsA(UArrayProperty::StaticClass()));
 			}
-		}
+		}*/
 		
 	} 
 	Logging::Log("=== END OBJECT DUMP ===\n");

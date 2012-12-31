@@ -1013,6 +1013,8 @@ public:
 		return pClassPointer;
 	};
 
+	void PushToLua(void* data);
+	void PushToLua(UObject* object, int index = 0);
 };
 
 // Class Core.StructProperty
@@ -1330,7 +1332,7 @@ public:
 class UBoolProperty : public UProperty
 {
 public:
-	unsigned char                                      UnknownData00[ 0x4 ];                             		// 0x0080 (0x0004) MISSED OFFSET
+	unsigned long                                      BitMask;                             				// 0x0080 (0x0004)
 
 private:
 	static UClass* pClassPointer;

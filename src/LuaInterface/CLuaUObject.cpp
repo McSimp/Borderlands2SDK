@@ -1,5 +1,8 @@
 #include "LuaInterface/CLuaUObject.h"
 #include "Logging/Logging.h"
+#include "BL2SDK/Util.h"
+
+using LuaManager::g_Lua;
 
 const char* CLuaUObject::MetaName = "UObject";
 const int CLuaUObject::MetaID = 100;
@@ -97,6 +100,84 @@ UProperty* CLuaUObject::FindProperty(const char* propertyName)
 	return pProperty;
 }
 
+void UProperty::PushToLua(void* data)
+{
+	if(this->IsA(UByteProperty::StaticClass()))
+	{
+		int value = *(unsigned char*)data;
+		g_Lua->Push(value);
+	}
+	else if(this->IsA(UIntProperty::StaticClass()))
+	{
+		int value = *(int*)data;
+		g_Lua->Push(value);
+	}
+	else if(this->IsA(UFloatProperty::StaticClass()))
+	{
+		float value = *(float*)data;
+		g_Lua->Push(value);
+	}
+	else if(this->IsA(UBoolProperty::StaticClass()))
+	{
+		Logging::Log("[Lua] Hey! Pushing a bool property needs testing!");
+		Logging::Log("Bool Prop bitmask = 0x%X\n", ((UBoolProperty*)this)->BitMask);
+		unsigned long value = *(int*)data; // Raw data with up to 32 booleans in it
+		value &= ((UBoolProperty*)this)->BitMask; // Check if the bit specified in the property is set
+		g_Lua->Push(value != 0);
+	}
+	else if(this->IsA(UStrProperty::StaticClass()))
+	{
+		FString* value = (FString*)data;
+		if(value->Data)
+		{
+			std::string str = Util::Narrow(value->Data);
+			g_Lua->Push(str.c_str());
+		}
+		else
+		{
+			g_Lua->PushNil();
+		}
+	}
+	else if(this->IsA(UNameProperty::StaticClass()))
+	{
+		FName value = *(FName*)data;
+		g_Lua->Push(value.GetName());
+	}
+	else if(this->IsA(UObjectProperty::StaticClass()) 
+		|| this->IsA(UClassProperty::StaticClass()) 
+		|| this->IsA(UInterfaceProperty::StaticClass()))
+	{
+		UObject* value = *(UObject**)data;
+
+		if(value)
+		{
+			CLuaUObject* luaObj = new CLuaUObject(value);
+
+			CLuaObject* metaT = g_Lua->GetMetaTable(CLuaUObject::MetaName);
+				g_Lua->PushUserData(metaT, luaObj, CLuaUObject::MetaID);
+			metaT->UnReference();
+		}
+		else
+		{
+			g_Lua->PushNil();
+		}
+	}
+	else
+	{
+		g_Lua->LuaError("Cannot push this property type");
+	}
+	// UDelegateProperty
+	// UStructProperty
+	// UMapProperty (not present in BL2)
+}
+
+void UProperty::PushToLua(UObject* object, int index)
+{
+	void* data = (void*)((unsigned char*)object + this->Offset + (this->ElementSize * index));
+	Logging::Log("UObject = 0x%X, Offset = 0x%X, ElementSize = 0x%X, Index = %d, Data = 0x%X\n", object, this->Offset, this->ElementSize, index, data);
+	this->PushToLua(data);
+}
+
 void CLuaUObject::PushProperty(UProperty* pProperty)
 {
 	// Property types:
@@ -105,12 +186,26 @@ void CLuaUObject::PushProperty(UProperty* pProperty)
 	// UArrayProperty, UMapProperty
 	// and UFunction
 
-	m_Lua->Push(pProperty->Name.GetName());
+	// UArrayProperty means that it's a TArray< innerType > propertyName, 
+	// an ArrayDim > 1 means that it's type propertyName[ArrayDim], and it'll just be the normal type (like UByteProperty)
 
-	//if(pProperty->IsA(UFunction::StaticClass()))
-	//{
-	//
-	//}
+	if(pProperty == NULL)
+	{
+		m_Lua->PushNil();
+		return;
+	}
+
+	//m_Lua->Push(pProperty->Name.GetName());
+
+	if(pProperty->IsA(UFunction::StaticClass()))
+	{
+		// NOT IMPLEMENT LOL.
+		g_Lua->LuaError("That's a function you silly duffer!");
+	}
+	else
+	{
+		pProperty->PushToLua(this->m_pObject);
+	}
 }
 
 /*
@@ -143,85 +238,9 @@ void CLuaUObject::PushProperty(UProperty* pProperty)
 				lua_setmetatable(L, -2);
 				return;
 			}
-
-			if ((index != NO_INDEX) && (pProperty->ArrayDim == 1))
-			{
-				luaL_argcheck(L, 0, 2, "Property cannot be indexed.");
-				return;
-			}
-
-			if(index == NO_INDEX)
-				index = 0;
-
-			if((index < 0) || ((unsigned long)index >= pProperty->ArrayDim))
-			{
-				luaL_argcheck(L, 0, 2, "Index out of range.");
-				return;
-			}
-
-			if (pProperty->IsA(UByteProperty::StaticClass()))
-			{
-				int value = *(unsigned char*)(pData + pProperty->Offset +
-					(pProperty->ElementSize * index));
-				lua_pushinteger(L, value);
-			}
-			else if (pProperty->IsA(UIntProperty::StaticClass()))
-			{
-				int value = *(int*)(pData + pProperty->Offset +
-					(pProperty->ElementSize * index));
-				lua_pushinteger(L, value);
-			}
-			else if (pProperty->IsA(UFloatProperty::StaticClass()))
-			{
-				float value = *(float*)(pData + pProperty->Offset +
-					(pProperty->ElementSize * index));
-				lua_pushnumber(L, value);
-			}
-			// BoolProperty
-			else if (pProperty->IsA(UStrProperty::StaticClass()))
-			{
-				FString* value = (FString*)(pData + pProperty->Offset +
-					(pProperty->ElementSize * index));
-				if(value->Data)
-				{
-					char* pName = new char[value->Count];
-					sprintf(pName, "%S", value->Data);
-					lua_pushstring(L, pName);
-					delete[] pName;
-				}
-				else
-				{
-					lua_pushnil(L);
-				}
-			}
-			else if(pProperty->IsA(UNameProperty::StaticClass()))
-			{
-				FName value = *(FName*)(pData + pProperty->Offset +
-					(pProperty->ElementSize * index));
-				lua_pushstring(L, value.GetName());
-			}
+			
 			// DelegateProperty
-			else if(pProperty->IsA(UObjectProperty::StaticClass()) ||
-				pProperty->IsA(UClassProperty::StaticClass()))
-			{
-				UObject* pValue = *(UObject **)(pData + pProperty->Offset +
-					(pProperty->ElementSize * index));
-
-				if(pValue)
-				{
-					UObjectData* pObjectData = (UObjectData*)lua_newuserdata(L, sizeof(*pObjectData));
-					pObjectData->pObject = pValue;
-					pObjectData->pClass = pValue->Class;
-					pObjectData->pData = (char*)pValue;
-					
-					luaL_getmetatable(L, EngineUObject);
-					lua_setmetatable(L, -2);
-				}
-				else
-				{
-					lua_pushnil(L);
-				}
-			}
+			
 			// InterfaceProperty (Probably same as Class/Object?)
 			else if(pProperty->IsA(UStructProperty::StaticClass()))
 			{
@@ -247,13 +266,6 @@ void CLuaUObject::PushProperty(UProperty* pProperty)
 				GetProperty(L, pObject, pProperty, (char*)((DWORD)pValue->Data + 
 					(index * pProperty->ElementSize)), NO_INDEX);
 			}
-			else
-			{
-				luaL_argcheck(L, 0, 2, "Can't get this property type.");
-			}
-			// UMap
-			// PointerProperty
-
 		}
 
 		void SetProperty(lua_State * L, UProperty * pProperty, char * pData, int Index)

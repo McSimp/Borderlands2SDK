@@ -1,7 +1,7 @@
 #ifndef CLUAUOBJECT_H
 #define CLUAUOBJECT_H
 
-#include "LuaInterface/CLuaInterface.h"
+#include "LuaInterface/LuaManager.h"
 #include "BL2SDK/BL2SDK.h"
 
 class CLuaUObject
