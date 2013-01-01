@@ -186,7 +186,7 @@ namespace BL2SDK
 		Logging::Log("[GameReady] Thread: %i\n", GetCurrentThreadId());
 	
 		Logging::InitializeExtern();
-		Logging::InitializeGameConsole();
+		//Logging::InitializeGameConsole();
 		Logging::PrintLogHeader();
 	
 		LuaManager::Initialize();

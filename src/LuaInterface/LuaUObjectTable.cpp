@@ -47,8 +47,9 @@ namespace LuaUObjectTable
 		if(pObject->IsA(UFunction::StaticClass()))
 		{
 			// TODO
-			g_Lua->Error("UFunctions not implemented");
-			return 0;
+			Logging::Log("[Lua] Warning: UFunctions not implemented\n");
+			g_Lua->PushNil();
+			return 1;
 		}
 		else
 		{

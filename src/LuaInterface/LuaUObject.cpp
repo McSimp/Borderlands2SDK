@@ -1,4 +1,5 @@
 #include "LuaInterface/LuaUObject.h"
+#include "LuaInterface/LuaPropertyArray.h"
 #include "Logging/Logging.h"
 #include "BL2SDK/Util.h"
 
@@ -162,6 +163,11 @@ void UProperty::PushToLua(UObject* object, int index)
 	this->PushToLua(data);
 }
 
+void UProperty::PushAsStaticArray(UObject* object)
+{
+	LuaPropertyArray::PushInstance(this, object);
+}
+
 void UObject::PushProperty(UProperty* pProperty)
 {
 	// Property types:
@@ -183,6 +189,10 @@ void UObject::PushProperty(UProperty* pProperty)
 	{
 		// NOT IMPLEMENT LOL.
 		g_Lua->LuaError("That's a function you silly duffer!");
+	}
+	else if(pProperty->ArrayDim > 1)
+	{
+		pProperty->PushAsStaticArray(this);
 	}
 	else
 	{

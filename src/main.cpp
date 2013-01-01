@@ -51,6 +51,24 @@ CON_COMMAND(SetDNCycleRate)
 	Logging::Log("Day/Night cycle rate changed to %f\n", rate);
 }
 
+CON_COMMAND(DumpObj)
+{
+	Logging::Log("=== OBJECT DUMP ===\n");
+	for(int i = 0; i < UObject::GObjObjects()->Count; i++) 
+	{ 
+		UObject* Object = UObject::GObjObjects()->Data[i];
+		if(Object)
+		{
+			Logging::Log("%d | 0x%X | %s\n", i, Object, Object->GetFullName());
+		}
+		else
+		{
+			Logging::Log("[DEBUGLOG] Got a null UObject at idx %d?\n", i);
+		}
+	} 
+	Logging::Log("=== END OBJECT DUMP ===\n");
+}
+
 CON_COMMAND(Derp)
 {
 	Logging::Log("=== OBJECT DUMP ===\n");
@@ -58,15 +76,15 @@ CON_COMMAND(Derp)
 	for(int i = 0; i < UObject::GObjObjects()->Count; i++) 
 	{ 
 		UObject* Object = UObject::GObjObjects()->Data[i];
-		Logging::Log("%d | 0x%X | %s\n", i, Object, Object->GetFullName()); 
-		/*if(Object->IsA(UProperty::StaticClass()))
+		//Logging::Log("%d | 0x%X | %s\n", i, Object, Object->GetFullName()); 
+		if(Object->IsA(UProperty::StaticClass()))
 		{
 			UProperty* prop = (UProperty*)Object;
 			if(prop->ArrayDim > 1 || prop->IsA(UArrayProperty::StaticClass()))
 			{
 				Logging::Log(" %40s | %10i | %10i\n", prop->Name.GetName(), prop->ArrayDim, prop->IsA(UArrayProperty::StaticClass()));
 			}
-		}*/
+		}
 		
 	} 
 	Logging::Log("=== END OBJECT DUMP ===\n");

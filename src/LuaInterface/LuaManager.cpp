@@ -2,6 +2,7 @@
 #include "Logging/Logging.h"
 #include "LuaInterface/LuaUObject.h"
 #include "LuaInterface/LuaUObjectTable.h"
+#include "LuaInterface/LuaPropertyArray.h"
 
 namespace LuaManager
 {
@@ -18,6 +19,9 @@ namespace LuaManager
 
 		LuaUObjectTable::Register();
 		Logging::Log("[Lua] UObjectTable registered\n");
+
+		LuaPropertyArray::Register();
+		Logging::Log("[Lua] PropertyArray registered\n");
 
 		// And we're done
 		Logging::Log("[Lua] Lua initialized (" LUA_VERSION ")\n");

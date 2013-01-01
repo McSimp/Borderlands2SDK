@@ -1020,6 +1020,7 @@ public:
 
 	void PushToLua(void* data);
 	void PushToLua(UObject* object, int index = 0);
+	void PushAsStaticArray(UObject* object);
 };
 
 // Class Core.StructProperty

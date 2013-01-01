@@ -156,6 +156,9 @@
     <ClCompile Include="..\..\src\LuaInterface\LuaUObjectTable.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\LuaInterface\LuaPropertyArray.cpp">
+      <Filter>Source Files\LuaInterface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Logging\Logging.h">
@@ -339,6 +342,9 @@
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\LuaInterface\LuaUObjectTable.h">
+      <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\LuaPropertyArray.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
   </ItemGroup>
