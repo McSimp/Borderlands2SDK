@@ -143,6 +143,7 @@ public:
 	void			SetMetaTable( int i );
 
 	int				RunString( const char* string );
+	int				DoFile( const char* filename );
 
 private:
 	lua_State*			m_pState;

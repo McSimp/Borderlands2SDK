@@ -725,3 +725,21 @@ int CLuaInterface::RunString(const char* string)
 	}
 	return error;
 }
+
+int CLuaInterface::DoFile(const char* filename)
+{
+	int status = luaL_loadfile(m_pState, filename);
+	if(status)
+	{
+		Logging::Log("[CLuaInterface] ERROR: DoFile failed to load file - %s\n", lua_tostring(m_pState, -1));
+		return status;
+	}
+
+	status = lua_pcall(m_pState, 0, LUA_MULTRET, 0);
+	if(status)
+	{
+		Logging::Log("[CLuaInterface] ERROR: DoFile failed to call chunk - %s\n", lua_tostring(m_pState, -1));
+	}
+
+	return status;
+}

@@ -147,13 +147,13 @@
     <ClCompile Include="..\..\src\LuaInterface\CLuaObject.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\LuaInterface\CLuaUObject.cpp">
-      <Filter>Source Files\LuaInterface</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\LuaInterface\LuaManager.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\LuaInterface\CLuaUObjectTable.cpp">
+    <ClCompile Include="..\..\src\LuaInterface\LuaUObject.cpp">
+      <Filter>Source Files\LuaInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\LuaInterface\LuaUObjectTable.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
   </ItemGroup>
@@ -332,13 +332,13 @@
     <ClInclude Include="..\..\src\LuaInterface\CLuaObject.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\LuaInterface\CLuaUObject.h">
-      <Filter>Header Files\LuaInterface</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\LuaInterface\LuaManager.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\LuaInterface\CLuaUObjectTable.h">
+    <ClInclude Include="..\..\src\LuaInterface\LuaUObject.h">
+      <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\LuaUObjectTable.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
   </ItemGroup>

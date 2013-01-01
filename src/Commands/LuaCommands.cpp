@@ -8,7 +8,7 @@
 
 using LuaManager::g_Lua;
 
-CON_COMMAND(lua_run_cl)
+CON_COMMAND(l)
 {
 	std::stringstream ss;
 	std::copy(args.begin()+1, args.end(), std::ostream_iterator<std::string>(ss, " "));
@@ -17,32 +17,11 @@ CON_COMMAND(lua_run_cl)
 	g_Lua->RunString(result.c_str());
 }
 
-CON_COMMAND(lua_openscript_cl)
+CON_COMMAND(lo)
 {
-	/*
 	std::stringstream ss;
 	std::copy(args.begin()+1, args.end(), std::ostream_iterator<std::string>(ss, " "));
 	std::string result = ss.str(); // There's a trailing space but lua shouldn't give a shit
 
-	if(Lua())
-	{
-		int status = luaL_loadfile(Lua(), result.c_str());
-		if(status)
-		{
-			Logging::Log("[Lua] Error: %s\n", lua_tostring(Lua(), -1));
-			return;
-		}
-
-		status = lua_pcall(Lua(), 0, LUA_MULTRET, 0);
-		if(status)
-		{
-			Logging::Log("[Lua] Error: %s\n", lua_tostring(Lua(), -1));
-			return;
-		}
-	}
-	else
-	{
-		Logging::Log("[Lua] Error: Lua state not initialized\n");
-	}
-	*/
+	g_Lua->DoFile(result.c_str());
 }

@@ -172,6 +172,8 @@
 
 // Class Core.Object
 // 0x003C
+class UProperty;
+
 class UObject
 {
 public:
@@ -237,6 +239,9 @@ public:
 
 		return pClassPointer;
 	};
+
+	UProperty* FindProperty( const char* propertyName );
+	void PushProperty( UProperty* pProperty );
 
 	bool IsRelevantForDebugging ( class UObject* Source );
 	class UObject* GetGlobalDebugTarget ( );
