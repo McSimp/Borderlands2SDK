@@ -88,6 +88,17 @@ if((!(VS-Env VS110COMNTOOLS "Visual Studio 2012" "v110")) -and (!(VS-Env VS100CO
 	Exit
 }
 
+Log-Action "Removing LuaJIT from SDK..."
+Cleanup-File "..\lib\lua51.lib"
+
+Log-Action "Building LuaJIT..."
+Push-Location LuaJIT\src
+cmd /c "msvcbuild.bat static"
+Pop-Location
+
+Log-Action "Moving built files to SDK..."
+Copy-Built-File "LuaJIT\src\lua51.lib" "..\lib\lua51.lib"
+
 Log-Action "Removing Crashrpt from SDK..."
 Cleanup-File "..\bin\Debug\CrashRpt1400d.dll"
 Cleanup-File "..\bin\Release\CrashRpt1400.dll"
