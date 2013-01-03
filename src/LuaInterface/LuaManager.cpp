@@ -3,6 +3,7 @@
 #include "LuaInterface/LuaUObject.h"
 #include "LuaInterface/LuaUObjectTable.h"
 #include "LuaInterface/LuaPropertyArray.h"
+#include "LuaInterface/LuaTArray.h"
 
 namespace LuaManager
 {
@@ -22,6 +23,9 @@ namespace LuaManager
 
 		LuaPropertyArray::Register();
 		Logging::Log("[Lua] PropertyArray registered\n");
+
+		LuaTArray::Register();
+		Logging::Log("[Lua] TArray registered\n");
 
 		// And we're done
 		Logging::Log("[Lua] Lua initialized (" LUA_VERSION ")\n");

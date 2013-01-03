@@ -1,5 +1,6 @@
 #include "LuaInterface/LuaUObject.h"
 #include "LuaInterface/LuaPropertyArray.h"
+#include "LuaInterface/LuaTArray.h"
 #include "Logging/Logging.h"
 #include "BL2SDK/Util.h"
 
@@ -146,11 +147,14 @@ void UProperty::PushToLua(void* data)
 			g_Lua->PushNil();
 		}
 	}
+	else if(this->IsA(UArrayProperty::StaticClass()))
+	{
+		LuaTArray::PushInstance(((UArrayProperty*)this)->Inner, data);
+	}
 	else
 	{
 		g_Lua->LuaError("Cannot push this property type");
 	}
-	// UArrayProperty
 	// UDelegateProperty
 	// UStructProperty
 	// UMapProperty (not present in BL2)
@@ -181,6 +185,7 @@ void UObject::PushProperty(UProperty* pProperty)
 
 	if(pProperty == NULL)
 	{
+		Logging::Log("[Lua] Warning: Property does not exist for this UObject\n");
 		g_Lua->PushNil();
 		return;
 	}

@@ -10,7 +10,7 @@ function Get-Batchfile($file)
 	}
 }
 
-function VS-Env($envvar, $name)
+function VS-Env($envvar, $name, $toolset)
 {
 	if(!(Test-Path "env:\$envvar")) # This VS environment variable doesn't exist
 	{
@@ -30,6 +30,9 @@ function VS-Env($envvar, $name)
 	Get-Batchfile $BatchFile
 	Write-Host "Environment variables loaded successfully"
 	
+	Set-Variable "PlatformToolset" $toolset -scope "Global"
+	Write-Host "Platform toolset set to $PlatformToolset"
+
 	return $true
 }
 
@@ -65,11 +68,12 @@ function Copy-Built-File($path, $to)
 	}
 }
 
-function Run-MSBuild($sln, $params)
+function Run-MSBuild($sln, $config, $params)
 {
-	$cmd = "MSBuild $sln $params"
-	Invoke-Expression $cmd
-	
+	$cmd = "MSBuild $sln /p:Configuration=$config;PlatformToolset=$PlatformToolset $params"
+	#Invoke-Expression $cmd
+	cmd /c `"$cmd`"
+
 	if($LASTEXITCODE -ne 0)
 	{
 		$Host.UI.WriteErrorLine("`nMSBuild failed on $sln (Cmd = $cmd).")
@@ -78,10 +82,10 @@ function Run-MSBuild($sln, $params)
 }
 
 Log-Action "Setting Visual Studio environment..."
-if((!(VS-Env VS110COMNTOOLS "Visual Studio 2012")) -and (!(VS-Env VS100COMNTOOLS "Visual Studio 2010")))
+if((!(VS-Env VS110COMNTOOLS "Visual Studio 2012" "v110")) -and (!(VS-Env VS100COMNTOOLS "Visual Studio 2010" "v100")))
 {
 	$Host.UI.WriteErrorLine("Failed to determine Visual Studio tools path. Make sure you have VS2010 or VS2012 installed.")
-	Exit 
+	Exit
 }
 
 Log-Action "Removing Crashrpt from SDK..."
@@ -95,14 +99,14 @@ Cleanup-File "..\lib\CrashRpt1400.lib"
 Cleanup-File "..\lib\CrashRpt1400d.lib"
 
 Log-Action "Cleaning CrashRpt solution..."
-Run-MSBuild "crashrpt\CrashRpt_vs2010.sln" "/p:Configuration=Debug /t:Clean /m"
-Run-MSBuild "crashrpt\CrashRpt_vs2010.sln" "/p:Configuration=Release /t:Clean /m"
+Run-MSBuild "crashrpt\CrashRpt_vs2010.sln" "Debug" "/t:Clean /m"
+Run-MSBuild "crashrpt\CrashRpt_vs2010.sln" "Release" "/t:Clean /m"
 
 Log-Action "Building CrashRpt in Debug..."
-Run-MSBuild "crashrpt\CrashRpt_vs2010.sln" "/p:Configuration=Debug /m"
+Run-MSBuild "crashrpt\CrashRpt_vs2010.sln" "Debug" "/m"
 
 Log-Action "Building CrashRpt in Release..." 
-Run-MSBuild "crashrpt\CrashRpt_vs2010.sln" "/p:Configuration=Release /m"
+Run-MSBuild "crashrpt\CrashRpt_vs2010.sln" "Release" "/m"
 
 Log-Action "Moving built files to SDK..."
 Copy-Built-File "crashrpt\bin\CrashRpt1400d.dll" "..\bin\Debug\CrashRpt1400d.dll"
@@ -140,14 +144,14 @@ Cleanup-File "..\lib\gwen_staticd.lib"
 Cleanup-File "..\lib\gwen_static.lib"
 
 Log-Action "Cleaning GWEN solution..."
-Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "/p:Configuration=Debug /t:Clean /m"
-Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "/p:Configuration=Release /t:Clean /m"
+Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "Debug" "/t:Clean /m"
+Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "Release" "/t:Clean /m"
 
 Log-Action "Building GWEN in Debug..."
-Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "/p:Configuration=Debug /m"
+Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "Debug" "/m"
 
 Log-Action "Bulding GWEN in Release..."
-Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "/p:Configuration=Release /m"
+Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "Release" "/m"
 
 Log-Action "Moving built files to SDK..."
 Copy-Built-File "gwen\gwen\lib\windows\vs2010\gwen_staticd" "..\lib\gwen_staticd.lib"

@@ -52,7 +52,7 @@ namespace LuaPropertyArray
 	{
 		g_Lua->CheckType(1, MetaID);
 		LuaPropertyArrayUD* data = (LuaPropertyArrayUD*)g_Lua->GetUserData(1);
-		delete[] data;
+		delete data;
 		return 0;
 	}
 
