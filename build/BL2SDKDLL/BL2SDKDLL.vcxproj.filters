@@ -284,21 +284,6 @@
     <ClInclude Include="..\..\src\BL2SDK\CSigScan.h">
       <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\thirdparty\lua521\lauxlib.h">
-      <Filter>Header Files\Third Party\Lua521</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\thirdparty\lua521\lua.h">
-      <Filter>Header Files\Third Party\Lua521</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\thirdparty\lua521\lua.hpp">
-      <Filter>Header Files\Third Party\Lua521</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\thirdparty\lua521\luaconf.h">
-      <Filter>Header Files\Third Party\Lua521</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\thirdparty\lua521\lualib.h">
-      <Filter>Header Files\Third Party\Lua521</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\thirdparty\crashrpt\include\CrashRpt.h">
       <Filter>Header Files\Third Party\Crashrpt</Filter>
     </ClInclude>
@@ -352,6 +337,21 @@
     </ClInclude>
     <ClInclude Include="..\..\src\LuaInterface\LuaTArray.h">
       <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\thirdparty\LuaJIT\src\lauxlib.h">
+      <Filter>Header Files\Third Party\Lua521</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\thirdparty\LuaJIT\src\lua.h">
+      <Filter>Header Files\Third Party\Lua521</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\thirdparty\LuaJIT\src\lua.hpp">
+      <Filter>Header Files\Third Party\Lua521</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\thirdparty\LuaJIT\src\luaconf.h">
+      <Filter>Header Files\Third Party\Lua521</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\thirdparty\LuaJIT\src\lualib.h">
+      <Filter>Header Files\Third Party\Lua521</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

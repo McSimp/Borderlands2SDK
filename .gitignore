@@ -99,3 +99,7 @@ Desktop.ini
 
 .svn
 thirdparty/crashrpt/docs
+thirdparty/LuaJIT/src/*.exe
+thirdparty/LuaJIT/src/*.lib
+thirdparty/LuaJIT/src/*.exp
+thirdparty/LuaJIT/src/*.dll

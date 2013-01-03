@@ -56,13 +56,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;BL2SDKDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src;..\..\thirdparty;..\..\thirdparty\gwen\gwen\include;$(DXSDK_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src;..\..\thirdparty;..\..\thirdparty\LuaJIT\src;..\..\thirdparty\gwen\gwen\include;$(DXSDK_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\lib;..\..\thirdparty;$(DXSDK_DIR)\Lib\x86</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Lua514d.lib;detours.lib;version.lib;d3d9.lib;d3dx9.lib;gwen_staticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Lua51.lib;detours.lib;version.lib;d3d9.lib;d3dx9.lib;gwen_staticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -188,11 +188,11 @@
     <ClInclude Include="..\..\src\LuaInterface\LuaUObjectTable.h" />
     <ClInclude Include="..\..\src\LuaInterface\UserData.h" />
     <ClInclude Include="..\..\thirdparty\crashrpt\include\CrashRpt.h" />
-    <ClInclude Include="..\..\thirdparty\lua521\lauxlib.h" />
-    <ClInclude Include="..\..\thirdparty\lua521\lua.h" />
-    <ClInclude Include="..\..\thirdparty\lua521\lua.hpp" />
-    <ClInclude Include="..\..\thirdparty\lua521\luaconf.h" />
-    <ClInclude Include="..\..\thirdparty\lua521\lualib.h" />
+    <ClInclude Include="..\..\thirdparty\LuaJIT\src\lauxlib.h" />
+    <ClInclude Include="..\..\thirdparty\LuaJIT\src\lua.h" />
+    <ClInclude Include="..\..\thirdparty\LuaJIT\src\lua.hpp" />
+    <ClInclude Include="..\..\thirdparty\LuaJIT\src\luaconf.h" />
+    <ClInclude Include="..\..\thirdparty\LuaJIT\src\lualib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
