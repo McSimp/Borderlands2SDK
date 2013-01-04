@@ -163,7 +163,7 @@ void UProperty::PushToLua(void* data)
 void UProperty::PushToLua(UObject* object, int index)
 {
 	void* data = (void*)((unsigned char*)object + this->Offset + (this->ElementSize * index));
-	Logging::Log("UObject = 0x%X, Offset = 0x%X, ElementSize = 0x%X, Index = %d, Data = 0x%X\n", object, this->Offset, this->ElementSize, index, data);
+	//Logging::Log("UObject = 0x%X, Offset = 0x%X, ElementSize = 0x%X, Index = %d, Data = 0x%X\n", object, this->Offset, this->ElementSize, index, data);
 	this->PushToLua(data);
 }
 

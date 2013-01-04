@@ -44,7 +44,7 @@ namespace LuaUObjectTable
 		}
 
 		// If it's a function, we want to treat it as such
-		if(pObject->IsA(UFunction::StaticClass()))
+		/*if(pObject->IsA(UFunction::StaticClass()))
 		{
 			// TODO
 			Logging::Log("[Lua] Warning: UFunctions not implemented\n");
@@ -52,9 +52,9 @@ namespace LuaUObjectTable
 			return 1;
 		}
 		else
-		{
+		{*/
 			LuaUObject::PushInstance(pObject);
-		}
+		//}
 
 		return 1;
 	}

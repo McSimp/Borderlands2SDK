@@ -4,6 +4,7 @@
 #include "LuaInterface/LuaUObjectTable.h"
 #include "LuaInterface/LuaPropertyArray.h"
 #include "LuaInterface/LuaTArray.h"
+#include "Commands/ConCommand.h"
 
 namespace LuaManager
 {
@@ -27,6 +28,12 @@ namespace LuaManager
 		LuaTArray::Register();
 		Logging::Log("[Lua] TArray registered\n");
 
+		// Setup everything on the Lua side
+		if(g_Lua->DoFile("includes\\init.lua") != 0) // Means it failed, weird right
+		{
+			Logging::Log("[Lua] Failed to initialize Lua modules\n");
+		}
+
 		// And we're done
 		Logging::Log("[Lua] Lua initialized (" LUA_VERSION ")\n");
 	}
@@ -35,4 +42,11 @@ namespace LuaManager
 	{
 		delete g_Lua;
 	}
+}
+
+CON_COMMAND(ResetLua)
+{
+	LuaManager::Shutdown();
+	LuaManager::Initialize();
+	Logging::Log("Lua Restarted\n");
 }

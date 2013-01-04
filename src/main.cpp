@@ -69,6 +69,23 @@ CON_COMMAND(DumpObj)
 	Logging::Log("=== END OBJECT DUMP ===\n");
 }
 
+CON_COMMAND(CountNullObj)
+{
+	Logging::Log("=== OBJECT DUMP ===\n");
+	int count = 0;
+	for(int i = 0; i < UObject::GObjObjects()->Count; i++) 
+	{ 
+		UObject* Object = UObject::GObjObjects()->Data[i];
+		if(!Object)
+		{
+			Logging::Log("%d\n", i);
+			count++;
+		}
+	} 
+	Logging::Log("Count Null = %d\n", count);
+	Logging::Log("=== END OBJECT DUMP ===\n");
+}
+
 CON_COMMAND(Derp)
 {
 	Logging::Log("=== OBJECT DUMP ===\n");

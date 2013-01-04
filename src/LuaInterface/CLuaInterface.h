@@ -144,12 +144,14 @@ public:
 
 	int				RunString( const char* string );
 	int				DoFile( const char* filename );
+	void			SetPaths();
 
 private:
 	lua_State*			m_pState;
 	CLuaObject*			m_pG;
 	CLuaObject*			m_pR; 
 	CLuaObject*			m_pE;
+	std::string			m_luaPath;
 };
 
 #endif

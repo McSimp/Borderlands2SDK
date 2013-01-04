@@ -2,6 +2,9 @@
 #include "LuaInterface/CLuaInterface.h"
 #include "LuaInterface/UserData.h"
 #include "Logging/Logging.h"
+#include "BL2SDK/Settings.h"
+#include "BL2SDK/Util.h"
+#undef GetObject // FUCKING WINDOWS 98
 
 static int luabl2_print (lua_State *L) {
 	int n = lua_gettop(L);  /* number of arguments */
@@ -65,6 +68,8 @@ CLuaInterface::CLuaInterface()
 
 	luaL_register(m_pState, "_G", base_funcs);
 	lua_pop(m_pState, 1);
+
+	this->SetPaths();
 
 	this->PushSpecial(Lua::SPECIAL_GLOB);
 	m_pG = new CLuaObject(this, this->CreateReference());
@@ -728,18 +733,29 @@ int CLuaInterface::RunString(const char* string)
 
 int CLuaInterface::DoFile(const char* filename)
 {
-	int status = luaL_loadfile(m_pState, filename);
-	if(status)
+	int status = luaL_dofile(m_pState, Util::Format("%s\\%s", m_luaPath.c_str(), filename).c_str());
+	if(status != 0)
 	{
-		Logging::Log("[CLuaInterface] ERROR: DoFile failed to load file - %s\n", lua_tostring(m_pState, -1));
-		return status;
+		Logging::Log("[CLuaInterface] ERROR: DoFile failed to run file - %s\n", lua_tostring(m_pState, -1));
+		this->Pop();
 	}
-
-	status = lua_pcall(m_pState, 0, LUA_MULTRET, 0);
-	if(status)
-	{
-		Logging::Log("[CLuaInterface] ERROR: DoFile failed to call chunk - %s\n", lua_tostring(m_pState, -1));
-	}
-
 	return status;
+}
+
+void CLuaInterface::SetPaths()
+{
+	// Set path to Lua folder, without trailing slash
+	m_luaPath = Util::Narrow(Settings::GetBinFile(L"lua"));
+	Logging::Log("[CLuaInterface] Lua Path = %s\n", m_luaPath.c_str());
+
+	CLuaObject* pkg = this->GetGlobal(LUA_LOADLIBNAME);
+	CLuaObject* pathobj = pkg->GetMember("path");
+	const char* pkgpath = pathobj->GetString();
+
+	std::string newpath = Util::Format("%s\\includes\\modules\\?.lua;%s", m_luaPath.c_str(), pkgpath);
+	Logging::Log("[CLuaInterface] package.path set to %s\n", newpath.c_str());
+	pkg->SetMember("path", newpath.c_str());
+
+	pathobj->UnReference();
+	pkg->UnReference();
 }
