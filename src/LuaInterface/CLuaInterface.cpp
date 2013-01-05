@@ -4,6 +4,8 @@
 #include "Logging/Logging.h"
 #include "BL2SDK/Settings.h"
 #include "BL2SDK/Util.h"
+#include "LuaInterface/LuaManager.h"
+#include <algorithm>
 #undef GetObject // FUCKING WINDOWS 98
 
 static int luabl2_print (lua_State *L) {
@@ -27,9 +29,26 @@ static int luabl2_print (lua_State *L) {
 	return 0;
 }
 
+static int luabl2_include (lua_State *L) {
+	lua_Debug dbg1;
+	lua_getstack(L, 1, &dbg1);
+	lua_getinfo(L, "f", &dbg1);
+	lua_Debug dbg2;
+	lua_getinfo(L, ">S", &dbg2);
+
+	std::string source = dbg2.source; // eg: @D:\dev\bl\Borderlands2SDK\bin\Debug\lua\test.lua
+	std::string filename = luaL_checkstring(L, 1);
+	std::replace(filename.begin(), filename.end(), '/', '\\');
+	std::string path = source.substr(1, source.find_last_of("\\/")) + filename; // Cuts off the @ at the start of the path and removes the filename
+	
+	LuaManager::g_Lua->DoFileAbsolute(path.c_str());
+
+	return 0;
+}
+
 static const luaL_Reg base_funcs[] = {
 	{"print", luabl2_print},
-	//{"include", luabl2_include},
+	{"include", luabl2_include},
 	{NULL, NULL}
 };
 
@@ -733,7 +752,12 @@ int CLuaInterface::RunString(const char* string)
 
 int CLuaInterface::DoFile(const char* filename)
 {
-	int status = luaL_dofile(m_pState, Util::Format("%s\\%s", m_luaPath.c_str(), filename).c_str());
+	return this->DoFileAbsolute(Util::Format("%s\\%s", m_luaPath.c_str(), filename).c_str());
+}
+
+int CLuaInterface::DoFileAbsolute(const char* path)
+{
+	int status = luaL_dofile(m_pState, path);
 	if(status != 0)
 	{
 		Logging::Log("[CLuaInterface] ERROR: DoFile failed to run file - %s\n", lua_tostring(m_pState, -1));

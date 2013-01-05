@@ -1,9 +1,5 @@
 #include "LuaInterface/LuaManager.h"
 #include "Logging/Logging.h"
-#include "LuaInterface/LuaUObject.h"
-#include "LuaInterface/LuaUObjectTable.h"
-#include "LuaInterface/LuaPropertyArray.h"
-#include "LuaInterface/LuaTArray.h"
 #include "Commands/ConCommand.h"
 
 namespace LuaManager
@@ -14,19 +10,6 @@ namespace LuaManager
 	{
 		// Create state and interface
 		g_Lua = new CLuaInterface();
-
-		// Register our classes
-		LuaUObject::Register();
-		Logging::Log("[Lua] UObject registered\n");
-
-		LuaUObjectTable::Register();
-		Logging::Log("[Lua] UObjectTable registered\n");
-
-		LuaPropertyArray::Register();
-		Logging::Log("[Lua] PropertyArray registered\n");
-
-		LuaTArray::Register();
-		Logging::Log("[Lua] TArray registered\n");
 
 		// Setup everything on the Lua side
 		if(g_Lua->DoFile("includes\\init.lua") != 0) // Means it failed, weird right

@@ -1,25 +1,11 @@
 local ffi = require("ffi")
 
-ffi.cdef[[
-	struct UObject_Data { 
-		unsigned char Unknown[0x28];
-		struct UObject* Outer;
-		struct FName Name;
-		struct UClass* Class;
-		struct UObject* ObjectArchetype;
-	};
-
-	struct UObject {
-		struct UObject_Data UObject;
-	};
-]]
-
 local UObjectMT = {}
 
 function UObjectMT.IsA(self, class)
 	-- class is a "struct UClass*"
 
-	local superclass = self.UObject.Class
+	local superclass = self.Class
 
 	while NotNull(superclass) do
 		if superclass == class then
@@ -33,7 +19,7 @@ function UObjectMT.IsA(self, class)
 end
 
 function UObjectMT.GetFullName(self)
-	print(self)
+
 	if NotNull(self.Class) and NotNull(self.Outer) then
 
 		local fullname
@@ -57,8 +43,6 @@ function UObjectMT.GetFullName(self)
 
 		end
 
-		print(fullname)
-
 		return fullname
 
 	end
@@ -69,7 +53,7 @@ end
 function UObjectMT.GetPackageObj(self)
 
 	local pkg = nil
-	local outer = self.UObject.Outer
+	local outer = self.Outer
 
 	while NotNull(outer) do
 		
@@ -84,6 +68,17 @@ end
 
 ffi.metatype("struct UObject_Data", { __index = UObjectMT })
 
+local engine = engine
+local IsNull = IsNull
+
 module("UObject")
 
-StaticClass = nil
+local _sc
+
+function StaticClass()
+	if IsNull(_sc) then
+		_sc = engine.FindClassSafe("Class Core.Object")
+	end
+
+	return _sc
+end

@@ -144,6 +144,7 @@ public:
 
 	int				RunString( const char* string );
 	int				DoFile( const char* filename );
+	int				DoFileAbsolute( const char* path );
 	void			SetPaths();
 
 private:

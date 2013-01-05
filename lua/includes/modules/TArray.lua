@@ -1,13 +1,5 @@
 local ffi = require("ffi")
 
-ffi.cdef[[
-	struct TArray {
-		unsigned char* Data;
-		int Count;
-		int Max;
-	};
-]]
-
 local TArrayMT = {}
 
 function TArrayMT.Get(self, idx)

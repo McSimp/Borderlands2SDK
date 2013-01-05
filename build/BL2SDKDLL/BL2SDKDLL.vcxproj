@@ -122,10 +122,6 @@
     <ClCompile Include="..\..\src\Logging\Logging.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\CLuaInterface.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\CLuaObject.cpp" />
-    <ClCompile Include="..\..\src\LuaInterface\LuaPropertyArray.cpp" />
-    <ClCompile Include="..\..\src\LuaInterface\LuaTArray.cpp" />
-    <ClCompile Include="..\..\src\LuaInterface\LuaUObject.cpp" />
-    <ClCompile Include="..\..\src\LuaInterface\LuaUObjectTable.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\LuaManager.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>
@@ -181,11 +177,7 @@
     <ClInclude Include="..\..\src\LuaInterface\CLuaInterface.h" />
     <ClInclude Include="..\..\src\LuaInterface\CLuaObject.h" />
     <ClInclude Include="..\..\src\LuaInterface\ILuaTable.h" />
-    <ClInclude Include="..\..\src\LuaInterface\LuaPropertyArray.h" />
-    <ClInclude Include="..\..\src\LuaInterface\LuaTArray.h" />
-    <ClInclude Include="..\..\src\LuaInterface\LuaUObject.h" />
     <ClInclude Include="..\..\src\LuaInterface\LuaManager.h" />
-    <ClInclude Include="..\..\src\LuaInterface\LuaUObjectTable.h" />
     <ClInclude Include="..\..\src\LuaInterface\UserData.h" />
     <ClInclude Include="..\..\thirdparty\crashrpt\include\CrashRpt.h" />
     <ClInclude Include="..\..\thirdparty\LuaJIT\src\lauxlib.h" />
