@@ -777,7 +777,6 @@ void CLuaInterface::SetPaths()
 	const char* pkgpath = pathobj->GetString();
 
 	std::string newpath = Util::Format("%s\\includes\\modules\\?.lua;%s", m_luaPath.c_str(), pkgpath);
-	Logging::Log("[CLuaInterface] package.path set to %s\n", newpath.c_str());
 	pkg->SetMember("path", newpath.c_str());
 
 	pathobj->UnReference();

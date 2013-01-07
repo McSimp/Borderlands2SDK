@@ -31,5 +31,4 @@ CON_COMMAND(ResetLua)
 {
 	LuaManager::Shutdown();
 	LuaManager::Initialize();
-	Logging::Log("Lua Restarted\n");
 }

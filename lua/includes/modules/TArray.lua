@@ -1,8 +1,8 @@
 local ffi = require("ffi")
 
-local TArrayMT = {}
+local TArrayMT = { __index = {} }
 
-function TArrayMT.Get(self, idx)
+function TArrayMT.__index.Get(self, idx)
 	if idx < self.Count and idx >= 0 then
 		return self.Data[idx]
 	else
@@ -11,7 +11,26 @@ function TArrayMT.Get(self, idx)
 	end
 end
 
-ffi.metatype("struct TArray", { __index = TArrayMT })
+local function TArrayIter(obj, k)
+
+	if k < (obj.Count - 1) then -- If current index is before the last index
+		k = k + 1
+
+		local v = obj.Data[k]
+		if NotNull(v) then
+			return k, v
+		else
+			return TArrayIter(obj, k)
+		end
+	end
+
+end
+
+function TArrayMT.__pairs(self)
+	return TArrayIter, self, -1 -- neg 1 because TArrayIter will increment this to 0
+end
+
+ffi.metatype("struct TArray", TArrayMT)
 
 function TArray(innerType, cdata)
 
@@ -21,7 +40,7 @@ function TArray(innerType, cdata)
 		int Count;
 		int Max;
 	}]], ffi.typeof(innerType))
-	local type_mt = ffi.metatype(type, { __index = TArrayMT })
+	local type_mt = ffi.metatype(type, TArrayMT)
 	local type_ptr = ffi.typeof("$ *", type_mt)
 
 	local data = ffi.cast(type_ptr, cdata)
@@ -30,7 +49,8 @@ function TArray(innerType, cdata)
 		__index = data,
 		__newindex = function(self, k, v)
 			error("Cannot set property '" .. k .. "' on TArray")
-		end
+		end,
+		__pairs = TArrayMT.__pairs,
 	}
 
 	return setmetatable({}, mt)

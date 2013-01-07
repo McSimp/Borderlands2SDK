@@ -1,17 +1,16 @@
+-- Load helper functions
+require("base")
+
 -- Import data structures
 include("structs/base.lua")
 include("classes/base.lua")
 
--- Load helper functions
-require("base")
-
--- Add metatables to base types
+-- Add load base types
 require("FName")
 require("TArray")
+require("UObject")
 
 -- Load engine functions
 require("engine")
 
--- Load classes
-require("UObject")
-require("UClass")
+engine.Initialize()

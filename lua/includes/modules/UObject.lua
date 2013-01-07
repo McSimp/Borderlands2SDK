@@ -1,14 +1,15 @@
 local ffi = require("ffi")
 
-local UObjectMT = {}
+local UObjectMT = { __index = {} }
 
-function UObjectMT.IsA(self, class)
-	-- class is a "struct UClass*"
+function UObjectMT.__index.IsA(self, class)
+	-- class is a table from engine.Classes
+	local class_instance = class._static
 
-	local superclass = self.Class
+	local superclass = self.UObject.Class
 
 	while NotNull(superclass) do
-		if superclass == class then
+		if superclass == class_instance then
 			return true
 		end
 
@@ -18,29 +19,31 @@ function UObjectMT.IsA(self, class)
 	return false
 end
 
-function UObjectMT.GetFullName(self)
+function UObjectMT.__index.GetName(self)
 
-	if NotNull(self.Class) and NotNull(self.Outer) then
+	return self.UObject.Name:GetName()
+
+end
+
+function UObjectMT.__index.GetFullName(self)
+
+	if NotNull(self.UObject.Class) and NotNull(self.UObject.Outer) then
 
 		local fullname
 
-		if NotNull(self.Outer.UObject.Outer) then
-
+		if NotNull(self.UObject.Outer.UObject.Outer) then
 			fullname = string.format("%s %s.%s.%s", 
-				self.Class.UObject.Name:GetName(),
-				self.Outer.UObject.Outer.UObject.Name:GetName(),
-				self.Outer.UObject.Name:GetName(),
-				self.Name:GetName()
+				self.UObject.Class:GetName(),
+				self.UObject.Outer.UObject.Outer:GetName(),
+				self.UObject.Outer:GetName(),
+				self:GetName()
 			)
-
 		else
-
 			fullname = string.format("%s %s.%s", 
-				self.Class.UObject.Name:GetName(),
-				self.Outer.UObject.Name:GetName(),
-				self.Name:GetName()
+				self.UObject.Class:GetName(),
+				self.UObject.Outer:GetName(),
+				self:GetName()
 			)
-
 		end
 
 		return fullname
@@ -50,10 +53,10 @@ function UObjectMT.GetFullName(self)
 	return "(null)"
 end
 
-function UObjectMT.GetPackageObj(self)
+function UObjectMT.__index.GetPackageObject(self)
 
 	local pkg = nil
-	local outer = self.Outer
+	local outer = self.UObject.Outer
 
 	while NotNull(outer) do
 		
@@ -66,19 +69,6 @@ function UObjectMT.GetPackageObj(self)
 
 end
 
-ffi.metatype("struct UObject_Data", { __index = UObjectMT })
-
-local engine = engine
-local IsNull = IsNull
-
 module("UObject")
 
-local _sc
-
-function StaticClass()
-	if IsNull(_sc) then
-		_sc = engine.FindClassSafe("Class Core.Object")
-	end
-
-	return _sc
-end
+MetaTable = UObjectMT

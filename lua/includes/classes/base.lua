@@ -285,3 +285,27 @@ ffi.cdef[[
 		struct UMapProperty_Data 	UMapProperty;
 	};
 ]]
+
+table.insert(loadedClasses, { "UObject", "Class Core.Object" })
+table.insert(loadedClasses, { "UField", "Class Core.Field" })
+table.insert(loadedClasses, { "UEnum", "Class Core.Enum" })
+table.insert(loadedClasses, { "UConst", "Class Core.Const" })
+table.insert(loadedClasses, { "UStruct", "Class Core.Struct" })
+table.insert(loadedClasses, { "UScriptStruct", "Class Core.ScriptStruct" })
+table.insert(loadedClasses, { "UFunction", "Class Core.Function" })
+table.insert(loadedClasses, { "UState", "Class Core.State" })
+table.insert(loadedClasses, { "UClass", "Class Core.Class" })
+table.insert(loadedClasses, { "UProperty", "Class Core.Property" })
+table.insert(loadedClasses, { "UByteProperty", "Class Core.ByteProperty" })
+table.insert(loadedClasses, { "UIntProperty", "Class Core.IntProperty" })
+table.insert(loadedClasses, { "UFloatProperty", "Class Core.FloatProperty" })
+table.insert(loadedClasses, { "UBoolProperty", "Class Core.BoolProperty" })
+table.insert(loadedClasses, { "UStrProperty", "Class Core.StrProperty" })
+table.insert(loadedClasses, { "UNameProperty", "Class Core.NameProperty" })
+table.insert(loadedClasses, { "UDelegateProperty", "Class Core.DelegateProperty" })
+table.insert(loadedClasses, { "UObjectProperty", "Class Core.ObjectProperty" })
+table.insert(loadedClasses, { "UClassProperty", "Class Core.ClassProperty" })
+table.insert(loadedClasses, { "UInterfaceProperty", "Class Core.InterfaceProperty" })
+table.insert(loadedClasses, { "UStructProperty", "Class Core.StructProperty" })
+table.insert(loadedClasses, { "UArrayProperty", "Class Core.ArrayProperty" })
+table.insert(loadedClasses, { "UMapProperty", "Class Core.MapProperty" })
