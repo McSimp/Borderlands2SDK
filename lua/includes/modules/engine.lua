@@ -14,23 +14,33 @@ Objects = TArray("struct UObject*", ffi.cast("struct TArray*", 0x19C6DC0))
 Names = TArray("struct FNameEntry*", ffi.cast("struct TArray*", 0x19849E4))
 Classes = {}
 
-function FindClass(className)
+function FindObject(objectName)
 
 	for i=0,(Objects.Count-1) do
 
 		local obj = Objects:Get(i)
 		if IsNull(obj) then goto continue end
 
-		if obj:GetFullName() == className then
-			
-			return ffi.cast("struct UClass*", obj)
-
+		if obj:GetFullName() == objectName then
+			return obj
 		end
 
 		::continue::
 	end
 
 	return nil
+
+end
+
+function FindClass(className)
+
+	local obj = FindObject(className)
+	
+	if IsNull(obj) then
+		return nil
+	else
+		return ffi.cast("struct UClass*", obj)
+	end
 
 end
 

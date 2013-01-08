@@ -11,6 +11,7 @@ function TArrayMT.__index.Get(self, idx)
 	end
 end
 
+--[[ Too slow
 local function TArrayIter(obj, k)
 
 	if k < (obj.Count - 1) then -- If current index is before the last index
@@ -29,6 +30,7 @@ end
 function TArrayMT.__pairs(self)
 	return TArrayIter, self, -1 -- neg 1 because TArrayIter will increment this to 0
 end
+]]
 
 ffi.metatype("struct TArray", TArrayMT)
 
@@ -50,7 +52,7 @@ function TArray(innerType, cdata)
 		__newindex = function(self, k, v)
 			error("Cannot set property '" .. k .. "' on TArray")
 		end,
-		__pairs = TArrayMT.__pairs,
+		--__pairs = TArrayMT.__pairs,
 	}
 
 	return setmetatable({}, mt)

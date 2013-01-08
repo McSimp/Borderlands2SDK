@@ -53,6 +53,27 @@ function UObjectMT.__index.GetFullName(self)
 	return "(null)"
 end
 
+-- TOOD: Fix this steaming pile of shit.
+function UObjectMT.__index.GetCName(self)
+
+	local cname
+	if self:IsA(engine.Classes.UClass) then
+		cname = "U" -- Just a plain old object by default
+
+		local class = self
+		while NotNull(class) do
+			if class:GetName() == "Actor" then
+				cname = "A"
+				break
+			end
+		end
+	else
+		cname = "F"
+	end
+
+	return cname .. self:GetName()
+end
+
 function UObjectMT.__index.GetPackageObject(self)
 
 	local pkg = nil

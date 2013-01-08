@@ -9,7 +9,7 @@ function table.contains(table, element)
 	return false
 end
 
-local fileheader = [[
+local FILE_HEADER = [[
 -- ###################################
 -- # Borderlands 2 SDK
 -- # Package: %s
@@ -18,7 +18,9 @@ local fileheader = [[
 
 ]]
 
-local Package = {}
+SDKGen = { Package = {} }
+
+local Package = SDKGen.Package
 Package.__index = Package
 
 function Package.new(package_object)
@@ -42,45 +44,10 @@ function Package:Close()
 end
 
 function Package:WriteFileHeader(contents)
-	self.File:write(string.format(fileheader, self.PackageObj:GetName(), contents))
+	self.File:write(string.format(FILE_HEADER, self.PackageObj:GetName(), contents))
 end
 
-function Package:ProcessScriptStructs()
-
-	self:CreateFile("structs")
-	self:WriteFileHeader("Script Structs")
-
-	for i=0,(engine.Objects.Count-1) do
-
-		local obj = engine.Objects:Get(i)
-		if IsNull(obj) then goto continue end
-		if not obj:IsA(engine.Classes.UScriptStruct) then goto continue end
-		obj = ffi.cast()
-
-		local package_object = obj:GetPackageObject()
-		if IsNull(package_object) then goto continue end
-
-		if package_object == self.PackageObj then
-
-			print("I would generate for " .. obj:GetName())
-			if NotNull(obj.UStruct.SuperField) then
-				print("\tParent = " .. obj.UStruct.SuperField:GetName())
-			end
-
-		end
-
-		::continue::
-	end
-
-	self:CloseFile()
-
-end
-
-function Package:GenerateScriptStructPre(script_struct)
-
-	
-
-end
+include("sdkgen_structs.lua")
 
 function ProcessPackages()
 
