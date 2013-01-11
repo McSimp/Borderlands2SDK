@@ -1,14 +1,5 @@
 local ffi = require("ffi")
 
-function table.contains(table, element)
-	for _,v in pairs(table) do
-		if v == element then
-			return true
-		end
-	end
-	return false
-end
-
 local FILE_HEADER = [[
 -- ###################################
 -- # Borderlands 2 SDK

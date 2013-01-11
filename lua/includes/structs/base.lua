@@ -14,7 +14,7 @@ ffi.cdef[[
 
 	struct FNameEntry {
 		unsigned char Unknown[0x10];
-		char Name[0x10];
+		char Name[0x18];
 	};
 
 	struct FName { 

@@ -8,13 +8,13 @@ local ffi = require("ffi")
 ffi.cdef[[
 	struct UObject_Data { 
 		struct FPointer 	VfTableObject;
-		struct FPointer		HashNext;
+		struct UObject*		HashNext;
 		struct FQWord 		ObjectFlags;
-		struct FPointer 	HashOuterNext;
+		struct UObject* 	HashOuterNext;
 		struct FPointer 	StateFrame;
 		struct UObject* 	Linker;
 		struct FPointer 	LinkerIndex;
-		int 				ObjectInternalInteger;
+		int 				Index;
 		int 				NetIndex;
 		struct UObject* 	Outer;
 		struct FName 		Name;
