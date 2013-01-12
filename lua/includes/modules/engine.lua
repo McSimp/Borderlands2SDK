@@ -7,6 +7,7 @@ local loadedClasses = loadedClasses
 local print = print
 local string = string
 local UObject = UObject
+local os = os
 
 module("engine")
 
@@ -57,6 +58,7 @@ function FindClassSafe(className)
 end
 
 function Initialize()
+	local start = os.clock()
 
 	print("[Lua] Initializing engine classes...")
 
@@ -76,4 +78,5 @@ function Initialize()
 
 	loadedClasses = nil
 
+	print(string.format("elapsed time: %.3f", os.clock() - start))
 end

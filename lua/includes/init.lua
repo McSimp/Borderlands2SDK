@@ -1,3 +1,6 @@
+require("jit.v")
+jit.v.on("jitv.txt")
+
 -- Load helper functions
 require("base")
 
@@ -14,3 +17,5 @@ require("UObject")
 require("engine")
 
 engine.Initialize()
+
+jit.v.off()

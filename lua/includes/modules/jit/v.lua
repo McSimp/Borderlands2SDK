@@ -78,7 +78,7 @@ local function fmtfunc(func, pc)
   if fi.loc then
     return fi.loc
   elseif fi.ffid then
-    return vmdef.ffnames[fi.ffid]
+    return vmdef.ffnames[fi.ffid-1]
   elseif fi.addr then
     return format("C:%x", fi.addr)
   else
