@@ -13,13 +13,15 @@ ffi.cdef[[
 	};
 
 	struct FNameEntry {
-		unsigned char Unknown[0x10];
-		char Name[0x18];
+		unsigned char Unknown[0x8];
+		int Index;
+		struct FNameEntry* HashNext;
+		char Name[1024];
 	};
 
 	struct FName { 
 		int Index;
-		unsigned char Unknown[0x4];
+		int Number;
 	};
 
 	struct FString {
@@ -29,11 +31,12 @@ ffi.cdef[[
 	}
 
 	struct FScriptDelegate {
-		unsigned char Unknown[0xC];
+		struct UObject* Object;
+		struct FName FunctionName;
 	};
 
 	struct FPointer {
-		int Dummy;
+		void* Pointer;
 	};
 
 	struct FQWord {

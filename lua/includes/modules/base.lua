@@ -64,4 +64,10 @@ function table.contains(table, element)
 	return false
 end
 
+local ffi = require("ffi")
+
+function PtrToNum(ptr)
+	return tonumber(ffi.cast("unsigned int", ptr))
+end
+
 loadedClasses = {}

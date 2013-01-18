@@ -4,7 +4,7 @@ local UObjectMT = { __index = {} }
 
 function UObjectMT.__index.IsA(self, class)
 	-- class is a table from engine.Classes
-	local class_instance = class._static
+	local class_instance = class.static
 
 	local superclass = self.UObject.Class
 

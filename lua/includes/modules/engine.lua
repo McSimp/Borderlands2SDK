@@ -8,11 +8,13 @@ local print = print
 local string = string
 local UObject = UObject
 local os = os
+local PtrToNum = PtrToNum
 
 module("engine")
 
 Objects = TArray("struct UObject*", ffi.cast("struct TArray*", 0x19C6DC0))
 Names = TArray("struct FNameEntry*", ffi.cast("struct TArray*", 0x19849E4))
+_ClassesInternal = {}
 Classes = {}
 
 function FindObject(objectName)
@@ -57,6 +59,10 @@ function FindClassSafe(className)
 
 end
 
+local function NilIndex()
+	return nil
+end
+
 function Initialize()
 	local start = os.clock()
 
@@ -65,12 +71,17 @@ function Initialize()
 	for i=1,#loadedClasses do
 
 		ffi.metatype("struct " .. loadedClasses[i][1], UObject.MetaTable) -- Everything is a UObject, so set its MT on everything
+		ffi.metatype("struct " .. loadedClasses[i][1] .. "_Data", { __index = NilIndex }) -- Makes the _Data types return nil if member not found
 
 	end
 
 	for i=1,#loadedClasses do
 
-		Classes[loadedClasses[i][1]] = { _static = FindClassSafe(loadedClasses[i][2]) }
+		local classPtr = FindClassSafe(loadedClasses[i][2])
+		local members = { name = loadedClasses[i][1], static = classPtr, base = Classes[loadedClasses[i][3]], funcs = {} }
+
+		_ClassesInternal[PtrToNum(classPtr)] = members
+		Classes[loadedClasses[i][1]] = members
 
 	end
 
