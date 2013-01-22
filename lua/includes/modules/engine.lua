@@ -16,6 +16,7 @@ Objects = TArray("struct UObject*", ffi.cast("struct TArray*", 0x19C6DC0))
 Names = TArray("struct FNameEntry*", ffi.cast("struct TArray*", 0x19849E4))
 _ClassesInternal = {}
 Classes = {}
+local BaseObjFuncs = UObject.BaseFuncs
 
 function FindObject(objectName)
 
@@ -59,29 +60,72 @@ function FindClassSafe(className)
 
 end
 
+--[[
+local function GenerateDataMT(className)
+	--local classFuncs = Classes[className]["funcs"]
+	return function(self, k)
+		--return Classes[className]["funcs"][k] -- Should return nil if not found
+		return nil
+	end
+end
+]]
+
 local function NilIndex()
 	return nil
 end
+
+local function UObjectIndex(self, k)
+	-- First check the base functions
+	if BaseObjFuncs[k] ~= nil then return BaseObjFuncs[k] end
+
+	-- Get the actual class information for this object
+	local classInfo = _ClassesInternal[PtrToNum(self.UObject.Class)]
+
+	-- Cast this object to the right type
+	self = ffi.cast(classInfo["cPtrName"], self)
+
+	-- Since we have casted, check the actual class type first
+	-- Then while this class has a base class, check that.
+	local base = classInfo
+	while base do
+		if self[base["name"]][k] ~= nil then 
+			return self[base["name"]][k]
+		else
+			base = base["base"]
+		end
+	end
+
+	return nil
+end
+
+local UObjectDataMT = { __index = NilIndex }
+local UObjectMT = { __index = UObjectIndex }
 
 function Initialize()
 	local start = os.clock()
 
 	print("[Lua] Initializing engine classes...")
 
+	-- Initialize metatables on all classes
 	for i=1,#loadedClasses do
-
-		ffi.metatype("struct " .. loadedClasses[i][1], UObject.MetaTable) -- Everything is a UObject, so set its MT on everything
-		ffi.metatype("struct " .. loadedClasses[i][1] .. "_Data", { __index = NilIndex }) -- Makes the _Data types return nil if member not found
-
+		ffi.metatype("struct " .. loadedClasses[i][1] .. "_Data", UObjectDataMT) -- Makes the _Data types return nil if member not found
+		ffi.metatype("struct " .. loadedClasses[i][1], UObjectMT) -- Everything is a UObject, so set its MT on everything
 	end
 
 	for i=1,#loadedClasses do
 
-		local classPtr = FindClassSafe(loadedClasses[i][2])
-		local members = { name = loadedClasses[i][1], static = classPtr, base = Classes[loadedClasses[i][3]], funcs = {} }
+		local class = loadedClasses[i] -- 1 = name, 2 = Full Name, 3 = Base name
+
+		local members = {
+			name = class[1],
+			static = FindClassSafe(class[2]),
+			base = Classes[class[3]],
+			cPtrName = "struct " .. class[1] .. "*",
+			funcs = {}
+		}
 
 		_ClassesInternal[PtrToNum(classPtr)] = members
-		Classes[loadedClasses[i][1]] = members
+		Classes[class[1]] = members
 
 	end
 

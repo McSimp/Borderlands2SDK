@@ -1,8 +1,8 @@
 local ffi = require("ffi")
 
-local UObjectMT = { __index = {} }
+local funcs = {}
 
-function UObjectMT.__index.IsA(self, class)
+function funcs.IsA(self, class)
 	-- class is a table from engine.Classes
 	local class_instance = class.static
 
@@ -19,13 +19,13 @@ function UObjectMT.__index.IsA(self, class)
 	return false
 end
 
-function UObjectMT.__index.GetName(self)
+function funcs.GetName(self)
 
 	return self.UObject.Name:GetName()
 
 end
 
-function UObjectMT.__index.GetFullName(self)
+function funcs.GetFullName(self)
 
 	if NotNull(self.UObject.Class) and NotNull(self.UObject.Outer) then
 
@@ -54,7 +54,7 @@ function UObjectMT.__index.GetFullName(self)
 end
 
 -- TOOD: Fix this steaming pile of shit.
-function UObjectMT.__index.GetCName(self)
+function funcs.GetCName(self)
 
 	local cname
 	if self:IsA(engine.Classes.UClass) then
@@ -74,7 +74,7 @@ function UObjectMT.__index.GetCName(self)
 	return cname .. self:GetName()
 end
 
-function UObjectMT.__index.GetPackageObject(self)
+function funcs.GetPackageObject(self)
 
 	local pkg = nil
 	local outer = self.UObject.Outer
@@ -92,4 +92,4 @@ end
 
 module("UObject")
 
-MetaTable = UObjectMT
+BaseFuncs = funcs

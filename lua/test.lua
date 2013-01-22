@@ -132,16 +132,18 @@ ffi.cdef[[
 local metaT = { __index = {} }
 
 function metaT:__index(k)
-	-- 0. Get the actual class information for this object
+	-- First check the base functions
+	
+
+	-- Get the actual class information for this object
 	local classInfo = engine._ClassesInternal[PtrToNum(self.UObject.Class)]
 
-	-- 1. Cast this object to the right type
+	-- Cast this object to the right type
 	local actualTypeName = "struct " .. classInfo["name"] .. "*"
 	self = ffi.cast(actualTypeName, self)
 
-	-- 2. Since we have casted, check the actual class type first
-	local value = self[classInfo["name"]][k]
-
+	-- Since we have casted, check the actual class type first
+	-- Then while this class has a base class, check that.
 	local base = classInfo
 	while base do
 		if self[base["name"]][k] ~= nil then 

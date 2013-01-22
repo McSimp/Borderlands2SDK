@@ -66,8 +66,9 @@ end
 
 local ffi = require("ffi")
 
+local uint_t = ffi.typeof("unsigned int")
 function PtrToNum(ptr)
-	return tonumber(ffi.cast("unsigned int", ptr))
+	return tonumber(ffi.cast(uint_t, ptr))
 end
 
 loadedClasses = {}
