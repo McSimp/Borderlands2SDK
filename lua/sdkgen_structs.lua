@@ -8,7 +8,7 @@ local ScriptStruct = {}
 ScriptStruct.__index = ScriptStruct
 
 function ScriptStruct.new(obj)
-	return setmetatable({ Struct = ffi.cast("struct UScriptStruct*", obj) }, ScriptStruct)
+	return setmetatable({ Struct = ffi.cast("struct UScriptStruct*", obj), UnknownDataIndex = 0 }, ScriptStruct)
 end
 
 function ScriptStruct:GeneratePrereqs(inPackage)
@@ -81,6 +81,10 @@ function ScriptStruct:GeneratePrereqs(inPackage)
 
 end
 
+function ScriptStruct:GetFieldsSize()
+	return self.Struct.UStruct.PropertySize
+end
+
 function ScriptStruct:GenerateDefinition()
 
 	local scriptStruct = self.Struct
@@ -94,13 +98,14 @@ function ScriptStruct:GenerateDefinition()
 	-- some hacky C struct inheritance, just put all the base fields straight into the def
 	-- for this struct.
 	local base = scriptStruct.UStruct.SuperField
+	local actualStart = 0
 	if NotNull(base) and base ~= scriptStruct then
-
-		structText = structText .. ScriptStruct.new(base):FieldsToC()
-
+		local baseStruct = ScriptStruct.new(base)
+		structText = structText .. baseStruct:FieldsToC(0)
+		actualStart = actualStart + baseStruct:GetFieldsSize()
 	end
 
-	structText = structText .. self:FieldsToC()
+	structText = structText .. self:FieldsToC(actualStart)
 	structText = structText .. "};"
 
 	table.insert(GeneratedStructs, scriptStruct)
@@ -108,26 +113,7 @@ function ScriptStruct:GenerateDefinition()
 	print(structText)
 end
 
-
-local function SortProperty(propA, propB)
-	-- Note that propA and propB should already be UProperty*
-
-	-- First check if they are booleans and share the same offset. Compare bitmasks if so.
-	-- Otherwise just compare their offset in the struct.
-	if 	propA.UProperty.Offset == propB.UProperty.Offset
-		and propA:IsA(engine.Classes.UBoolProperty)
-		and propB:IsA(engine.Classes.UBoolProperty)
-	then
-		propA = ffi.cast("struct UBoolProperty*", propA)
-		propB = ffi.cast("struct UBoolProperty*", propB)
-
-		return propA.UBoolProperty.BitMask < propB.UBoolProperty.BitMask
-	else
-		return propA.UProperty.Offset < propB.UProperty.Offset
-	end
-end
-
-function ScriptStruct:FieldsToC()
+function ScriptStruct:FieldsToC(startingOffset)
 
 	local scriptStruct = self.Struct
 
@@ -144,18 +130,36 @@ function ScriptStruct:FieldsToC()
 
 	-- Next, sort the properties according to their offset in the struct. When dealing with
 	-- boolean types, we need the one with the smallest bitmask first.
-	table.sort(properties, SortProperty)
+	table.sort(properties, SDKGen.SortProperty)
 
 	local out = ""
-	local unknownDataIndex = 1
 	for _,property in ipairs(properties) do
 
-		local typeof = "type"
+		if startingOffset < property.UProperty.Offset then
+			print("Had to miss an offset")
+			out = out .. self:MissedOffset(startingOffset, (property.UProperty.Offset - startingOffset))
+		end
+
+		local typeof = SDKGen.GetPropertyType(property) -- Handle false return
 
 		out = out .. "\t" .. typeof .. " ".. property:GetName() .. "; // Offset = " .. tostring(property.UProperty.Offset) .. " Size = " .. tostring(property.UProperty.ElementSize) .. " ArrayDim = " .. tostring(property.UProperty.ArrayDim) .. "\n"
+	
+		startingOffset = property.UProperty.Offset + (property.UProperty.ElementSize * property.UProperty.ArrayDim)
 	end
 
 	return out
+end
+
+function ScriptStruct:MissedOffset(at, missedSize)
+	if missedSize < STRUCT_ALIGN then return "" end
+
+	self.UnknownDataIndex = self.UnknownDataIndex + 1
+
+	return string.format("\tunsigned char Unknown%d[0x%X]; // 0x%X (0x%X) MISSED OFFSET\n", 
+		self.UnknownDataIndex,
+		missedSize,
+		at,
+		missedSize)
 end
 
 function Package:ProcessScriptStructs()

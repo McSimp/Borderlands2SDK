@@ -66,6 +66,7 @@ function funcs.GetCName(self)
 				cname = "A"
 				break
 			end
+			class = class.UObject.Outer
 		end
 	else
 		cname = "F"

@@ -228,6 +228,18 @@ ffi.cdef[[
 		struct UObjectProperty_Data 	UObjectProperty;
 	};
 
+	struct UComponentProperty_Data {
+
+	};
+
+	struct UComponentProperty {
+		struct UObject_Data 			UObject;
+		struct UField_Data 				UField;
+		struct UProperty_Data 			UProperty;
+		struct UObjectProperty_Data 	UObjectProperty;
+		struct UComponentProperty_Data 	UComponentProperty;
+	};
+
 	struct UClassProperty_Data {
 		struct UClass* MetaClass;
 	};
@@ -304,7 +316,8 @@ table.insert(loadedClasses, { "UStrProperty", "Class Core.StrProperty", "UProper
 table.insert(loadedClasses, { "UNameProperty", "Class Core.NameProperty", "UProperty" })
 table.insert(loadedClasses, { "UDelegateProperty", "Class Core.DelegateProperty", "UProperty" })
 table.insert(loadedClasses, { "UObjectProperty", "Class Core.ObjectProperty", "UProperty" })
-table.insert(loadedClasses, { "UClassProperty", "Class Core.ClassProperty", "UProperty" })
+table.insert(loadedClasses, { "UComponentProperty", "Class Core.ComponentProperty", "UObjectProperty" })
+table.insert(loadedClasses, { "UClassProperty", "Class Core.ClassProperty", "UObjectProperty" })
 table.insert(loadedClasses, { "UInterfaceProperty", "Class Core.InterfaceProperty", "UProperty" })
 table.insert(loadedClasses, { "UStructProperty", "Class Core.StructProperty", "UProperty" })
 table.insert(loadedClasses, { "UArrayProperty", "Class Core.ArrayProperty", "UProperty" })

@@ -106,70 +106,41 @@ print(engine.Objects:Get(10):GetName())
 print(tonumber(ffi.cast("unsigned int", engine.Objects:Get(10).UObject.Class)))
 print(tonumber(0x025ab418))
 ]]
+local bit = require("bit")
 
 ffi.cdef[[
-	struct UObjectT_Data { 
-		struct FPointer 	VfTableObject;
-		struct UObject*		HashNext;
-		struct FQWord 		ObjectFlags;
-		struct UObject* 	HashOuterNext;
-		struct FPointer 	StateFrame;
-		struct UObject* 	Linker;
-		struct FPointer 	LinkerIndex;
-		int 				Index;
-		int 				NetIndex;
-		struct UObject* 	Outer;
-		struct FName 		Name;
-		struct UClass* 		Class;
-		struct UObject* 	ObjectArchetype;
-	};
+struct UObject_execGetPackageName_Parms
+{
+	struct FName                                       ReturnValue;                                      		// 0x0000 (0x0008) [0x0000000000000580]              ( CPF_Parm | CPF_OutParm | CPF_ReturnParm )
+};
 
-	struct UObjectT {
-		struct UObjectT_Data UObject;
-	};
+typedef void (__thiscall *tProcessEvent) (struct UObject*, struct UFunction*, void*, void*);
 ]]
 
-local metaT = { __index = {} }
+local func = ffi.cast("tProcessEvent", 0x65C820)
 
-function metaT:__index(k)
-	-- First check the base functions
-	
+function SetSubtitle()
+	local pc = engine.FindObject("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController")
+	if IsNull(pc) then return end
+	print(pc)
 
-	-- Get the actual class information for this object
-	local classInfo = engine._ClassesInternal[PtrToNum(self.UObject.Class)]
+	local getengver = engine.Objects:Get(5374)
+	getengver = ffi.cast("struct UFunction*", getengver)
+	print(getengver)
 
-	-- Cast this object to the right type
-	local actualTypeName = "struct " .. classInfo["name"] .. "*"
-	self = ffi.cast(actualTypeName, self)
+	local parms = ffi.new("struct UObject_execGetPackageName_Parms")
+	print(bit.tohex(getengver.UFunction.FunctionFlags))
+	--getengver.UFunction.FunctionFlags = bit.band(getengver.UFunction.FunctionFlags, bit.bnot(0x400))
+	print(bit.tohex(getengver.UFunction.FunctionFlags))
+	print(parms)
 
-	-- Since we have casted, check the actual class type first
-	-- Then while this class has a base class, check that.
-	local base = classInfo
-	while base do
-		if self[base["name"]][k] ~= nil then 
-			return self[base["name"]][k]
-		else
-			base = base["base"]
-		end
-	end
+	print("Calling it now")
+	func(pc, getengver, parms, nil)
 
-	return nil
+	getengver.UFunction.FunctionFlags = bit.bor(getengver.UFunction.FunctionFlags, 0x400)
+	print(bit.tohex(getengver.UFunction.FunctionFlags))
+	print(parms.ReturnValue.Index)
 end
 
-ffi.metatype("struct UObjectT", metaT)
 
-local start = os.clock()
-local myvar = ffi.cast("struct UIntProperty*", engine.Objects:Get(10))
-io.stdout:write(tostring(myvar.UObject.Class))
---print(myvar.UObject.Class:GetName())
-io.stdout:write(myvar.UProperty.Offset)
-print(string.format("elapsed time: %.3f", os.clock() - start))
-
-start = os.clock()
-myvar = ffi.cast("struct UObjectT*", engine.Objects:Get(10))
-io.stdout:write(tostring(myvar.Class))
---print(myvar.Class:GetName())
-io.stdout:write(myvar.Offset)
-print(string.format("elapsed time: %.5f", os.clock() - start))
-
-print("Ran!")
+SetSubtitle()
