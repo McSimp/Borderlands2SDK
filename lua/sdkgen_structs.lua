@@ -136,14 +136,36 @@ function ScriptStruct:FieldsToC(startingOffset)
 	for _,property in ipairs(properties) do
 
 		if startingOffset < property.UProperty.Offset then
-			print("Had to miss an offset")
 			out = out .. self:MissedOffset(startingOffset, (property.UProperty.Offset - startingOffset))
 		end
 
 		local typeof = SDKGen.GetPropertyType(property) -- Handle false return
+		local size = property.UProperty.ElementSize * property.UProperty.ArrayDim
+		if not typeof then
+			out = out .. string.format("\tunsigned char %s[0x%X]; // 0x%X (0x%X) UNKNOWN PROPERTY\n",
+				property:GetName(),
+				size,
+				property.UProperty.Offset,
+				size)
+		else
+			local special = ""
 
-		out = out .. "\t" .. typeof .. " ".. property:GetName() .. "; // Offset = " .. tostring(property.UProperty.Offset) .. " Size = " .. tostring(property.UProperty.ElementSize) .. " ArrayDim = " .. tostring(property.UProperty.ArrayDim) .. "\n"
-	
+			if property.UProperty.ArrayDim > 1 then -- It's a C style array, so [x] needed
+				special = special .. string.format("[%d]", property.UProperty.ArrayDim)
+			end
+
+			if property:IsA(engine.Classes.UBoolProperty) then
+				special = special .. " : 1" -- A bool is defined as a 1 bit unsigned long
+			end
+
+			out = out .. string.format("\t%s %s%s; // 0x%X (0x%X)\n",
+				typeof,
+				property:GetName(),
+				special,
+				property.UProperty.Offset,
+				size)
+		end
+
 		startingOffset = property.UProperty.Offset + (property.UProperty.ElementSize * property.UProperty.ArrayDim)
 	end
 

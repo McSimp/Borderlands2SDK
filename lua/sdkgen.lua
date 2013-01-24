@@ -9,7 +9,7 @@ local FILE_HEADER = [[
 
 ]]
 
-SDKGen = { Package = {} }
+SDKGen = { Package = {}, Errors = {} }
 
 function SDKGen.SortProperty(propA, propB)
 	-- Note that propA and propB should already be UProperty*
@@ -41,7 +41,7 @@ local types = {
 	ClassProperty = "struct %s*",
 	ComponentProperty = "struct %s*",
 	InterfaceProperty = "struct FScriptInterface",
-	StructProperty = "struct type",
+	StructProperty = "struct %s",
 	ArrayProperty = "struct TArray"
 	--MapProperty = ...
 }
@@ -56,9 +56,21 @@ function SDKGen.GetPropertyType(prop)
 	elseif prop:IsA(engine.Classes.UObjectProperty) then -- Covers UComponentProp too
 		prop = ffi.cast("struct UObjectProperty*", prop)
 		propType = string.format(propType, prop.UObjectProperty.PropertyClass:GetCName())
+	elseif prop:IsA(engine.Classes.UStructProperty) then
+		prop = ffi.cast("struct UStructProperty*", prop)
+		propType = string.format(propType, prop.UStructProperty.Struct:GetCName())
 	end
 
 	return propType
+end
+
+function SDKGen.GetPropertySize(prop)
+	local propType = SDKGen.GetPropertyType(prop)
+	if not propType then
+		return 0
+	else
+		return ffi.sizeof(proptype) or 0
+	end
 end
 
 local Package = SDKGen.Package
