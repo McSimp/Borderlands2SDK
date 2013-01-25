@@ -100,6 +100,14 @@ function Package:WriteFileHeader(contents)
 	self.File:write(string.format(FILE_HEADER, self.PackageObj:GetName(), contents))
 end
 
+function Package:WriteCDefWrapperStart()
+	self.File:write("local ffi = require(\"ffi\")\n\nffi.cdef[[\n\n")
+end
+
+function Package:WriteCDefWrapperEnd()
+	self.File:write("]]")
+end
+
 include("sdkgen_structs.lua")
 
 function ProcessPackages()
