@@ -1,7 +1,8 @@
 local ffi = require("ffi")
+local engine = engine
 local Package = SDKGen.Package
 local GeneratedStructs = {}
-local DefaultStruct = engine.FindObject("ScriptStruct Core.Default__ScriptStruct")
+local DefaultStruct = engine.FindObject("ScriptStruct Core.Default__ScriptStruct", engine.Classes.UScriptStruct)
 local STRUCT_ALIGN = 4
 
 local ScriptStruct = {}
@@ -189,7 +190,7 @@ function Package:ProcessScriptStructs()
 	-- Add the structs added manually to the generated list so they aren't generated again
 	local preGenerated = { "Core.Object.Pointer", "Core.Object.QWord" }
 	for _, structName in ipairs(preGenerated) do
-		local struct = engine.FindObject("ScriptStruct " .. structName)
+		local struct = engine.FindObject("ScriptStruct " .. structName, engine.Classes.UScriptStruct)
 		if NotNull(struct) then
 			table.insert(GeneratedStructs, struct)
 		end

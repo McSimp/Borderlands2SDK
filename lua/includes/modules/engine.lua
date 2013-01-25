@@ -18,7 +18,30 @@ _ClassesInternal = {}
 Classes = {}
 local BaseObjFuncs = UObject.BaseFuncs
 
-function FindObject(objectName)
+local function FindObjectWithClass(objectName, class)
+
+	for i=0,(Objects.Count-1) do
+
+		local obj = Objects:Get(i)
+		if IsNull(obj) then goto continue end
+		if not obj:IsA(class) then goto continue end
+
+		if obj:GetFullName() == objectName then
+			return obj
+		end
+
+		::continue::
+	end
+
+	return nil
+
+end
+
+function FindObject(objectName, class)
+
+	if class ~= nil then
+		return FindObjectWithClass(objectName, class)
+	end
 
 	for i=0,(Objects.Count-1) do
 
@@ -38,7 +61,13 @@ end
 
 function FindClass(className)
 
-	local obj = FindObject(className)
+	local obj
+
+	if Classes.UClass ~= nil then
+		obj = FindObjectWithClass(className, Classes.UClass)
+	else
+		obj = FindObject(className)
+	end
 	
 	if IsNull(obj) then
 		return nil
@@ -82,7 +111,7 @@ local function UObjectIndex(self, k)
 	local classInfo = _ClassesInternal[PtrToNum(self.UObject.Class)]
 
 	-- Cast this object to the right type
-	self = ffi.cast(classInfo["cPtrName"], self)
+	self = ffi.cast(classInfo.ptrType, self)
 
 	-- Since we have casted, check the actual class type first
 	-- Then while this class has a base class, check that.
@@ -120,7 +149,7 @@ function Initialize()
 			name = class[1],
 			static = FindClassSafe(class[2]),
 			base = Classes[class[3]],
-			cPtrName = "struct " .. class[1] .. "*",
+			ptrType = ffi.typeof("struct " .. class[1] .. "*"),
 			funcs = {}
 		}
 
