@@ -93,7 +93,13 @@ function ScriptStruct:GenerateDefinition()
 	print("[SDKGen] Struct " .. scriptStruct:GetFullName())
 
 	-- Start by defining the struct with its name
-	local structText = "struct " .. scriptStruct:GetCName() .. " {\n"
+	local count = SDKGen.CountObject(scriptStruct.UObject.Name, engine.Classes.UScriptStruct)
+	local structText
+	if count == 1 then
+		structText = "struct " .. scriptStruct:GetCName() .. " {\n"
+	else
+		structText = "struct " .. scriptStruct.UObject.Outer:GetCName() .. "_" .. scriptStruct:GetCName() .. " {\n"
+	end
 
 	-- Check if this struct has a base which it inherits from. If it does, instead of doing
 	-- some hacky C struct inheritance, just put all the base fields straight into the def

@@ -1,4 +1,5 @@
 local ffi = require("ffi")
+local bit = require("bit")
 
 local TArray = TArray
 local IsNull = IsNull
@@ -12,8 +13,12 @@ local PtrToNum = PtrToNum
 
 module("engine")
 
+local OBJECT_HASH_BINS = 32*1024
+
 Objects = TArray("struct UObject*", ffi.cast("struct TArray*", 0x19C6DC0))
 Names = TArray("struct FNameEntry*", ffi.cast("struct TArray*", 0x19849E4))
+ObjHash = ffi.cast(ffi.typeof("struct UObject**"), 0x019A6CF8)
+
 _ClassesInternal = {}
 Classes = {}
 local BaseObjFuncs = UObject.BaseFuncs
@@ -87,6 +92,10 @@ function FindClassSafe(className)
 		return result
 	end
 
+end
+
+function GetObjectHash(objName)
+	return bit.band(bit.bxor(objName.Index, objName.Number), OBJECT_HASH_BINS - 1)
 end
 
 --[[

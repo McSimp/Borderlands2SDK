@@ -73,6 +73,30 @@ function SDKGen.GetPropertySize(prop)
 	end
 end
 
+local objectCounts = {}
+
+function SDKGen.CountObject(objectName, class)
+	if objectCounts[objectName.Index] ~= nil then
+		return objectCounts[objectName.Index]
+	end
+
+	local count = 0
+
+	local iHash = engine.GetObjectHash(objectName)
+	local hash = engine.ObjHash[iHash]
+	while NotNull(hash) do
+
+		if hash:IsA(class) and hash.UObject.Name.Index == objectName.Index then
+			count = count + 1
+		end
+
+		hash = hash.UObject.HashNext
+	end
+
+	objectCounts[objectName.Index] = count
+	return count
+end
+
 local Package = SDKGen.Package
 Package.__index = Package
 
