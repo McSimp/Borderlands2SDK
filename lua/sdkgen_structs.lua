@@ -186,6 +186,15 @@ end
 
 function Package:ProcessScriptStructs()
 
+	-- Add the structs added manually to the generated list so they aren't generated again
+	local preGenerated = { "Core.Object.Pointer", "Core.Object.QWord" }
+	for _, structName in ipairs(preGenerated) do
+		local struct = engine.FindObject("ScriptStruct " .. structName)
+		if NotNull(struct) then
+			table.insert(GeneratedStructs, struct)
+		end
+	end
+
 	self:CreateFile("structs")
 	self:WriteFileHeader("Script Structs")
 

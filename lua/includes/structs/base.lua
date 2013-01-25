@@ -43,4 +43,10 @@ ffi.cdef[[
 		int A;
 		int B;
 	};
+
+	struct FScriptInterface 
+	{
+		struct UObject* ObjectPointer; 
+		void* InterfacePointer; 
+	};
 ]]
