@@ -30,24 +30,24 @@ function SDKGen.SortProperty(propA, propB)
 end
 
 local types = {
-	ByteProperty = "unsigned char",
-	IntProperty = "int",
-	FloatProperty = "float",
-	BoolProperty = "unsigned long", -- No bool in C AFAIK
-	StrProperty = "struct FString",
-	NameProperty = "struct FName",
-	DelegateProperty = "struct FScriptDelegate",
-	ObjectProperty = "struct %s*",
-	ClassProperty = "struct %s*",
-	ComponentProperty = "struct %s*",
-	InterfaceProperty = "struct FScriptInterface",
-	StructProperty = "struct %s",
-	ArrayProperty = "struct TArray"
+	ByteProperty = { c = "unsigned char" },
+	IntProperty = { c = "int" },
+	FloatProperty = { c = "float" },
+	BoolProperty = { c = "unsigned long" }, -- No bool in C AFAIK
+	StrProperty = { c = "struct FString" },
+	NameProperty = { c = "struct FName" },
+	DelegateProperty = { c = "struct FScriptDelegate" },
+	ObjectProperty = { c = "struct %s*", size = 4 },
+	ClassProperty = { c = "struct %s*", size = 4 },
+	ComponentProperty = { c = "struct %s*", size = 4 },
+	InterfaceProperty = { c = "struct FScriptInterface" },
+	StructProperty = { c = "struct %s" },
+	ArrayProperty = { c = "struct TArray" }
 	--MapProperty = ...
 }
 
 function SDKGen.GetPropertyType(prop)
-	local propType = types[prop.UObject.Class:GetName()]
+	local propType = types[prop.UObject.Class:GetName()].c
 	if not propType then return false end
 
 	if prop:IsA(engine.Classes.UClassProperty) then
@@ -64,12 +64,18 @@ function SDKGen.GetPropertyType(prop)
 	return propType
 end
 
-function SDKGen.GetPropertySize(prop)
-	local propType = SDKGen.GetPropertyType(prop)
+function SDKGen.GetCPropertySize(prop)
+	if prop:IsA(engine.Classes.UStructProperty) then
+		return prop.UProperty.ElementSize
+	end
+
+	local propType = types[prop.UObject.Class:GetName()]
 	if not propType then
 		return 0
+	elseif propType.size ~= nil then
+		return propType.size
 	else
-		return ffi.sizeof(proptype) or 0
+		return ffi.sizeof(propType.c) or 0
 	end
 end
 

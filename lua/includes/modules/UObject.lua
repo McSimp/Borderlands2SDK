@@ -60,13 +60,13 @@ function funcs.GetCName(self)
 	if self:IsA(engine.Classes.UClass) then
 		cname = "U" -- Just a plain old object by default
 
-		local class = self
+		local class = ffi.cast("struct UClass*", self)
 		while NotNull(class) do
 			if class:GetName() == "Actor" then
 				cname = "A"
 				break
 			end
-			class = class.UObject.Outer
+			class = ffi.cast("struct UClass*", class.UStruct.SuperField)
 		end
 	else
 		cname = "F"

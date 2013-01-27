@@ -106,6 +106,7 @@ print(engine.Objects:Get(10):GetName())
 print(tonumber(ffi.cast("unsigned int", engine.Objects:Get(10).UObject.Class)))
 print(tonumber(0x025ab418))
 ]]
+
 local bit = require("bit")
 
 ffi.cdef[[
@@ -117,6 +118,7 @@ struct UObject_execGetPackageName_Parms
 typedef void (__thiscall *tProcessEvent) (struct UObject*, struct UFunction*, void*, void*);
 ]]
 
+--[[
 local func = ffi.cast("tProcessEvent", 0x65C820)
 
 function SetSubtitle()
@@ -144,3 +146,6 @@ end
 
 
 SetSubtitle()
+]]
+
+print(ffi.sizeof("struct ing"))

@@ -120,7 +120,7 @@ function ScriptStruct:GenerateDefinition()
 	return structText
 end
 
-function ScriptStruct:FieldsToC(startingOffset)
+function ScriptStruct:FieldsToC(lastOffset)
 
 	local scriptStruct = self.Struct
 
@@ -142,12 +142,17 @@ function ScriptStruct:FieldsToC(startingOffset)
 	local out = ""
 	for _,property in ipairs(properties) do
 
-		if startingOffset < property.UProperty.Offset then
-			out = out .. self:MissedOffset(startingOffset, (property.UProperty.Offset - startingOffset))
+		-- If the offset for this property is ahead of the end of the last property,
+		-- add some unknown data into the struct def.
+		if lastOffset < property.UProperty.Offset then
+			out = out .. self:MissedOffset(lastOffset, (property.UProperty.Offset - lastOffset))
 		end
 
-		local typeof = SDKGen.GetPropertyType(property) -- Handle false return
+		-- Get the type and size of the property
+		local typeof = SDKGen.GetPropertyType(property)
 		local size = property.UProperty.ElementSize * property.UProperty.ArrayDim
+
+		-- If the type isn't one we recognize, add unknown data to the def.
 		if not typeof then
 			out = out .. string.format("\tunsigned char %s[0x%X]; // 0x%X (0x%X) UNKNOWN PROPERTY\n",
 				property:GetName(),
@@ -171,24 +176,43 @@ function ScriptStruct:FieldsToC(startingOffset)
 				special,
 				property.UProperty.Offset,
 				size)
+
+			-- It's possible that our C definition for this type is not correct
+			-- If that's the case, we need to ensure that the fields are still 
+			-- at their correct offsets. So here we'll add some data to fix our 
+			-- dodgy definition.
+			local actualSize = SDKGen.GetCPropertySize(property) * property.UProperty.ArrayDim
+			local missedSize = size - actualSize
+			if missedSize > 0 then
+				out = out .. self:MissedOffset(property.UProperty.Offset + missedSize, missedSize, "PROPERTY C DEF INCORRECT")
+			elseif missedSize < 0 then
+				error(property.UObject.Class:GetName() .. " has an incorrect C definition (too small)!")
+			end
 		end
 
-		startingOffset = property.UProperty.Offset + (property.UProperty.ElementSize * property.UProperty.ArrayDim)
+		lastOffset = property.UProperty.Offset + (property.UProperty.ElementSize * property.UProperty.ArrayDim)
+	end
+
+	-- If there is additional data after the last property we have, add it to the end
+	if lastOffset < scriptStruct.UStruct.PropertySize then
+		out = out .. self:MissedOffset(lastOffset, (property.UStruct.PropertySize - lastOffset))
 	end
 
 	return out
 end
 
-function ScriptStruct:MissedOffset(at, missedSize)
+function ScriptStruct:MissedOffset(at, missedSize, reason)
 	if missedSize < STRUCT_ALIGN then return "" end
+	if reason == nil then reason = "MISSED OFFSET" end
 
 	self.UnknownDataIndex = self.UnknownDataIndex + 1
 
-	return string.format("\tunsigned char Unknown%d[0x%X]; // 0x%X (0x%X) MISSED OFFSET\n", 
+	return string.format("\tunsigned char Unknown%d[0x%X]; // 0x%X (0x%X) %s\n", 
 		self.UnknownDataIndex,
 		missedSize,
 		at,
-		missedSize)
+		missedSize,
+		reason)
 end
 
 function Package:ProcessScriptStructs()
