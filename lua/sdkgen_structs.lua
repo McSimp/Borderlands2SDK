@@ -186,7 +186,7 @@ function ScriptStruct:FieldsToC(lastOffset)
 			if missedSize > 0 then
 				out = out .. self:MissedOffset(property.UProperty.Offset + missedSize, missedSize, "PROPERTY C DEF INCORRECT")
 			elseif missedSize < 0 then
-				error(property.UObject.Class:GetName() .. " has an incorrect C definition (too small)!")
+				error(property.UObject.Class:GetName() .. " has an incorrect C definition (too big)!")
 			end
 		end
 
@@ -206,6 +206,8 @@ function ScriptStruct:MissedOffset(at, missedSize, reason)
 	if reason == nil then reason = "MISSED OFFSET" end
 
 	self.UnknownDataIndex = self.UnknownDataIndex + 1
+
+	SDKGen.AddError("Missed offset in " .. self.Struct:GetName() .. " (Reason = " .. reason .. ")")
 
 	return string.format("\tunsigned char Unknown%d[0x%X]; // 0x%X (0x%X) %s\n", 
 		self.UnknownDataIndex,

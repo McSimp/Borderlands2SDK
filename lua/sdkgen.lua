@@ -103,6 +103,10 @@ function SDKGen.CountObject(objectName, class)
 	return count
 end
 
+function SDKGen.AddError(errorText)
+	table.insert(SDKGen.Errors, errorText)
+end
+
 local Package = SDKGen.Package
 Package.__index = Package
 
@@ -140,7 +144,7 @@ end
 
 include("sdkgen_structs.lua")
 
-function ProcessPackages()
+local function ProcessPackages()
 
 	local processed = {}
 
@@ -167,5 +171,13 @@ function ProcessPackages()
 
 end
 
+local function PrintErrors()
+	print("====== SDK GENERATOR ERRORS ======")
+	for _, err in ipairs(SDKGen.Errors) do
+		print(err)
+	end
+	print("====== END ERRORS ======")
+end
 
 ProcessPackages()
+PrintErrors()
