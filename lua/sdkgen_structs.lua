@@ -13,7 +13,6 @@ function ScriptStruct.new(obj)
 end
 
 function ScriptStruct:GeneratePrereqs(inPackage)
-
 	local scriptStruct = self.Struct
 	local structPackage = scriptStruct:GetPackageObject()
 	local structText = ""
@@ -87,7 +86,6 @@ function ScriptStruct:GetFieldsSize()
 end
 
 function ScriptStruct:GenerateDefinition()
-
 	local scriptStruct = self.Struct
 
 	print("[SDKGen] Struct " .. scriptStruct:GetFullName())
@@ -121,7 +119,6 @@ function ScriptStruct:GenerateDefinition()
 end
 
 function ScriptStruct:FieldsToC(lastOffset)
-
 	local scriptStruct = self.Struct
 
 	-- Foreach property, add them into the properties array
@@ -207,7 +204,7 @@ function ScriptStruct:MissedOffset(at, missedSize, reason)
 
 	self.UnknownDataIndex = self.UnknownDataIndex + 1
 
-	SDKGen.AddError("Missed offset in " .. self.Struct:GetName() .. " (Reason = " .. reason .. ")")
+	SDKGen.AddError("Missed offset in " .. self.Struct:GetFullName() .. " (Reason = " .. reason .. ")")
 
 	return string.format("\tunsigned char Unknown%d[0x%X]; // 0x%X (0x%X) %s\n", 
 		self.UnknownDataIndex,
@@ -218,7 +215,6 @@ function ScriptStruct:MissedOffset(at, missedSize, reason)
 end
 
 function Package:ProcessScriptStructs()
-
 	-- Add the structs added manually to the generated list so they aren't generated again
 	local preGenerated = { "Core.Object.Pointer", "Core.Object.QWord" }
 	for _, structName in ipairs(preGenerated) do
@@ -253,11 +249,9 @@ function Package:ProcessScriptStructs()
 
 	self:WriteCDefWrapperEnd()
 	self:CloseFile()
-
 end
 
 function Package:CheckForSameName(checkobj)
-
 	for i=0,(engine.Objects.Count-1) do
 
 		local obj = engine.Objects:Get(i)
@@ -273,5 +267,4 @@ function Package:CheckForSameName(checkobj)
 
 		::continue::
 	end
-
 end

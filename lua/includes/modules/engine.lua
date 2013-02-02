@@ -10,6 +10,7 @@ local string = string
 local UObject = UObject
 local os = os
 local PtrToNum = PtrToNum
+local profiling = profiling
 
 module("engine")
 
@@ -140,7 +141,7 @@ local UObjectDataMT = { __index = NilIndex }
 local UObjectMT = { __index = UObjectIndex }
 
 function Initialize()
-	local start = os.clock()
+	profiling.StartTimer("engineinit", "Engine Initialization")
 
 	print("[Lua] Initializing engine classes...")
 
@@ -171,5 +172,5 @@ function Initialize()
 
 	loadedClasses = nil
 
-	print(string.format("elapsed time: %.3f", os.clock() - start))
+	profiling.StopTimer("engineinit")
 end

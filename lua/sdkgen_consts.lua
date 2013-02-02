@@ -37,6 +37,8 @@ end
 function Package:ProcessConst(const)
 	if const == DefaultConst then return end
 
+	print("[SDKGen] Constant " .. const:GetFullName())
+
 	local value = const.UConst.Value:GetLuaString()
 	local idx = const.UObject.Name.Index
 
@@ -46,8 +48,10 @@ function Package:ProcessConst(const)
 
 		self.File:write(string.format("UCONST_%s = %s\n", name, FixConstValue(value)))
 		table.insert(GeneratedConsts, { Value = value, Index = idx })
-	elseif SameNameValue(idx, value) then
+	elseif not SameNameValue(idx, value) then
 		local name = const:GetName()
+
+		SDKGen.AddError("Duplicate constant name " .. const:GetFullName())
 
 		self.File:write(string.format("UCONST_%s%d = %s\n", name, nameCount, FixConstValue(value)))
 		table.insert(GeneratedConsts, { Value = value, Index = idx })
@@ -56,7 +60,6 @@ end
 
 
 function Package:ProcessConstants()
-
 	self:CreateFile("consts")
 	self:WriteFileHeader("Constants")
 
@@ -81,5 +84,4 @@ function Package:ProcessConstants()
 	end
 
 	self:CloseFile()
-
 end

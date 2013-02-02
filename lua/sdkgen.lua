@@ -146,6 +146,7 @@ include("sdkgen_structs.lua")
 include("sdkgen_consts.lua")
 
 local function ProcessPackages()
+	profiling.StartTimer("sdkgen", "SDK generation")
 
 	local processed = {}
 
@@ -160,7 +161,7 @@ local function ProcessPackages()
 		if table.contains(processed, package_object) then goto continue end
 
 		local pkg = Package.new(package_object)
-		
+
 		pkg:ProcessScriptStructs()
 		pkg:ProcessConstants()
 
@@ -171,6 +172,7 @@ local function ProcessPackages()
 		::continue::
 	end
 
+	profiling.StopTimer("sdkgen")
 end
 
 local function PrintErrors()

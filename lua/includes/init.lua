@@ -1,6 +1,8 @@
 require("jit.v")
 jit.v.on("jitv.txt")
 
+require("profiling")
+
 -- Load helper functions
 require("base")
 
