@@ -28,7 +28,7 @@ ffi.cdef[[
 		wchar_t* Data;
 		int Count;
 		int Max;
-	}
+	};
 
 	struct FScriptDelegate {
 		struct UObject* Object;

@@ -143,6 +143,7 @@ function Package:WriteCDefWrapperEnd()
 end
 
 include("sdkgen_structs.lua")
+include("sdkgen_consts.lua")
 
 local function ProcessPackages()
 
@@ -161,6 +162,7 @@ local function ProcessPackages()
 		local pkg = Package.new(package_object)
 		
 		pkg:ProcessScriptStructs()
+		pkg:ProcessConstants()
 
 		pkg:Close()
 

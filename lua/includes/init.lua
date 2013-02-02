@@ -11,6 +11,7 @@ include("classes/base.lua")
 -- Add load base types
 require("FName")
 require("TArray")
+require("FString")
 require("UObject")
 
 -- Load engine functions
