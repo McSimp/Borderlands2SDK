@@ -8,6 +8,7 @@ struct TArray_%s_ {
 	int Count;
 	int Max;
 };
+
 ]]
 
 -- innerType should be a UProperty*

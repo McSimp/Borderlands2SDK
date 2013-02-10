@@ -42,7 +42,7 @@ local types = {
 	ComponentProperty = { c = "struct %s*", size = 4 },
 	InterfaceProperty = { c = "struct FScriptInterface" },
 	StructProperty = { c = "struct %s" },
-	ArrayProperty = { c = "struct TArray" }
+	ArrayProperty = { c = "struct TArray_%s_", size = 12 }
 	--MapProperty = ...
 }
 
@@ -59,6 +59,9 @@ function SDKGen.GetPropertyType(prop)
 	elseif prop:IsA(engine.Classes.UStructProperty) then
 		prop = ffi.cast("struct UStructProperty*", prop)
 		propType = string.format(propType, prop.UStructProperty.Struct:GetCName())
+	elseif prop:IsA(engine.Classes.UArrayProperty) then
+		prop = ffi.cast("struct UArrayProperty*", prop)
+		propType = string.format(propType, SDKGen.GetCleanPropertyType(prop.UArrayProperty.Inner))
 	end
 
 	return propType
