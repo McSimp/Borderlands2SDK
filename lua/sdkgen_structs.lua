@@ -69,6 +69,12 @@ function ScriptStruct:GeneratePrereqs(inPackage)
 					structText = structText .. ScriptStruct.new(innerStruct):GeneratePrereqs(inPackage)
 				end
 			end
+
+			-- Check if we need to generate the TArray template for the inner type
+			-- and do it if we need to.
+			if not SDKGen.TArrayTypeGenerated(innerProperty) then
+				structText = structText .. SDKGen.GenerateTArrayType(innerProperty)
+			end
 		end
 
 		-- TMap would be here if BL needed it
@@ -191,8 +197,8 @@ function ScriptStruct:FieldsToC(lastOffset)
 	end
 
 	-- If there is additional data after the last property we have, add it to the end
-	if lastOffset < scriptStruct.UStruct.PropertySize then
-		out = out .. self:MissedOffset(lastOffset, (property.UStruct.PropertySize - lastOffset))
+	if lastOffset < self:GetFieldsSize() then
+		out = out .. self:MissedOffset(lastOffset, (self:GetFieldsSize() - lastOffset))
 	end
 
 	return out

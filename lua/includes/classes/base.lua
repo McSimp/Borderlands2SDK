@@ -35,8 +35,14 @@ ffi.cdef[[
 		struct UField_Data 		UField;
 	};
 
+	struct TArray_FName_ {
+		struct FName* Data;
+		int Count;
+		int Max;
+	};
+
 	struct UEnum_Data {
-		struct TArray Names;
+		struct TArray_FName_ Names;
 	};
 
 	struct UEnum {
@@ -275,7 +281,7 @@ ffi.cdef[[
 	};
 
 	struct UArrayProperty_Data {
-		struct UClass* Inner;
+		struct UProperty* Inner;
 	};
 
 	struct UArrayProperty {

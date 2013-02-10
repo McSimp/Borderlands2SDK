@@ -64,6 +64,16 @@ function SDKGen.GetPropertyType(prop)
 	return propType
 end
 
+function SDKGen.GetCleanPropertyType(prop)
+	local propType = SDKGen.GetPropertyType(prop)
+
+	propType = string.gsub(propType, "*", "Ptr")
+	propType = string.gsub(propType, "struct ", "")
+	propType = string.gsub(propType, " ", "_")
+
+	return propType
+end
+
 function SDKGen.GetCPropertySize(prop)
 	if prop:IsA(engine.Classes.UStructProperty) then
 		return prop.UProperty.ElementSize
@@ -142,6 +152,7 @@ function Package:WriteCDefWrapperEnd()
 	self.File:write("]]")
 end
 
+include("sdkgen_tarray.lua")
 include("sdkgen_structs.lua")
 include("sdkgen_consts.lua")
 

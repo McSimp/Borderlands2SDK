@@ -11,7 +11,7 @@ function TArrayMT.__index.Get(self, idx)
 	end
 end
 
---[[ Too slow
+-- Using pairs is probably slower than a normal for loop, but it's a tad more convenient
 local function TArrayIter(obj, k)
 
 	if k < (obj.Count - 1) then -- If current index is before the last index
@@ -30,7 +30,6 @@ end
 function TArrayMT.__pairs(self)
 	return TArrayIter, self, -1 -- neg 1 because TArrayIter will increment this to 0
 end
-]]
 
 ffi.metatype("struct TArray", TArrayMT)
 
