@@ -1,4 +1,6 @@
 local ffi = require("ffi")
+local setmetatable = setmetatable
+local error = error
 
 local TArrayMT = { __index = {} }
 
@@ -31,9 +33,15 @@ function TArrayMT.__pairs(self)
 	return TArrayIter, self, -1 -- neg 1 because TArrayIter will increment this to 0
 end
 
+function TArrayMT.__ipairs(self)
+	return TArrayIter, self, -1 -- neg 1 because TArrayIter will increment this to 0
+end
+
 ffi.metatype("struct TArray", TArrayMT)
 
-function TArray(innerType, cdata)
+module("TArray")
+
+function Create(innerType, cdata)
 
 	local type = ffi.typeof([[
 	struct {
@@ -56,3 +64,5 @@ function TArray(innerType, cdata)
 
 	return setmetatable({}, mt)
 end
+
+BaseMT = TArrayMT

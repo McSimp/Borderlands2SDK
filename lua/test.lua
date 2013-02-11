@@ -17,8 +17,29 @@ for i=0,(engine.Objects.Count-1) do
 end
 ]]
 
+function MakeEnum(name, identifiers)
+	local enum = {}
+	for k,v in ipairs(identifiers) do
+		enum[v] = (k-1)
+	end
+
+	_G[name] = enum
+end
+
+MakeEnum("Shazbot", {
+	"UNATCO",
+	"SAVAGE",
+	"JCDENTON"
+})
+
 ffi.cdef[[
-struct TArray_pUClass_ {
-	int hi;
+struct TestStruct {
+	unsigned long hi;
 };
 ]]
+
+local test = ffi.new("struct TestStruct")
+test.hi = 6
+test.hi = Shazbot.JCDENTON
+
+print(test.hi)

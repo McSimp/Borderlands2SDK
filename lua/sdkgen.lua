@@ -33,7 +33,7 @@ local types = {
 	ByteProperty = { c = "unsigned char" },
 	IntProperty = { c = "int" },
 	FloatProperty = { c = "float" },
-	BoolProperty = { c = "unsigned long" }, -- No bool in C AFAIK
+	BoolProperty = { c = "bool" }, -- bool is added by LuaJIT's implementation
 	StrProperty = { c = "struct FString" },
 	NameProperty = { c = "struct FName" },
 	DelegateProperty = { c = "struct FScriptDelegate" },
@@ -158,6 +158,7 @@ end
 include("sdkgen_tarray.lua")
 include("sdkgen_structs.lua")
 include("sdkgen_consts.lua")
+include("sdkgen_enums.lua")
 
 local function ProcessPackages()
 	profiling.StartTimer("sdkgen", "SDK generation")
@@ -178,6 +179,7 @@ local function ProcessPackages()
 
 		pkg:ProcessScriptStructs()
 		pkg:ProcessConstants()
+		pkg:ProcessEnums()
 
 		pkg:Close()
 
@@ -189,6 +191,14 @@ local function ProcessPackages()
 	profiling.StopTimer("sdkgen")
 end
 
+local function WriteListingFiles()
+	local file = io.open("D:\\dev\\bl\\Borderlands2SDK\\bin\\Debug\\lua\\sdkgen\\TArrayList.lua", "w+")
+	file:write(SDKGen.GenerateTArrayMetaList())
+	file:close()
+
+	print("[SDKGen] TArray listing file created")
+end
+
 local function PrintErrors()
 	print("====== SDK GENERATOR ERRORS ======")
 	for _, err in ipairs(SDKGen.Errors) do
@@ -198,4 +208,5 @@ local function PrintErrors()
 end
 
 ProcessPackages()
+WriteListingFiles()
 PrintErrors()

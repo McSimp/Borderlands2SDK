@@ -1,10 +1,11 @@
 require("jit.v")
 jit.v.on("jitv.txt")
 
-require("profiling")
-
 -- Load helper functions
 require("base")
+
+-- Profiling library
+require("profiling")
 
 -- Import data structures
 include("structs/base.lua")

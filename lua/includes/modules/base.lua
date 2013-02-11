@@ -71,4 +71,7 @@ function PtrToNum(ptr)
 	return tonumber(ffi.cast(uint_t, ptr))
 end
 
-loadedClasses = {}
+g_loadedClasses = {}
+g_TArrayTypes = {}
+
+enums = {}

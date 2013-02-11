@@ -27,3 +27,12 @@ function SDKGen.GenerateTArrayType(innerType)
 
 	return string.format(TARRAY_TEMPLATE, propTypeClean, propType)
 end
+
+function SDKGen.GenerateTArrayMetaList()
+	local list = ""
+	for _,v in ipairs(GeneratedTArrays) do
+		list = list .. "table.insert(g_TArrayTypes, \"" .. v .. "\")\n"
+	end
+
+	return list
+end
