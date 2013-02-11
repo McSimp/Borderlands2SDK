@@ -2,7 +2,6 @@ local ffi = require("ffi")
 local engine = engine
 local Package = SDKGen.Package
 
-local GeneratedEnums = {}
 local DefaultEnum = engine.FindObject("Enum Core.Default__Enum", engine.Classes.UEnum)
 
 function Package:ProcessEnum(enum)
@@ -40,8 +39,6 @@ function Package:ProcessEnum(enum)
 	enumText = enumText .. "})\n\n"
 
 	self.File:write(enumText)
-
-	table.insert(GeneratedEnums, enum)
 end
 
 
