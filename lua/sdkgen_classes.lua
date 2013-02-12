@@ -75,15 +75,33 @@ end
 
 function Class:GenerateDefinition()
 	local class = self.ClassObj
+	local cname = class:GetCName()
 
 	print("[SDKGen] Class " .. class:GetFullName())
 
-	-- Start by defining the class with its name
-	local classText = "struct " .. class:GetCName() .. " {\n"
+	-- Start by defining the class with name_Data and put the fields in there
+	local classText = "struct " .. cname .. "_Data {\n"
 
 
 
 	classText = classText .. "};\n\n"
+
+	-- Now we have the data fields for this class, write the inheritance struct
+	classText = classText .. "struct " .. cname .. " {\n"
+
+	-- Needs to be in reverse order, so going to create a new string buffer
+	-- that we can prepend to.
+	local inheritText = ""
+	local base = ffi.cast("struct UClass*", class.UStruct.SuperField)
+	while NotNull(base) do
+		local name = base:GetCName()
+		inheritText = string.format("\tstruct %s_Data %s;\n", name, name) .. inheritText
+		base = ffi.cast("struct UClass*", base.UStruct.SuperField)
+	end
+
+	-- At the end, make sure we have the actual class
+	inheritText = inheritText .. string.format("\tstruct %s_Data %s;\n};\n\n", cname, cname)
+	classText = classText .. inheritText
 
 	table.insert(GeneratedClasses, class)
 
