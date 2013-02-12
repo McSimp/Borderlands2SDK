@@ -156,9 +156,10 @@ function Package:WriteCDefWrapperEnd()
 end
 
 include("sdkgen_tarray.lua")
-include("sdkgen_structs.lua")
 include("sdkgen_consts.lua")
 include("sdkgen_enums.lua")
+include("sdkgen_structs.lua")
+include("sdkgen_classes.lua")
 
 local function ProcessPackages()
 	profiling.StartTimer("sdkgen", "SDK generation")
@@ -177,9 +178,10 @@ local function ProcessPackages()
 
 		local pkg = Package.new(package_object)
 
-		pkg:ProcessScriptStructs()
-		pkg:ProcessConstants()
-		pkg:ProcessEnums()
+		--pkg:ProcessConstants()
+		--pkg:ProcessEnums()
+		--pkg:ProcessScriptStructs()
+		pkg:ProcessClasses()
 
 		pkg:Close()
 
