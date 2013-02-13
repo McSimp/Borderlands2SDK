@@ -1,7 +1,5 @@
 g_TArrayTypes = {}
 
-include("sdkgen/TArrays.lua")
-
 local packages = { 
 	"Core",
 	"Engine",
@@ -16,29 +14,15 @@ local packages = {
 	"WillowGame"
 }
 
---[[
-local packages = { 
-	"AkAudio",
-	"Core",
-	"Engine",
-	"GameFramework",
-	"GearboxFramework",
-	"GFxUI",
-	"IpDrv",
-	"OnlineSubsystemSteamworks",
-	"WillowGame",
-	"WinDrv",
-	"XAudio2"
-}
-]]
+include("sdkgen/TArrays.lua")
 
-for _,v in ipairs(packages) do
-	profiling.TrackMemory("loadpackage", "Loading " .. v)
-	include("sdkgen/consts/" .. v .. ".lua")
-	include("sdkgen/enums/" .. v .. ".lua")
-	include("sdkgen/structs/" .. v .. ".lua")
-	include("sdkgen/classes/" .. v .. ".lua")
+for _,pkg in ipairs(packages) do
+	profiling.TrackMemory("loadpackage", "Loading " .. pkg)
+	include("sdkgen/consts/" .. pkg .. ".lua")
+	include("sdkgen/enums/" .. pkg .. ".lua")
+	include("sdkgen/structs/" .. pkg .. ".lua")
+	include("sdkgen/classes/" .. pkg .. ".lua")
 	profiling.GetMemoryUsage("loadpackage")
 end
 
-print("Generated SDK loaded")
+print("[SDKGen] Generated SDK loaded")

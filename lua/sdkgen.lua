@@ -231,9 +231,36 @@ local function PrintErrors()
 	print("====== END ERRORS ======")
 end
 
-ProcessPackages()
-PrintErrors()
 
-for _,v in ipairs(SDKGen.PackageOrder) do
-	print(v:GetName())
+local LOADER_TEMPLATE = 
+[[local packages = { 
+%s
+}
+
+include("TArrays.lua")
+
+for _,pkg in ipairs(packages) do
+	profiling.TrackMemory("loadpackage", "Loading " .. pkg)
+	include("consts/" .. pkg .. ".lua")
+	include("enums/" .. pkg .. ".lua")
+	include("structs/" .. pkg .. ".lua")
+	include("classes/" .. pkg .. ".lua")
+	profiling.GetMemoryUsage("loadpackage")
 end
+
+print("[SDKGen] Generated SDK loaded")
+]]
+
+local function CreateLoaderFile()
+	local packageText = ""
+	for _, pkg in ipairs(SDKGen.PackageOrder)
+		packageText = packageText .. "\t\"" .. pkg .. "\",\n"
+	end
+
+	local file = io.open("D:\\dev\\bl\\Borderlands2SDK\\bin\\Debug\\lua\\sdkgen\\loader.lua", "w+")
+	file:write(string.format(LOADER_TEMPLATE, packageText))
+end
+
+ProcessPackages()
+CreateLoaderFile()
+PrintErrors()
