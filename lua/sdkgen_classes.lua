@@ -4,6 +4,7 @@ local Package = SDKGen.Package
 local GeneratedClasses = {}
 local DefaultClass = engine.FindObject("Class Core.Default__Class", engine.Classes.UClass)
 local CLASS_ALIGN = 4
+local PackageOrder = SDKGen.PackageOrder
 
 -- Add the classes added manually to the generated list so they aren't generated again
 for _, v in pairs(engine.Classes) do
@@ -22,8 +23,37 @@ function Class:GeneratePrereqs(inPackage)
 	local classPackage = class:GetPackageObject()
 	local classText = ""
 
-	if IsNull(classPackage) or classPackage ~= inPackage then
+	if IsNull(classPackage) then
 		return classText
+	end
+
+	-- The next section is for determining the order in which package data structures
+	-- should be loaded. If a class inherits from another class which is in another
+	-- package, then the base class' package will need to be loaded first. 
+
+	if not table.contains(PackageOrder, inPackage) then
+		table.insert(PackageOrder, inPackage) -- Add the package to process into the pkg order
+	end
+
+	-- If this class' package is not the one we want to process, some class from "inPackage"
+	-- has a base class from "classPackage", which means that "classPackage" will need to be
+	-- loaded first. 
+	if classPackage ~= inPackage then
+		local iClassPackage = table.find(PackageOrder, classPackage)
+		local iInPackage = table.find(PackageOrder, inPackage)
+
+		-- If we haven't processed this class' package yet, add it before the package
+		-- we're currently processing. Otherwise, if we have record of processing both,
+		-- if this class' package is after the current package, move this class' package
+		-- before the current one. 
+		if not iClassPackage then 
+			table.insert(PackageOrder, iInPackage, classPackage)
+		elseif iClassPackage >= iInPackage then
+			table.insert(PackageOrder, iInPackage, classPackage)
+			table.remove(PackageOrder, iClassPackage)
+		end
+
+		return classText -- Do the actual processing later
 	end
 
 	if class == DefaultClass then return end -- Skip the default because it's a dummy

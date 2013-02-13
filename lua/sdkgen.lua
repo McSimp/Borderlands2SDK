@@ -9,7 +9,7 @@ local FILE_HEADER = [[
 
 ]]
 
-SDKGen = { Package = {}, Errors = {} }
+SDKGen = { Package = {}, Errors = {}, PackageOrder = {} }
 
 function SDKGen.SortProperty(propA, propB)
 	-- Note that propA and propB should already be UProperty*
@@ -233,3 +233,7 @@ end
 
 ProcessPackages()
 PrintErrors()
+
+for _,v in ipairs(SDKGen.PackageOrder) do
+	print(v:GetName())
+end

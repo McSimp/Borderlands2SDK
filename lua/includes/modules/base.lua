@@ -54,14 +54,25 @@ function table.copy(t, lookup_table)
 	return copy
 end
 
-
+-- Returns whether or not the specified table (numerically indexed) contains "element"
 function table.contains(table, element)
-	for _,v in pairs(table) do
+	for _,v in ipairs(table) do
 		if v == element then
 			return true
 		end
 	end
 	return false
+end
+
+-- Returns the first index of value in the specified table (numerically indexed) or nil
+function table.find(table, value)
+	for k,v in ipairs(table) do
+		if v == value then
+			return k
+		end
+	end
+
+	return nil
 end
 
 local ffi = require("ffi")

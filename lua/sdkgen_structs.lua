@@ -256,21 +256,3 @@ function Package:ProcessScriptStructs()
 	self:WriteCDefWrapperEnd()
 	self:CloseFile()
 end
-
-function Package:CheckForSameName(checkobj)
-	for i=0,(engine.Objects.Count-1) do
-
-		local obj = engine.Objects:Get(i)
-		if IsNull(obj) then goto continue end
-		if not obj:IsA(engine.Classes.UScriptStruct) then goto continue end
-
-		if obj ~= checkobj and obj:GetFullName() == checkobj:GetFullName() then
-
-			print("FOUND THE SAME NAME FOR " .. name)
-			return
-
-		end
-
-		::continue::
-	end
-end
