@@ -1,8 +1,7 @@
 g_TArrayTypes = {}
 
-include("sdkgen/TArrayList.lua")
+include("sdkgen/TArrays.lua")
 
---[[
 local packages = { 
 	"Core",
 	"Engine",
@@ -16,8 +15,8 @@ local packages = {
 	"OnlineSubsystemSteamworks",
 	"WillowGame"
 }
-]]
 
+--[[
 local packages = { 
 	"AkAudio",
 	"Core",
@@ -31,6 +30,7 @@ local packages = {
 	"WinDrv",
 	"XAudio2"
 }
+]]
 
 for _,v in ipairs(packages) do
 	profiling.TrackMemory("loadpackage", "Loading " .. v)

@@ -44,7 +44,7 @@ local types = {
 	ClassProperty = { c = "struct %s*", size = 4, generated = true },
 	ComponentProperty = { c = "struct %s*", size = 4, generated = true },
 	InterfaceProperty = { c = "struct FScriptInterface" },
-	StructProperty = { c = "struct %s" },
+	StructProperty = { c = "struct %s", generated = true },
 	ArrayProperty = { c = "struct TArray_%s_", size = 12, generated = true }
 	--MapProperty = ...
 }

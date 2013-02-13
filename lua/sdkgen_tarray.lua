@@ -41,7 +41,7 @@ function TArrayTypes.Generate(innerType)
 
 	local forwardDec = ""
 	if propTypeData.generated then
-		forwardDec = "\n" .. propType .. ";"
+		forwardDec = "\n" .. string.gsub(propType, "*", "") .. ";"
 	end
 
 	table.insert(GeneratedTArrays, propTypeClean)
