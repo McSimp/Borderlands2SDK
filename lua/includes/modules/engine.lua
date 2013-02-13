@@ -13,6 +13,7 @@ local os = os
 local PtrToNum = PtrToNum
 local profiling = profiling
 local enums = enums
+local debug = debug
 
 module("engine")
 
@@ -123,6 +124,12 @@ local function UObjectIndex(self, k)
 
 	-- Get the actual class information for this object
 	local classInfo = _ClassesInternal[PtrToNum(self.UObject.Class)]
+
+	-- Check that we actually have the info for this class
+	if classInfo == nil then
+		print(debug.traceback())
+		error("Class info not found")
+	end
 
 	-- Cast this object to the right type
 	self = ffi.cast(classInfo.ptrType, self)

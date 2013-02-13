@@ -31,24 +31,50 @@ end
 
 local types = {
 	ByteProperty = { c = "unsigned char" },
+	ByteAttributeProperty = { c = "unsigned char" },
 	IntProperty = { c = "int" },
+	IntAttributeProperty = { c = "int" },
 	FloatProperty = { c = "float" },
+	FloatAttributeProperty = { c = "float" },
 	BoolProperty = { c = "bool" }, -- bool is added by LuaJIT's implementation
 	StrProperty = { c = "struct FString" },
 	NameProperty = { c = "struct FName" },
 	DelegateProperty = { c = "struct FScriptDelegate" },
-	ObjectProperty = { c = "struct %s*", size = 4 },
-	ClassProperty = { c = "struct %s*", size = 4 },
-	ComponentProperty = { c = "struct %s*", size = 4 },
+	ObjectProperty = { c = "struct %s*", size = 4, generated = true },
+	ClassProperty = { c = "struct %s*", size = 4, generated = true },
+	ComponentProperty = { c = "struct %s*", size = 4, generated = true },
 	InterfaceProperty = { c = "struct FScriptInterface" },
 	StructProperty = { c = "struct %s" },
-	ArrayProperty = { c = "struct TArray_%s_", size = 12 }
+	ArrayProperty = { c = "struct TArray_%s_", size = 12, generated = true }
 	--MapProperty = ...
 }
 
+function SDKGen.GetPropertyTypeData(prop)
+	local propType = types[prop.UObject.Class:GetName()]
+	if not propType then
+		SDKGen.AddError(string.format("Property type (%s) for %s in %s not found",
+			prop.UObject.Class:GetName(),
+			prop:GetName(),
+			prop.UObject.Outer:GetName()
+		))
+		return false 
+	end
+
+	return propType
+end
+
 function SDKGen.GetPropertyType(prop)
-	local propType = types[prop.UObject.Class:GetName()].c
-	if not propType then return false end
+	local propType = types[prop.UObject.Class:GetName()]
+	if not propType then
+		SDKGen.AddError(string.format("Property type (%s) for %s in %s not found",
+			prop.UObject.Class:GetName(),
+			prop:GetName(),
+			prop.UObject.Outer:GetName()
+		))
+		return false 
+	end
+
+	propType = propType.c
 
 	if prop:IsA(engine.Classes.UClassProperty) then
 		prop = ffi.cast("struct UClassProperty*", prop)
@@ -164,6 +190,8 @@ include("sdkgen_classes.lua")
 local function ProcessPackages()
 	profiling.StartTimer("sdkgen", "SDK generation")
 
+	SDKGen.TArrayTypes.Init()
+
 	local processed = {}
 
 	for i=0,(engine.Objects.Count-1) do
@@ -178,9 +206,9 @@ local function ProcessPackages()
 
 		local pkg = Package.new(package_object)
 
-		--pkg:ProcessConstants()
-		--pkg:ProcessEnums()
-		--pkg:ProcessScriptStructs()
+		pkg:ProcessConstants()
+		pkg:ProcessEnums()
+		pkg:ProcessScriptStructs()
 		pkg:ProcessClasses()
 
 		pkg:Close()
@@ -190,15 +218,9 @@ local function ProcessPackages()
 		::continue::
 	end
 
+	SDKGen.TArrayTypes.Finalize()
+
 	profiling.StopTimer("sdkgen")
-end
-
-local function WriteListingFiles()
-	local file = io.open("D:\\dev\\bl\\Borderlands2SDK\\bin\\Debug\\lua\\sdkgen\\TArrayList.lua", "w+")
-	file:write(SDKGen.GenerateTArrayMetaList())
-	file:close()
-
-	print("[SDKGen] TArray listing file created")
 end
 
 local function PrintErrors()
@@ -210,5 +232,4 @@ local function PrintErrors()
 end
 
 ProcessPackages()
-WriteListingFiles()
 PrintErrors()

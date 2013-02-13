@@ -56,8 +56,8 @@ function Class:GeneratePrereqs(inPackage)
 
 			-- Check if we need to generate the TArray template for the inner type
 			-- and do it if we need to.
-			if not SDKGen.TArrayTypeGenerated(innerProperty) then
-				classText = classText .. SDKGen.GenerateTArrayType(innerProperty)
+			if not SDKGen.TArrayTypes.IsGenerated(innerProperty) then
+				SDKGen.TArrayTypes.Generate(innerProperty)
 			end
 		end
 
@@ -82,7 +82,8 @@ function Class:GenerateDefinition()
 	-- Start by defining the class with name_Data and put the fields in there
 	local classText = "struct " .. cname .. "_Data {\n"
 
-
+	-- Add the fields of this class into the struct
+	classText = classText .. self:FieldsToC()
 
 	classText = classText .. "};\n\n"
 
@@ -106,6 +107,116 @@ function Class:GenerateDefinition()
 	table.insert(GeneratedClasses, class)
 
 	return classText
+end
+
+function Class:FieldsToC()
+	local class = self.ClassObj
+
+	-- Foreach property, add them into the properties array
+	local properties = {}
+	local classProperty = ffi.cast("struct UProperty*", class.UStruct.Children)
+	while NotNull(classProperty) do
+		if 	classProperty.UProperty.ElementSize > 0
+			and not classProperty:IsA(engine.Classes.UConst) -- Consts and enums are in children
+			and not classProperty:IsA(engine.Classes.UEnum)
+		then
+			table.insert(properties, classProperty)
+		end
+
+		classProperty = ffi.cast("struct UProperty*", classProperty.UField.Next)
+	end
+
+	-- Next, sort the properties according to their offset in the class. When dealing with
+	-- boolean types, we need the one with the smallest bitmask first.
+	table.sort(properties, SDKGen.SortProperty)
+
+	-- Get the position that the first property of this class should be starting at
+	-- If there's no base class, it'll be 0, otherwise it will be the size of the base
+	-- and all its bases. 
+	local lastOffset = 0
+
+	local base = ffi.cast("struct UClass*", class.UStruct.SuperField)
+	while NotNull(base) do
+		lastOffset = lastOffset + base.UStruct.PropertySize
+		base = ffi.cast("struct UClass*", base.UStruct.SuperField)
+	end
+
+	local out = ""
+	for _,property in ipairs(properties) do
+
+		-- If the offset for this property is ahead of the end of the last property,
+		-- add some unknown data into the struct def.
+		if lastOffset < property.UProperty.Offset then
+			out = out .. self:MissedOffset(lastOffset, (property.UProperty.Offset - lastOffset))
+		end
+
+		-- Get the type and size of the property
+		local typeof = SDKGen.GetPropertyType(property)
+		local size = property.UProperty.ElementSize * property.UProperty.ArrayDim
+
+		-- If the type isn't one we recognize, add unknown data to the def.
+		if not typeof then
+			out = out .. string.format("\tunsigned char %s[0x%X]; // 0x%X (0x%X) UNKNOWN PROPERTY\n",
+				property:GetName(),
+				size,
+				property.UProperty.Offset,
+				size)
+		else
+			local special = ""
+
+			if property.UProperty.ArrayDim > 1 then -- It's a C style array, so [x] needed
+				special = special .. string.format("[%d]", property.UProperty.ArrayDim)
+			end
+
+			if property:IsA(engine.Classes.UBoolProperty) then
+				special = special .. " : 1" -- A bool is defined as a 1 bit unsigned long
+			end
+
+			out = out .. string.format("\t%s %s%s; // 0x%X (0x%X)\n",
+				typeof,
+				property:GetName(),
+				special,
+				property.UProperty.Offset,
+				size)
+
+			-- It's possible that our C definition for this type is not correct
+			-- If that's the case, we need to ensure that the fields are still 
+			-- at their correct offsets. So here we'll add some data to fix our 
+			-- dodgy definition.
+			local actualSize = SDKGen.GetCPropertySize(property) * property.UProperty.ArrayDim
+			local missedSize = size - actualSize
+			if missedSize > 0 then
+				out = out .. self:MissedOffset(property.UProperty.Offset + missedSize, missedSize, "PROPERTY C DEF INCORRECT")
+			elseif missedSize < 0 then
+				error(property.UObject.Class:GetName() .. " has an incorrect C definition (too big)!")
+			end
+		end
+
+		lastOffset = property.UProperty.Offset + (property.UProperty.ElementSize * property.UProperty.ArrayDim)
+	end
+
+	-- If there is additional data after the last property we have, add it to the end
+	if lastOffset < self:GetFieldsSize() then
+		out = out .. self:MissedOffset(lastOffset, (self:GetFieldsSize() - lastOffset))
+	end
+
+	return out
+end
+
+function Class:MissedOffset(at, missedSize, reason)
+	if missedSize < CLASS_ALIGN then return "" end
+	if reason == nil then reason = "MISSED OFFSET" end
+
+	self.UnknownDataIndex = self.UnknownDataIndex + 1
+
+	SDKGen.AddError("Missed offset in " .. self.ClassObj:GetFullName() .. " (Reason = " .. reason .. ")")
+
+	return string.format("\tunsigned char Unknown%d[0x%X]; // 0x%X (0x%X) %s\n", 
+		self.UnknownDataIndex,
+		missedSize,
+		at,
+		missedSize,
+		reason)
 end
 
 function Package:ProcessClasses()

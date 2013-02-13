@@ -5,6 +5,15 @@ local GeneratedStructs = {}
 local DefaultStruct = engine.FindObject("ScriptStruct Core.Default__ScriptStruct", engine.Classes.UScriptStruct)
 local STRUCT_ALIGN = 4
 
+-- Add the structs added manually to the generated list so they aren't generated again
+local preGenerated = { "Core.Object.Pointer", "Core.Object.QWord" }
+for _, structName in ipairs(preGenerated) do
+	local struct = engine.FindObject("ScriptStruct " .. structName, engine.Classes.UScriptStruct)
+	if NotNull(struct) then
+		table.insert(GeneratedStructs, struct)
+	end
+end
+
 local ScriptStruct = {}
 ScriptStruct.__index = ScriptStruct
 
@@ -72,8 +81,8 @@ function ScriptStruct:GeneratePrereqs(inPackage)
 
 			-- Check if we need to generate the TArray template for the inner type
 			-- and do it if we need to.
-			if not SDKGen.TArrayTypeGenerated(innerProperty) then
-				structText = structText .. SDKGen.GenerateTArrayType(innerProperty)
+			if not SDKGen.TArrayTypes.IsGenerated(innerProperty) then
+				SDKGen.TArrayTypes.Generate(innerProperty)
 			end
 		end
 
@@ -221,15 +230,6 @@ function ScriptStruct:MissedOffset(at, missedSize, reason)
 end
 
 function Package:ProcessScriptStructs()
-	-- Add the structs added manually to the generated list so they aren't generated again
-	local preGenerated = { "Core.Object.Pointer", "Core.Object.QWord" }
-	for _, structName in ipairs(preGenerated) do
-		local struct = engine.FindObject("ScriptStruct " .. structName, engine.Classes.UScriptStruct)
-		if NotNull(struct) then
-			table.insert(GeneratedStructs, struct)
-		end
-	end
-
 	self:CreateFile("structs")
 	self:WriteFileHeader("Script Structs")
 

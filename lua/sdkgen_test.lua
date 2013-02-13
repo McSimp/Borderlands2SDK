@@ -2,46 +2,43 @@ g_TArrayTypes = {}
 
 include("sdkgen/TArrayList.lua")
 
-profiling.TrackMemory("loadconsts", "Loading consts")
-include("sdkgen/consts/AkAudio.lua")
-include("sdkgen/consts/Core.lua")
-include("sdkgen/consts/Engine.lua")
-include("sdkgen/consts/GameFramework.lua")
-include("sdkgen/consts/GearboxFramework.lua")
-include("sdkgen/consts/GFxUI.lua")
-include("sdkgen/consts/IpDrv.lua")
-include("sdkgen/consts/OnlineSubsystemSteamworks.lua")
-include("sdkgen/consts/WillowGame.lua")
-include("sdkgen/consts/WinDrv.lua")
-include("sdkgen/consts/XAudio2.lua")
-profiling.GetMemoryUsage("loadconsts")
+--[[
+local packages = { 
+	"Core",
+	"Engine",
+	"GameFramework",
+	"GFxUI",
+	"GearboxFramework",
+	"IpDrv",
+	"XAudio2",
+	"AkAudio",
+	"WinDrv",
+	"OnlineSubsystemSteamworks",
+	"WillowGame"
+}
+]]
 
-profiling.TrackMemory("loadenums", "Loading enums")
-include("sdkgen/enums/AkAudio.lua")
-include("sdkgen/enums/Core.lua")
-include("sdkgen/enums/Engine.lua")
-include("sdkgen/enums/GameFramework.lua")
-include("sdkgen/enums/GearboxFramework.lua")
-include("sdkgen/enums/GFxUI.lua")
-include("sdkgen/enums/IpDrv.lua")
-include("sdkgen/enums/OnlineSubsystemSteamworks.lua")
-include("sdkgen/enums/WillowGame.lua")
-include("sdkgen/enums/WinDrv.lua")
-include("sdkgen/enums/XAudio2.lua")
-profiling.GetMemoryUsage("loadenums")
+local packages = { 
+	"AkAudio",
+	"Core",
+	"Engine",
+	"GameFramework",
+	"GearboxFramework",
+	"GFxUI",
+	"IpDrv",
+	"OnlineSubsystemSteamworks",
+	"WillowGame",
+	"WinDrv",
+	"XAudio2"
+}
 
-profiling.TrackMemory("loadstructs", "Loading structs")
-include("sdkgen/structs/AkAudio.lua")
-include("sdkgen/structs/Core.lua")
-include("sdkgen/structs/Engine.lua")
-include("sdkgen/structs/GameFramework.lua")
-include("sdkgen/structs/GearboxFramework.lua")
-include("sdkgen/structs/GFxUI.lua")
-include("sdkgen/structs/IpDrv.lua")
-include("sdkgen/structs/OnlineSubsystemSteamworks.lua")
-include("sdkgen/structs/WillowGame.lua")
-include("sdkgen/structs/WinDrv.lua")
-include("sdkgen/structs/XAudio2.lua")
-profiling.GetMemoryUsage("loadstructs")
+for _,v in ipairs(packages) do
+	profiling.TrackMemory("loadpackage", "Loading " .. v)
+	include("sdkgen/consts/" .. v .. ".lua")
+	include("sdkgen/enums/" .. v .. ".lua")
+	include("sdkgen/structs/" .. v .. ".lua")
+	include("sdkgen/classes/" .. v .. ".lua")
+	profiling.GetMemoryUsage("loadpackage")
+end
 
 print("Generated SDK loaded")

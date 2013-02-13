@@ -17,29 +17,62 @@ for i=0,(engine.Objects.Count-1) do
 end
 ]]
 
-function MakeEnum(name, identifiers)
-	local enum = {}
-	for k,v in ipairs(identifiers) do
-		enum[v] = (k-1)
-	end
-
-	_G[name] = enum
-end
-
-MakeEnum("Shazbot", {
-	"UNATCO",
-	"SAVAGE",
-	"JCDENTON"
-})
-
 ffi.cdef[[
+
+struct Shazbot;
 struct TestStruct {
 	unsigned long hi;
+	struct Shazbot* hey;
+};
+
+struct Shazbot {
+	bool dosh;
 };
 ]]
 
 local test = ffi.new("struct TestStruct")
-test.hi = 6
-test.hi = Shazbot.JCDENTON
+local shaz = ffi.new("struct Shazbot")
+shaz.dosh = true
 
-print(test.hi)
+test.hey = shaz
+print(test.hey)
+print(test.hey.dosh)
+
+--[[
+DWORD GCRCTable[256];
+
+inline DWORD appStrihash( const TCHAR* Data )
+{
+	DWORD Hash=0;
+	while( *Data )
+	{
+		TCHAR Ch = appToUpper(*Data++);
+		WORD  B  = Ch;
+		Hash     = ((Hash >> 8) & 0x00FFFFFF) ^ GCRCTable[(Hash ^ B) & 0x000000FF];
+		B        = Ch>>8;
+		Hash     = ((Hash >> 8) & 0x00FFFFFF) ^ GCRCTable[(Hash ^ B) & 0x000000FF];
+	}
+	return Hash;
+}
+
+FORCEINLINE INT GetIndex() const
+{
+	return Index >> NAME_INDEX_SHIFT;
+}
+
+InName is char*
+INT iHash = appStrihash( InName ) & (ARRAY_COUNT(NameHash)-1);
+
+for( FNameEntry* Hash=NameHash[iHash]; Hash; Hash=Hash->HashNext )
+	{
+		// Compare the passed in string, either ANSI or TCHAR.
+		if( ( bIsPureAnsi && Hash->IsEqual( AnsiName )) 
+		||  (!bIsPureAnsi && Hash->IsEqual( InName )) )
+		{
+			// Got the FName
+			Hash->GetIndex()
+
+			return;
+		}
+	}
+]]
