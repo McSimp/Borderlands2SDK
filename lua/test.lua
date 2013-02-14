@@ -17,26 +17,10 @@ for i=0,(engine.Objects.Count-1) do
 end
 ]]
 
-ffi.cdef[[
 
-struct Shazbot;
-struct TestStruct {
-	unsigned long hi;
-	struct Shazbot* hey;
-};
-
-struct Shazbot {
-	bool dosh;
-};
-]]
-
-local test = ffi.new("struct TestStruct")
-local shaz = ffi.new("struct Shazbot")
-shaz.dosh = true
-
-test.hey = shaz
-print(test.hey)
-print(test.hey.dosh)
+local name, val = debug.getupvalue(engine.FindClass, 3)
+print(name, val)
+PrintTable(val)
 
 --[[
 DWORD GCRCTable[256];

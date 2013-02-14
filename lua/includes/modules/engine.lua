@@ -14,6 +14,7 @@ local PtrToNum = PtrToNum
 local profiling = profiling
 local enums = enums
 local debug = debug
+local type = type
 
 module("engine")
 
@@ -171,11 +172,20 @@ local function InitializeClasses()
 
 		local members = {
 			name = class[1],
-			static = FindClassSafe(class[2]),
 			base = Classes[class[3]],
 			ptrType = ffi.typeof("struct " .. class[1] .. "*"),
 			funcs = {}
 		}
+
+		-- If it's a string, it's a full name and we need to search.
+		if type(class[2]) == "string" then
+			members.static = FindClassSafe(class[2])
+		else -- Otherwise it's just an offset and we can just get it out of the array
+			members.static = Objects:Get(class[2])
+			if IsNull(members.static) then
+				error("Failed to find class '" .. class[1] .. "'")
+			end
+		end
 
 		_ClassesInternal[PtrToNum(classPtr)] = members
 		Classes[class[1]] = members

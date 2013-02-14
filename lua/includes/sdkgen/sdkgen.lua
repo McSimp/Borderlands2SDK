@@ -178,14 +178,14 @@ function Package:WriteCDefWrapperStart()
 end
 
 function Package:WriteCDefWrapperEnd()
-	self.File:write("]]")
+	self.File:write("]]\n")
 end
 
-include("sdkgen_tarray.lua")
-include("sdkgen_consts.lua")
-include("sdkgen_enums.lua")
-include("sdkgen_structs.lua")
-include("sdkgen_classes.lua")
+include("tarray.lua")
+include("consts.lua")
+include("enums.lua")
+include("structs.lua")
+include("classes.lua")
 
 local function ProcessPackages()
 	profiling.StartTimer("sdkgen", "SDK generation")
@@ -234,10 +234,9 @@ end
 
 local LOADER_TEMPLATE = 
 [[local packages = { 
-%s
-}
+%s}
 
-include("TArrays.lua")
+include("TArrayTypes.lua")
 
 for _,pkg in ipairs(packages) do
 	profiling.TrackMemory("loadpackage", "Loading " .. pkg)
@@ -253,12 +252,13 @@ print("[SDKGen] Generated SDK loaded")
 
 local function CreateLoaderFile()
 	local packageText = ""
-	for _, pkg in ipairs(SDKGen.PackageOrder)
-		packageText = packageText .. "\t\"" .. pkg .. "\",\n"
+	for _, pkg in ipairs(SDKGen.PackageOrder) do
+		packageText = packageText .. "\t\"" .. pkg:GetName() .. "\",\n"
 	end
 
 	local file = io.open("D:\\dev\\bl\\Borderlands2SDK\\bin\\Debug\\lua\\sdkgen\\loader.lua", "w+")
 	file:write(string.format(LOADER_TEMPLATE, packageText))
+	file:close()
 end
 
 ProcessPackages()

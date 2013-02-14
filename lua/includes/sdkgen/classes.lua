@@ -5,6 +5,7 @@ local GeneratedClasses = {}
 local DefaultClass = engine.FindObject("Class Core.Default__Class", engine.Classes.UClass)
 local CLASS_ALIGN = 4
 local PackageOrder = SDKGen.PackageOrder
+local ClassList = {} -- This is used for the metaclass information at the end of each package's file
 
 -- Add the classes added manually to the generated list so they aren't generated again
 for _, v in pairs(engine.Classes) do
@@ -135,6 +136,7 @@ function Class:GenerateDefinition()
 	classText = classText .. inheritText
 
 	table.insert(GeneratedClasses, class)
+	table.insert(ClassList, class)
 
 	return classText
 end
@@ -249,6 +251,24 @@ function Class:MissedOffset(at, missedSize, reason)
 		reason)
 end
 
+local META_TEMPLATE = [[table.insert(g_loadedClasses, { "%s", %d, "%s" })
+]]
+function Package:WriteClassMetaData()
+	for _,class in ipairs(ClassList) do
+		local CName = class:GetCName()
+		local index = class.UObject.Index
+		local base = class.UStruct.SuperField
+
+		if IsNull(base) then
+			SDKGen.AddError("No base class found for " .. class:GetFullName())
+		else
+			self.File:write(string.format(META_TEMPLATE, CName, index, base:GetCName()))
+		end
+	end
+
+	ClassList = {}
+end
+
 function Package:ProcessClasses()
 
 	self:CreateFile("classes")
@@ -275,5 +295,6 @@ function Package:ProcessClasses()
 	end
 
 	self:WriteCDefWrapperEnd()
+	self:WriteClassMetaData()
 	self:CloseFile()
 end

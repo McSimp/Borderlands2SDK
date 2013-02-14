@@ -10,7 +10,7 @@ struct TArray_%s_ {
 };
 ]]
 
-local file = io.open("D:\\dev\\bl\\Borderlands2SDK\\bin\\Debug\\lua\\sdkgen\\TArrays.lua", "w+")
+local file = io.open("D:\\dev\\bl\\Borderlands2SDK\\bin\\Debug\\lua\\sdkgen\\TArrayTypes.lua", "w+")
 
 local TArrayTypes = {}
 

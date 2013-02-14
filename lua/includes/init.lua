@@ -20,6 +20,16 @@ require("UObject")
 -- Load engine functions
 require("engine")
 
-engine.Initialize()
+local function NeedsSDKGenerated()
+	return false
+end
+
+if NeedsSDKGenerated() then
+	engine.Initialize()
+	include("sdkgen/sdkgen.lua")
+else
+	include("../sdkgen/loader.lua")
+	engine.Initialize()
+end
 
 jit.v.off()
