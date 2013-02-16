@@ -1,4 +1,6 @@
 local ffi = require("ffi")
+local bit = require("bit")
+local band, bnot, rshift = bit.band, bit.bnot, bit.rshift
 local engine = engine
 local Package = SDKGen.Package
 local GeneratedClasses = {}
@@ -16,7 +18,7 @@ local Class = {}
 Class.__index = Class
 
 function Class.new(obj)
-	return setmetatable({ ClassObj = ffi.cast("struct UClass*", obj), UnknownDataIndex = 0 }, Class)
+	return setmetatable({ ClassObj = ffi.cast("struct UClass*", obj), UnknownDataIndex = 0, ConsecBools = 0 }, Class)
 end
 
 function Class:GeneratePrereqs(inPackage)
@@ -202,6 +204,12 @@ function Class:FieldsToC()
 
 			if property:IsA(engine.Classes.UBoolProperty) then
 				special = special .. " : 1" -- A bool is defined as a 1 bit unsigned long
+				self.ConsecBools = self.ConsecBools + 1
+
+			-- If this property is not a bool, but the previous properties (or property)
+			-- have been, then padding might be needed, see FixBitfields()
+			elseif self.ConsecBools > 0 then
+				out = out .. self:FixBitfields()
 			end
 
 			out = out .. string.format("\t%s %s%s; // 0x%X (0x%X)\n",
@@ -227,10 +235,46 @@ function Class:FieldsToC()
 		lastOffset = property.UProperty.Offset + (property.UProperty.ElementSize * property.UProperty.ArrayDim)
 	end
 
+	-- Make sure that if the last property was a bitfield, the appropriate padding is added
+	if self.ConsecBools > 0 then
+		out = out .. self:FixBitfields()
+	end
+
 	-- If there is additional data after the last property we have, add it to the end
 	if lastOffset < self:GetFieldsSize() then
 		out = out .. self:MissedOffset(lastOffset, (self:GetFieldsSize() - lastOffset))
 	end
+
+	return out
+end
+
+-- Due to bitfields being implemented differently in MSVC and LuaJIT,
+-- we have to do a bit of a hack here. MSVC will allocate the full size
+-- of the type (like unsigned long, 32 bits) then fill this up with the
+-- bitfields, leaving any extra space unused. GCC and LuaJIT, however, 
+-- will only allocate to the nearest byte; if you have nine 1-bit bitfields,
+-- then GCC/LuaJIT will allocate 2 bytes, whereas MSVC will allocate 4.
+-- This is a problem for us, since we need the struct sizes and offsets
+-- to match MSVC (since that's what BL2 is compiled with), so we have to 
+-- add the extra data defs onto the end of series of bitfields to make sure
+-- it's aligned to 32 bit boundaries. Perhaps there is some kind of alingment 
+-- pragma or attribute for this, but I've been unable to find one. 
+-- I figured out a cool way to get the number of bytes needed using some
+-- bit twiddling trickery: 
+--    band(rshift(band((32 - band(numBitFields, 31)), bnot(7)), 3), 3)
+-- This does the same job as:
+--    math.floor((32 - (numBitFields % 32)) / 8)
+-- but faster.
+function Class:FixBitfields()
+	local out = ""
+	local neededPadding = band(rshift(band((32 - band(self.ConsecBools, 31)), bnot(7)), 3), 3)
+	if neededPadding > 0 then
+		out = out .. string.format("\tunsigned char Unknown%d[0x%X]; // BITFIELD FIX\n", 
+			self.UnknownDataIndex,
+			neededPadding)
+	end
+
+	self.ConsecBools = 0
 
 	return out
 end

@@ -1,4 +1,6 @@
 local ffi = require("ffi")
+local bit = require("bit")
+local band, bnot, rshift = bit.band, bit.bnot, bit.rshift
 local engine = engine
 local Package = SDKGen.Package
 local GeneratedStructs = {}
@@ -18,7 +20,7 @@ local ScriptStruct = {}
 ScriptStruct.__index = ScriptStruct
 
 function ScriptStruct.new(obj)
-	return setmetatable({ Struct = ffi.cast("struct UScriptStruct*", obj), UnknownDataIndex = 0 }, ScriptStruct)
+	return setmetatable({ Struct = ffi.cast("struct UScriptStruct*", obj), UnknownDataIndex = 0, ConsecBools = 0 }, ScriptStruct)
 end
 
 function ScriptStruct:GeneratePrereqs(inPackage)
@@ -180,7 +182,13 @@ function ScriptStruct:FieldsToC(lastOffset)
 
 			if property:IsA(engine.Classes.UBoolProperty) then
 				special = special .. " : 1" -- A bool is defined as a 1 bit unsigned long
-			end
+				self.ConsecBools = self.ConsecBools + 1
+
+			-- If this property is not a bool, but the previous properties (or property)
+			-- have been, then padding might be needed, see FixBitfields()
+			elseif self.ConsecBools > 0 then
+				out = out .. self:FixBitfields()
+ 			end
 
 			out = out .. string.format("\t%s %s%s; // 0x%X (0x%X)\n",
 				typeof,
@@ -205,10 +213,30 @@ function ScriptStruct:FieldsToC(lastOffset)
 		lastOffset = property.UProperty.Offset + (property.UProperty.ElementSize * property.UProperty.ArrayDim)
 	end
 
+	-- Make sure that if the last property was a bitfield, the appropriate padding is added
+	if self.ConsecBools > 0 then
+		out = out .. self:FixBitfields()
+	end
+
 	-- If there is additional data after the last property we have, add it to the end
 	if lastOffset < self:GetFieldsSize() then
 		out = out .. self:MissedOffset(lastOffset, (self:GetFieldsSize() - lastOffset))
 	end
+
+	return out
+end
+
+-- See classes.lua for a rant on this
+function ScriptStruct:FixBitfields()
+	local out = ""
+	local neededPadding = band(rshift(band((32 - band(self.ConsecBools, 31)), bnot(7)), 3), 3)
+	if neededPadding > 0 then
+		out = out .. string.format("\tunsigned char Unknown%d[0x%X]; // BITFIELD FIX\n", 
+			self.UnknownDataIndex,
+			neededPadding)
+	end
+
+	self.ConsecBools = 0
 
 	return out
 end

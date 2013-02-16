@@ -15,6 +15,7 @@ local profiling = profiling
 local enums = enums
 local debug = debug
 local type = type
+local tostring = tostring
 
 module("engine")
 
@@ -129,7 +130,10 @@ local function UObjectIndex(self, k)
 	-- Check that we actually have the info for this class
 	if classInfo == nil then
 		print(debug.traceback())
-		error("Class info not found")
+		error(string.format("Class info not found: Name = %s, Ptr = 0x%X",
+			self.UObject.Class:GetCName(),
+			PtrToNum(self.UObject.Class)
+		))
 	end
 
 	-- Cast this object to the right type
@@ -187,7 +191,7 @@ local function InitializeClasses()
 			end
 		end
 
-		_ClassesInternal[PtrToNum(classPtr)] = members
+		_ClassesInternal[PtrToNum(members.static)] = members
 		Classes[class[1]] = members
 	end
 
