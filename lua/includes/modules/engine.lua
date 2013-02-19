@@ -16,6 +16,7 @@ local enums = enums
 local debug = debug
 local type = type
 local tostring = tostring
+local pairs = pairs
 
 module("engine")
 
@@ -171,6 +172,8 @@ local function InitializeClasses()
 		ffi.metatype("struct " .. name, UObjectMT) -- Everything is a UObject, so set its MT on everything
 	end
 
+	local count = 0
+
 	for name,class in pairs(g_loadedClasses) do
 		-- name = class name, 1 = Full Name/index, 2 = Base name
 
@@ -193,9 +196,10 @@ local function InitializeClasses()
 
 		_ClassesInternal[PtrToNum(members.static)] = members
 		Classes[name] = members
+		count = count + 1
 	end
 
-	print(string.format("[Lua] %d classes initialized", #g_loadedClasses))
+	print(string.format("[Lua] %d classes initialized", count))
 
 	g_loadedClasses = nil
 end

@@ -303,28 +303,28 @@ ffi.cdef[[
 		struct UMapProperty_Data 	UMapProperty;
 	};
 ]]
---							  Class Name -   Engine Name   - Base Class
-table.insert(g_loadedClasses, { "UObject", "Class Core.Object", nil })
-table.insert(g_loadedClasses, { "UField", "Class Core.Field", "UObject" })
-table.insert(g_loadedClasses, { "UEnum", "Class Core.Enum", "UField" })
-table.insert(g_loadedClasses, { "UConst", "Class Core.Const", "UField" })
-table.insert(g_loadedClasses, { "UStruct", "Class Core.Struct", "UField" })
-table.insert(g_loadedClasses, { "UScriptStruct", "Class Core.ScriptStruct", "UStruct" })
-table.insert(g_loadedClasses, { "UFunction", "Class Core.Function", "UStruct" })
-table.insert(g_loadedClasses, { "UState", "Class Core.State", "UStruct" })
-table.insert(g_loadedClasses, { "UClass", "Class Core.Class", "UState" })
-table.insert(g_loadedClasses, { "UProperty", "Class Core.Property", "UField" })
-table.insert(g_loadedClasses, { "UByteProperty", "Class Core.ByteProperty", "UProperty" })
-table.insert(g_loadedClasses, { "UIntProperty", "Class Core.IntProperty", "UProperty" })
-table.insert(g_loadedClasses, { "UFloatProperty", "Class Core.FloatProperty", "UProperty" })
-table.insert(g_loadedClasses, { "UBoolProperty", "Class Core.BoolProperty", "UProperty" })
-table.insert(g_loadedClasses, { "UStrProperty", "Class Core.StrProperty", "UProperty" })
-table.insert(g_loadedClasses, { "UNameProperty", "Class Core.NameProperty", "UProperty" })
-table.insert(g_loadedClasses, { "UDelegateProperty", "Class Core.DelegateProperty", "UProperty" })
-table.insert(g_loadedClasses, { "UObjectProperty", "Class Core.ObjectProperty", "UProperty" })
-table.insert(g_loadedClasses, { "UComponentProperty", "Class Core.ComponentProperty", "UObjectProperty" })
-table.insert(g_loadedClasses, { "UClassProperty", "Class Core.ClassProperty", "UObjectProperty" })
-table.insert(g_loadedClasses, { "UInterfaceProperty", "Class Core.InterfaceProperty", "UProperty" })
-table.insert(g_loadedClasses, { "UStructProperty", "Class Core.StructProperty", "UProperty" })
-table.insert(g_loadedClasses, { "UArrayProperty", "Class Core.ArrayProperty", "UProperty" })
-table.insert(g_loadedClasses, { "UMapProperty", "Class Core.MapProperty", "UProperty" })
+--				 Class Name -   Engine Name   - Base Class
+g_loadedClasses["UObject"] = { "Class Core.Object", nil }
+g_loadedClasses["UField"] = { "Class Core.Field", "UObject" }
+g_loadedClasses["UEnum"] = { "Class Core.Enum", "UField" }
+g_loadedClasses["UConst"] = { "Class Core.Const", "UField" }
+g_loadedClasses["UStruct"] = { "Class Core.Struct", "UField" }
+g_loadedClasses["UScriptStruct"] = { "Class Core.ScriptStruct", "UStruct" }
+g_loadedClasses["UFunction"] = { "Class Core.Function", "UStruct" }
+g_loadedClasses["UState"] = { "Class Core.State", "UStruct" }
+g_loadedClasses["UClass"] = { "Class Core.Class", "UState" }
+g_loadedClasses["UProperty"] = { "Class Core.Property", "UField" }
+g_loadedClasses["UByteProperty"] = { "Class Core.ByteProperty", "UProperty" }
+g_loadedClasses["UIntProperty"] = { "Class Core.IntProperty", "UProperty" }
+g_loadedClasses["UFloatProperty"] = { "Class Core.FloatProperty", "UProperty" }
+g_loadedClasses["UBoolProperty"] = { "Class Core.BoolProperty", "UProperty" }
+g_loadedClasses["UStrProperty"] = { "Class Core.StrProperty", "UProperty" }
+g_loadedClasses["UNameProperty"] = { "Class Core.NameProperty", "UProperty" }
+g_loadedClasses["UDelegateProperty"] = { "Class Core.DelegateProperty", "UProperty" }
+g_loadedClasses["UObjectProperty"] = { "Class Core.ObjectProperty", "UProperty" }
+g_loadedClasses["UComponentProperty"] = { "Class Core.ComponentProperty", "UObjectProperty" }
+g_loadedClasses["UClassProperty"] = { "Class Core.ClassProperty", "UObjectProperty" }
+g_loadedClasses["UInterfaceProperty"] = { "Class Core.InterfaceProperty", "UProperty" }
+g_loadedClasses["UStructProperty"] = { "Class Core.StructProperty", "UProperty" }
+g_loadedClasses["UArrayProperty"] = { "Class Core.ArrayProperty", "UProperty" }
+g_loadedClasses["UMapProperty"] ={ "Class Core.MapProperty", "UProperty" }

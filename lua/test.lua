@@ -66,23 +66,7 @@ for( FNameEntry* Hash=NameHash[iHash]; Hash; Hash=Hash->HashNext )
 
 ]]
 
-ffi.cdef[[
-struct USkeletalMeshComponent_execGetBoneNames_Parms
-{
-	struct TArray_FName_ BoneNames;
-};
-
-struct USkeletalMeshComponent_execSetSkeletalMesh_Parms
-{
-	struct USkeletalMesh*                               NewMesh;                                          		// 0x0000 (0x0004) [0x0000000000000080]              ( CPF_Parm )
-	bool                                      bKeepSpaceBases : 1;                              		// 0x0004 (0x0004) [0x0000000000000090] [0x00000001] ( CPF_OptionalParm | CPF_Parm )
-	unsigned char hello[3];
-};
-
-typedef void (__thiscall *tProcessEvent) (struct UObject*, struct UFunction*, void*, void*);
-]]
-
-local func = ffi.cast("tProcessEvent", 0x65C820)
+--local func = ffi.cast("tProcessEvent", 0x65C820)
 
 function SetScale(scale)
 	local setScaleFunc = engine.Objects:Get(11518)
@@ -172,4 +156,9 @@ function Benchmark2()
 
 	local elapsed = os.clock() - start
 	print(string.format("%.3f = %d", elapsed, sum))
+end
+
+print(bit.band(0x80, 0x100))
+if bit.band(0x400880, 0x100) then
+	print("LOLOOLL")
 end

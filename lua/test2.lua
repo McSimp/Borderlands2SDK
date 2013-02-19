@@ -1,5 +1,90 @@
 local ffi = require("ffi")
 
+g_loadedClasses["UObject"][3] = {
+	["Trace"] = {
+		args = {
+			{ name = "TraceEnd", cdata = true,
+				type = ffi.typeof("struct FVector"),
+				castTo = ffi.typeof("struct FVector*"),
+				offset = 24
+			},
+			{
+				name = "TraceStart",
+				optional = true,
+				cdata = true,
+				type = ffi.typeof("struct FVector"),
+				castTo = ffi.typeof("struct FVector*"),
+				offset = 36
+			},
+			{
+				name = "bTraceActors",
+				optional = true,
+				type = "boolean",
+				castTo = ffi.typeof("unsigned long*"),
+				offset = 48,
+			},
+			{
+				name = "Extent",
+				optional = true,
+				cdata = true,
+				type = ffi.typeof("struct FVector"),
+				castTo = ffi.typeof("struct FVector*"),
+				offset = 52,
+			},
+			{
+				name = "ExtraTraceFlags",
+				optional = true,
+				type = "number",
+				castTo = ffi.typeof("int*"),
+				offset = 92,
+			},
+			{
+				name = "bTraceBulletListeners",
+				optional = true,
+				type = "boolean",
+				castTo = ffi.typeof("unsigned long*"),
+				offset = 96,
+			},
+			{
+				name = "BulletListenerSource",
+				optional = true,
+				cdata = true,
+				type = ffi.typeof("struct AActor*"),
+				castTo = ffi.typeof("struct AActor**"),
+				offset = 100,
+			}
+		},
+		retVals = {
+			{
+				name = "ReturnValue",
+				type = ffi.typeof("struct AActor*"),
+				castTo = ffi.typeof("struct AActor**"),
+				offset = 104
+			},
+			{
+				name = "HitLocation",
+				type = ffi.typeof("struct FVector"),
+				castTo = ffi.typeof("struct FVector*"),
+				offset = 0
+			},
+			{
+				name = "HitNormal",
+				type = ffi.typeof("struct FVector"),
+				castTo = ffi.typeof("struct FVector*"),
+				offset = 12
+			},
+			{
+				name = "HitInfo",
+				type = ffi.typeof("struct FTraceHitInfo"),
+				castTo = ffi.typeof("struct FTraceHitInfo*"),
+				offset = 64
+			}
+		},
+		dataSize = 108,
+		ptr = ffi.cast("struct UFunction*", engine.Objects:Get(7273))
+	}
+}
+
 local funcData = {
 	name = "Trace",
 	args = {
@@ -198,6 +283,7 @@ function CallFunc(funcData, obj, ...)
 	end
 end
 
+--[[
 local pc = engine.FindObject("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
 print(pc)
 local X, XdotX, Y,Z = CallFunc(funcData2, pc, pc)
@@ -205,4 +291,5 @@ print(X.X, X.Y, X.Z)
 print(XdotX)
 print(Y.X, Y.Y, Y.Z)
 print(Z.X, Z.Y, Z.Z)
+]]
 --print(CallFunc(funcData, pc, )))

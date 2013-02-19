@@ -30,13 +30,13 @@ function SDKGen.SortProperty(propA, propB)
 end
 
 local types = {
-	ByteProperty = { c = "unsigned char" },
-	ByteAttributeProperty = { c = "unsigned char" },
-	IntProperty = { c = "int" },
-	IntAttributeProperty = { c = "int" },
-	FloatProperty = { c = "float" },
-	FloatAttributeProperty = { c = "float" },
-	BoolProperty = { c = "bool" }, -- bool is added by LuaJIT's implementation
+	ByteProperty = { c = "unsigned char", basic = true },
+	ByteAttributeProperty = { c = "unsigned char", basic = true },
+	IntProperty = { c = "int", basic = true },
+	IntAttributeProperty = { c = "int", basic = true },
+	FloatProperty = { c = "float", basic = true },
+	FloatAttributeProperty = { c = "float", basic = true },
+	BoolProperty = { c = "bool", basic = true }, -- bool is added by LuaJIT's implementation
 	StrProperty = { c = "struct FString" },
 	NameProperty = { c = "struct FName" },
 	DelegateProperty = { c = "struct FScriptDelegate" },
@@ -207,10 +207,10 @@ local function ProcessPackages()
 
 		local pkg = Package.new(package_object)
 
-		pkg:ProcessConstants()
-		pkg:ProcessEnums()
-		pkg:ProcessScriptStructs()
-		pkg:ProcessClasses()
+		--pkg:ProcessConstants()
+		--pkg:ProcessEnums()
+		--pkg:ProcessScriptStructs()
+		--pkg:ProcessClasses()
 		pkg:ProcessFunctions()
 
 		pkg:Close()
@@ -246,7 +246,7 @@ for _,pkg in ipairs(packages) do
 	include("enums/" .. pkg .. ".lua")
 	include("structs/" .. pkg .. ".lua")
 	include("classes/" .. pkg .. ".lua")
-	include("funcs/" .. pkg .. ".lua")
+	--include("funcs/" .. pkg .. ".lua")
 	profiling.GetMemoryUsage("loadpackage")
 end
 
