@@ -66,104 +66,89 @@ for( FNameEntry* Hash=NameHash[iHash]; Hash; Hash=Hash->HashNext )
 
 ]]
 
---local func = ffi.cast("tProcessEvent", 0x65C820)
+ffi.cdef[[
+struct USkeletalMeshComponent_execGetBoneNames_Parms
+{
+	struct TArray_FName_ BoneNames;
+};
+
+struct USkeletalMeshComponent_execSetSkeletalMesh_Parms
+{
+	struct USkeletalMesh*                               NewMesh;                                          		// 0x0000 (0x0004) [0x0000000000000080]              ( CPF_Parm )
+	bool                                      bKeepSpaceBases : 1;                              		// 0x0004 (0x0004) [0x0000000000000090] [0x00000001] ( CPF_OptionalParm | CPF_Parm )
+	unsigned char hello[3];
+};
+
+typedef void (__thiscall *tProcessEvent) (struct UObject*, struct UFunction*, void*, void*);
+]]
+
+local func = ffi.cast("tProcessEvent", 0x65C820)
 
 function SetScale(scale)
-	local setScaleFunc = engine.Objects:Get(9668)
+	local setScaleFunc = engine.Objects:Get(11518)
 	setScaleFunc = ffi.cast("struct UFunction*", setScaleFunc)
 	print(setScaleFunc)
 
-	local parms = ffi.new("struct UPrimitiveComponent_execSetScale_Parms")
-	print(bit.tohex(getengver.UFunction.FunctionFlags))
-	--getengver.UFunction.FunctionFlags = bit.band(getengver.UFunction.FunctionFlags, bit.bnot(0x400))
+	local parms = ffi.new("struct USkeletalMeshComponent_execGetBoneNames_Parms")
+	print(bit.tohex(setScaleFunc.UFunction.FunctionFlags))
+	setScaleFunc.UFunction.FunctionFlags = bit.bor(setScaleFunc.UFunction.FunctionFlags, bit.bnot(0x400))
 	--print(bit.tohex(getengver.UFunction.FunctionFlags))
-	parms.NewScale = scale
 	print(parms)
+
+	local pc = engine.Objects:Get(178373)
+	print(pc:GetFullName())
 
 	print("Calling it now")
 	func(pc, setScaleFunc, parms, nil)
 
-	--getengver.UFunction.FunctionFlags = bit.bor(getengver.UFunction.FunctionFlags, 0x400)
+	setScaleFunc.UFunction.FunctionFlags = bit.bor(setScaleFunc.UFunction.FunctionFlags, 0x400)
 	--print(bit.tohex(getengver.UFunction.FunctionFlags))
-	print(parms.ReturnValue.Index)
+	--print(parms.ReturnValue.Index)
+	print(parms.BoneNames.Count)
+	for k,v in ipairs(parms.BoneNames) do
+		print(v:GetName())
+	end
 end
 
-function GetOffset()
-	print("===================")
-	print(ffi.sizeof("struct UObject_Data"))
-	print(ffi.sizeof("struct UComponent_Data"))
-	print(ffi.sizeof("struct UActorComponent_Data"))
-	print(bit.tohex(ffi.offsetof("struct UPrimitiveComponent_Data", "Scale")))
-	print(bit.tohex(ffi.offsetof("struct UPrimitiveComponent", "UPrimitiveComponent")))
-	print(bit.tohex(ffi.offsetof("struct UPrimitiveComponent", "UComponent")))
-	print(bit.tohex(ffi.offsetof("struct UPrimitiveComponent", "UActorComponent")))
-	print(bit.tohex(ffi.offsetof("struct UActorComponent_Data", "bNeedsUpdateTransform")))
-	print(bit.tohex(ffi.offsetof("struct UActorComponent_Data", "TickGroup")))
+function SetScale2()
+	local setScaleFunc = engine.Objects:Get(11359)
+	setScaleFunc = ffi.cast("struct UFunction*", setScaleFunc)
+	print(setScaleFunc)
+
+	local parms = ffi.new("struct USkeletalMeshComponent_execSetSkeletalMesh_Parms")
+	print(bit.tohex(setScaleFunc.UFunction.FunctionFlags))
+	setScaleFunc.UFunction.FunctionFlags = bit.bor(setScaleFunc.UFunction.FunctionFlags, bit.bnot(0x400))
+	--print(bit.tohex(getengver.UFunction.FunctionFlags))
+	print(parms)
+
+	local a = engine.Objects:Get(187265)
+	parms.NewMesh = ffi.cast("struct USkeletalMesh*", a)
+	parms.bKeepSpaceBases = false
+
+	local pc = engine.Objects:Get(178373)
+	print(pc:GetFullName())
+
+	print("Calling it now")
+	func(pc, setScaleFunc, parms, nil)
+
+	setScaleFunc.UFunction.FunctionFlags = bit.bor(setScaleFunc.UFunction.FunctionFlags, 0x400)
+	--print(bit.tohex(getengver.UFunction.FunctionFlags))
+	--print(parms.ReturnValue.Index)
 end
 
 function GetAllPrims()
 	for i=0,(engine.Objects.Count-1) do
 		local obj = engine.Objects:Get(i)
 		if IsNull(obj) then goto continue end
-		if not obj:IsA(engine.Classes.UGearLikenessMeshComponent) then goto continue end
+		if not obj:IsA(engine.Classes.APawn) then goto continue end
 
-		--if obj.Scale > 0 then
-			print(string.format("%s => %s, %s", obj:GetFullName(), obj.bAllowCullDistanceVolume, obj.bPlayerOwnerNoSee))
-		--end
+		print(string.format("%d: %s", obj.Index, obj:GetFullName()))
 
 		::continue::
 	end
 end
 
-GetAllPrims()
-
-ffi.cdef[[
-struct MyStructLoL
-{
-	unsigned int VfTable_IIWorldBody; // 0x48 (0x4)
-	unsigned int Scene; // 0x4C (0x4)
-	unsigned int Owner; // 0x50 (0x4)
-	unsigned int bAttached : 1; // 0x54 (0x4)
-	unsigned int bSkipChildComponentUpdate : 1; // 0x54 (0x4)
-	unsigned int bTickInEditor : 1; // 0x54 (0x4)
-	unsigned int bTickInGame : 1; // 0x54 (0x4)
-	unsigned int bTickInStatusMenu : 1; // 0x54 (0x4)
-	unsigned int bNeedsReattach : 1; // 0x54 (0x4)
-	unsigned int bNeedsUpdateTransform : 1; // 0x54 (0x4)
-	unsigned int afj : 1; // 0x54 (0x4)
-	unsigned int gskskg : 1; // 0x54 (0x4)
-	unsigned int asgkfj : 1; // 0x54 (0x4)
-	unsigned int gksgkshght : 1; // 0x54 (0x4)
-	unsigned char TickGroup; // 0x58 (0x1)
-};
-
-struct MyStructUnpacked
-{
-	unsigned int VfTable_IIWorldBody; // 0x48 (0x4)
-	unsigned int Scene; // 0x4C (0x4)
-	unsigned int Owner; // 0x50 (0x4)
-	unsigned int bitfields;
-	unsigned char TickGroup; // 0x58 (0x1)
-};
-]]
-
-function TestPacking()
-	local shazbot = ffi.new("struct MyStructLoL[1]")
-	ffi.fill(shazbot[0], ffi.sizeof("struct MyStructLoL"), 0)
-
-	shazbot[0].TickGroup = 0x13
-	shazbot[0].bNeedsUpdateTransform = 1
-	shazbot[0].Owner = 0x1337
-
-	local unpacked = ffi.cast("struct MyStructUnpacked*", shazbot)
-
-	print(string.format("Size = 0x%X", ffi.sizeof("struct MyStructLoL")))
-	print(string.format("bNeedsUpdateTransform = %d", shazbot[0].bNeedsUpdateTransform))
-	print(string.format("Owner = 0x%X", unpacked.Owner))
-	print(string.format("Packed = 0x%X", unpacked.bitfields))
-end
-
---TestPacking()
+--GetAllPrims()
 
 function Benchmark()
 	local band, bnot, rshift = bit.band, bit.bnot, bit.rshift

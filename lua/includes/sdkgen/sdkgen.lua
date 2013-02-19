@@ -186,6 +186,7 @@ include("consts.lua")
 include("enums.lua")
 include("structs.lua")
 include("classes.lua")
+include("funcs.lua")
 
 local function ProcessPackages()
 	profiling.StartTimer("sdkgen", "SDK generation")
@@ -210,6 +211,7 @@ local function ProcessPackages()
 		pkg:ProcessEnums()
 		pkg:ProcessScriptStructs()
 		pkg:ProcessClasses()
+		pkg:ProcessFunctions()
 
 		pkg:Close()
 
@@ -244,6 +246,7 @@ for _,pkg in ipairs(packages) do
 	include("enums/" .. pkg .. ".lua")
 	include("structs/" .. pkg .. ".lua")
 	include("classes/" .. pkg .. ".lua")
+	include("funcs/" .. pkg .. ".lua")
 	profiling.GetMemoryUsage("loadpackage")
 end
 

@@ -166,33 +166,33 @@ local UObjectDataMT = { __index = NilIndex }
 local UObjectMT = { __index = UObjectIndex }
 
 local function InitializeClasses()
-	for i=1,#g_loadedClasses do
-		ffi.metatype("struct " .. g_loadedClasses[i][1] .. "_Data", UObjectDataMT) -- Makes the _Data types return nil if member not found
-		ffi.metatype("struct " .. g_loadedClasses[i][1], UObjectMT) -- Everything is a UObject, so set its MT on everything
+	for name,_ in pairs(g_loadedClasses) do
+		ffi.metatype("struct " .. name .. "_Data", UObjectDataMT) -- Makes the _Data types return nil if member not found
+		ffi.metatype("struct " .. name, UObjectMT) -- Everything is a UObject, so set its MT on everything
 	end
 
-	for i=1,#g_loadedClasses do
-		local class = g_loadedClasses[i] -- 1 = name, 2 = Full Name, 3 = Base name
+	for name,class in pairs(g_loadedClasses) do
+		-- name = class name, 1 = Full Name/index, 2 = Base name
 
 		local members = {
-			name = class[1],
-			base = Classes[class[3]],
-			ptrType = ffi.typeof("struct " .. class[1] .. "*"),
+			name = name,
+			base = Classes[class[2]],
+			ptrType = ffi.typeof("struct " .. name .. "*"),
 			funcs = {}
 		}
 
 		-- If it's a string, it's a full name and we need to search.
-		if type(class[2]) == "string" then
-			members.static = FindClassSafe(class[2])
+		if type(class[1]) == "string" then
+			members.static = FindClassSafe(class[1])
 		else -- Otherwise it's just an offset and we can just get it out of the array
-			members.static = Objects:Get(class[2])
+			members.static = Objects:Get(class[1])
 			if IsNull(members.static) then
-				error("Failed to find class '" .. class[1] .. "'")
+				error("Failed to find class '" .. name .. "'")
 			end
 		end
 
 		_ClassesInternal[PtrToNum(members.static)] = members
-		Classes[class[1]] = members
+		Classes[name] = members
 	end
 
 	print(string.format("[Lua] %d classes initialized", #g_loadedClasses))

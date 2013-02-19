@@ -24,6 +24,12 @@ CON_COMMAND(CrashMe)
 	
 }
 
+CON_COMMAND(GetLocalPlayer)
+{
+	AWillowPlayerController* pc = UObject::FindObject<AWillowPlayerController>("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController");
+	Logging::Log("pc = 0x%X\n", pc);
+}
+
 CON_COMMAND(PrintSDKVersion)
 {
 	Logging::Log("BL2 SDK Version %s\n", BL2SDK::Version.c_str());
