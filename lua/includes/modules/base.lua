@@ -83,6 +83,7 @@ function PtrToNum(ptr)
 end
 
 g_loadedClasses = {}
+g_classFuncs = {}
 g_TArrayTypes = {}
 
 enums = {}

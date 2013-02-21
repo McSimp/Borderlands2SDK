@@ -295,7 +295,7 @@ function Class:MissedOffset(at, missedSize, reason)
 		reason)
 end
 
-local META_TEMPLATE = [[g_loadedClasses["%s"] = { %d, "%s" }
+local META_TEMPLATE = [[table.insert(g_loadedClasses, { "%s", %d, "%s" })
 ]]
 function Package:WriteClassMetaData()
 	for _,class in ipairs(ClassList) do

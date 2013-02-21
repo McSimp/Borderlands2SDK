@@ -15,7 +15,7 @@ print(CPF_OutParm)
 function Package:ProcessClassForFuncs(class)
 	if class == DefaultClass then return end
 
-	self.File:write(string.format("c[%q][3] = {\n", class:GetCName()))
+	self.File:write(string.format("c[%q] = {\n", class:GetCName()))
 
 	local classProperty = ffi.cast("struct UProperty*", class.UStruct.Children)
 	while NotNull(classProperty) do
@@ -146,7 +146,7 @@ end
 function Package:ProcessFunctions()
 	self:CreateFile("funcs")
 	self:WriteFileHeader("Function structures")
-	self.File:write("local ffi = require(\"ffi\")\nlocal c = g_loadedClasses\n\n")
+	self.File:write("local ffi = require(\"ffi\")\nlocal c = g_classFuncs\n\n")
 
 	-- Foreach object, check if it's a class, then check if it's in the package.
 	-- If it is, then process the class, in turn processing all the functions in it.

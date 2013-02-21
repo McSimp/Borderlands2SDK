@@ -5,6 +5,7 @@ local TArray = TArray
 local IsNull = IsNull
 local error = error
 local g_loadedClasses = g_loadedClasses
+local g_classFuncs = g_classFuncs
 local g_TArrayTypes = g_TArrayTypes
 local print = print
 local string = string
@@ -16,7 +17,6 @@ local enums = enums
 local debug = debug
 local type = type
 local tostring = tostring
-local pairs = pairs
 
 module("engine")
 
@@ -107,6 +107,7 @@ function GetObjectHash(objName)
 	return bit.band(bit.bxor(objName.Index, objName.Number), OBJECT_HASH_BINS - 1)
 end
 
+--[[
 local function GenerateDataMT(name, funcs)
 	return function(self, k)
 		print("DataMT: " .. k .. " " .. name)
@@ -114,6 +115,7 @@ local function GenerateDataMT(name, funcs)
 		--return funcs[k] -- Should return nil if not found
 	end
 end
+]]
 
 local function NilIndex()
 	return nil
@@ -125,8 +127,6 @@ local function UObjectIndex(self, k)
 
 	-- Get the actual class information for this object
 	local classInfo = _ClassesInternal[PtrToNum(self.UObject.Class)]
-
-	print("Object is actually " .. classInfo["name"])
 
 	-- Check that we actually have the info for this class
 	if classInfo == nil then
@@ -144,12 +144,11 @@ local function UObjectIndex(self, k)
 	-- Then while this class has a base class, check that.
 	local base = classInfo
 	while base do
-		print("Trying base " .. base["name"])
 		if self[base["name"]][k] ~= nil then
-			print("not nil returning")
 			return self[base["name"]][k]
+		elseif base["funcs"][k] ~= nil then
+			return base["funcs"][k]
 		else
-			print("doing the next base")
 			base = base["base"]
 		end
 	end
@@ -170,43 +169,36 @@ local UObjectDataMT = { __index = NilIndex }
 local UObjectMT = { __index = UObjectIndex }
 
 local function InitializeClasses()
-	for name,_ in pairs(g_loadedClasses) do
-		ffi.metatype("struct " .. name, UObjectMT) -- Everything is a UObject, so set its MT on everything
+	for i=1,#g_loadedClasses do
+		ffi.metatype("struct " .. g_loadedClasses[i][1], UObjectMT) -- Everything is a UObject, so set its MT on everything
+		ffi.metatype("struct " .. g_loadedClasses[i][1] .. "_Data", UObjectDataMT) -- Makes the _Data types return nil
 	end
 
-	local count = 0
+	for i=1,#g_loadedClasses do
+		local class = g_loadedClasses[i] -- 1 = name, 2 = Full Name, 3 = Base name
 
-	for name,class in pairs(g_loadedClasses) do
-		-- name = class name, 1 = Full Name/index, 2 = Base name, 3 = func table
-
-		print(name .. " has base " .. class[2])
 		local members = {
-			name = name,
-			base = Classes[class[2]],
-			ptrType = ffi.typeof("struct " .. name .. "*"),
-			funcs = class[3]
+			name = class[1],
+			base = Classes[class[3]],
+			ptrType = ffi.typeof("struct " .. class[1] .. "*"),
+			funcs = g_classFuncs[class[1]]
 		}
 
 		-- If it's a string, it's a full name and we need to search.
-		if type(class[1]) == "string" then
-			members.static = FindClassSafe(class[1])
+		if type(class[2]) == "string" then
+			members.static = FindClassSafe(class[2])
 		else -- Otherwise it's just an offset and we can just get it out of the array
-			members.static = Objects:Get(class[1])
+			members.static = Objects:Get(class[2])
 			if IsNull(members.static) then
-				error("Failed to find class '" .. name .. "'")
+				error("Failed to find class '" .. class[1]  .. "'")
 			end
 		end
 
 		_ClassesInternal[PtrToNum(members.static)] = members
-		Classes[name] = members
-
-		-- Makes the _Data types return nil if member not found, or a function
-		ffi.metatype("struct " .. name .. "_Data", { __index = GenerateDataMT(name, members.funcs) })
-
-		count = count + 1
+		Classes[class[1]] = members
 	end
 
-	print(string.format("[Lua] %d classes initialized", count))
+	print(string.format("[Lua] %d classes initialized", #g_loadedClasses))
 
 	g_loadedClasses = nil
 end
