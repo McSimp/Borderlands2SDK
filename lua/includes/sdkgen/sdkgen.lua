@@ -140,7 +140,6 @@ function SDKGen.CountObject(objectName, class)
 	local iHash = engine.GetObjectHash(objectName)
 	local hash = engine.ObjHash[iHash]
 	while NotNull(hash) do
-
 		if hash:IsA(class) and hash.UObject.Name.Index == objectName.Index then
 			count = count + 1
 		end

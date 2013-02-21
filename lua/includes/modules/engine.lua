@@ -17,6 +17,8 @@ local enums = enums
 local debug = debug
 local type = type
 local tostring = tostring
+local setmetatable = setmetatable
+local ipairs = ipairs
 
 module("engine")
 
@@ -26,6 +28,11 @@ Objects = TArray.Create("struct UObject*", ffi.cast("struct TArray*", 0x19C6DC0)
 Names = TArray.Create("struct FNameEntry*", ffi.cast("struct TArray*", 0x19849E4))
 ObjHash = ffi.cast(ffi.typeof("struct UObject**"), 0x019A6CF8)
 
+ffi.cdef[[
+typedef void (__thiscall *tProcessEvent) (struct UObject*, struct UFunction*, void*, void*);
+]]
+local pProcessEvent = ffi.cast("tProcessEvent", 0x65C820)
+
 _ClassesInternal = {}
 Classes = {}
 local BaseObjFuncs = UObject.BaseFuncs
@@ -33,9 +40,7 @@ local BaseObjFuncs = UObject.BaseFuncs
 local TArrayMT = TArray.BaseMT
 
 local function FindObjectWithClass(objectName, class)
-
 	for i=0,(Objects.Count-1) do
-
 		local obj = Objects:Get(i)
 		if IsNull(obj) then goto continue end
 		if not obj:IsA(class) then goto continue end
@@ -48,17 +53,14 @@ local function FindObjectWithClass(objectName, class)
 	end
 
 	return nil
-
 end
 
 function FindObject(objectName, class)
-
 	if class ~= nil then
 		return FindObjectWithClass(objectName, class)
 	end
 
 	for i=0,(Objects.Count-1) do
-
 		local obj = Objects:Get(i)
 		if IsNull(obj) then goto continue end
 
@@ -70,13 +72,10 @@ function FindObject(objectName, class)
 	end
 
 	return nil
-
 end
 
 function FindClass(className)
-
 	local obj
-
 	if Classes.UClass ~= nil then
 		obj = FindObjectWithClass(className, Classes.UClass)
 	else
@@ -88,11 +87,9 @@ function FindClass(className)
 	else
 		return ffi.cast("struct UClass*", obj)
 	end
-
 end
 
 function FindClassSafe(className)
-
 	local result = FindClass(className)
 
 	if IsNull(result) then
@@ -100,26 +97,91 @@ function FindClassSafe(className)
 	else
 		return result
 	end
-
 end
 
 function GetObjectHash(objName)
 	return bit.band(bit.bxor(objName.Index, objName.Number), OBJECT_HASH_BINS - 1)
 end
 
---[[
-local function GenerateDataMT(name, funcs)
-	return function(self, k)
-		print("DataMT: " .. k .. " " .. name)
-		return nil
-		--return funcs[k] -- Should return nil if not found
-	end
-end
-]]
-
 local function NilIndex()
 	return nil
 end
+
+local function GetReturn(retVal, pParamBlockBase)
+	local field = ffi.cast(retVal.castTo, pParamBlockBase + retVal.offset)
+
+	if not retVal.cType then
+		return field[0]
+	else
+		local new = ffi.new(retVal.cType)
+		ffi.copy(new, field, ffi.sizeof(retVal.cType))
+
+		return new
+	end
+end
+
+function CallFunc(funcData, obj, ...)
+	local args = { ... }
+
+	local paramBlock = ffi.new("char[?]", funcData.dataSize)
+	local pParamBlockBase = ffi.cast("char*", paramBlock)
+
+	for k,v in ipairs(funcData.args) do
+		local luaArg = args[k]
+
+		if not v.optional then
+			if luaArg == nil then
+				error(string.format("Arg #%d (%s) is required", k, v.name))
+			elseif not v.cdata and type(luaArg) ~= v.type then
+				error(string.format("Arg #%d (%s) expects a Lua %s", k, v.name, v.type))
+			elseif v.cdata and not ffi.istype(v.type, luaArg) then
+				error(string.format("Arg #%d (%s) expects a cdata %s", k, v.name, v.type))
+			end
+		end
+
+		if luaArg ~= nil then
+			local field = ffi.cast(v.castTo, pParamBlockBase + v.offset)
+			field[0] = luaArg
+		end
+	end
+
+	--for i=0,(funcData.dataSize-1) do
+	--	io.write(string.format("%d ", paramBlock[i]))
+	--end
+
+	-- Have we got a pointer?
+	if not funcData.ptr then
+		funcData.ptr = ffi.cast("struct UFunction*", Objects:Get(funcData.index))
+	end
+
+	-- Call func
+	local func = funcData.ptr
+	func.UFunction.FunctionFlags = bit.bor(func.UFunction.FunctionFlags, bit.bnot(0x400))
+	
+	local native = func.UFunction.iNative
+	func.UFunction.iNative = 0
+
+	pProcessEvent(obj, func, paramBlock, nil)
+
+	func.UFunction.iNative = native
+
+	-- This is a fairly common occurrence, usually just a bool, so we can just handle
+	-- this without having to fallback to the interpreter with unpack()
+	if #funcData.retvals == 0 then
+		return
+	elseif #funcData.retvals == 1 then
+		return GetReturn(funcData.retvals[1], pParamBlockBase)
+	else
+		local returns = {}
+		for _,v in ipairs(funcData.retvals) do
+			table.insert(returns, GetReturn(v, pParamBlockBase))
+		end
+
+		return unpack(returns)
+	end
+end
+
+local FuncMT = { __call = CallFunc }
 
 local function UObjectIndex(self, k)
 	-- First check the base functions
@@ -147,7 +209,7 @@ local function UObjectIndex(self, k)
 		if self[base["name"]][k] ~= nil then
 			return self[base["name"]][k]
 		elseif base["funcs"][k] ~= nil then
-			return base["funcs"][k]
+			return setmetatable(base["funcs"][k], FuncMT)
 		else
 			base = base["base"]
 		end
