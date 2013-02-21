@@ -107,15 +107,13 @@ function GetObjectHash(objName)
 	return bit.band(bit.bxor(objName.Index, objName.Number), OBJECT_HASH_BINS - 1)
 end
 
---[[
-local function GenerateDataMT(className)
-	--local classFuncs = Classes[className]["funcs"]
+local function GenerateDataMT(name, funcs)
 	return function(self, k)
-		--return Classes[className]["funcs"][k] -- Should return nil if not found
+		print("DataMT: " .. k .. " " .. name)
 		return nil
+		--return funcs[k] -- Should return nil if not found
 	end
 end
-]]
 
 local function NilIndex()
 	return nil
@@ -127,6 +125,8 @@ local function UObjectIndex(self, k)
 
 	-- Get the actual class information for this object
 	local classInfo = _ClassesInternal[PtrToNum(self.UObject.Class)]
+
+	print("Object is actually " .. classInfo["name"])
 
 	-- Check that we actually have the info for this class
 	if classInfo == nil then
@@ -144,9 +144,12 @@ local function UObjectIndex(self, k)
 	-- Then while this class has a base class, check that.
 	local base = classInfo
 	while base do
-		if self[base["name"]][k] ~= nil then 
+		print("Trying base " .. base["name"])
+		if self[base["name"]][k] ~= nil then
+			print("not nil returning")
 			return self[base["name"]][k]
 		else
+			print("doing the next base")
 			base = base["base"]
 		end
 	end
@@ -168,20 +171,20 @@ local UObjectMT = { __index = UObjectIndex }
 
 local function InitializeClasses()
 	for name,_ in pairs(g_loadedClasses) do
-		ffi.metatype("struct " .. name .. "_Data", UObjectDataMT) -- Makes the _Data types return nil if member not found
 		ffi.metatype("struct " .. name, UObjectMT) -- Everything is a UObject, so set its MT on everything
 	end
 
 	local count = 0
 
 	for name,class in pairs(g_loadedClasses) do
-		-- name = class name, 1 = Full Name/index, 2 = Base name
+		-- name = class name, 1 = Full Name/index, 2 = Base name, 3 = func table
 
+		print(name .. " has base " .. class[2])
 		local members = {
 			name = name,
 			base = Classes[class[2]],
 			ptrType = ffi.typeof("struct " .. name .. "*"),
-			funcs = {}
+			funcs = class[3]
 		}
 
 		-- If it's a string, it's a full name and we need to search.
@@ -196,6 +199,10 @@ local function InitializeClasses()
 
 		_ClassesInternal[PtrToNum(members.static)] = members
 		Classes[name] = members
+
+		-- Makes the _Data types return nil if member not found, or a function
+		ffi.metatype("struct " .. name .. "_Data", { __index = GenerateDataMT(name, members.funcs) })
+
 		count = count + 1
 	end
 

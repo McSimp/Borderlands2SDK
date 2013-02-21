@@ -21,7 +21,7 @@ require("UObject")
 require("engine")
 
 local function NeedsSDKGenerated()
-	return true
+	return false
 end
 
 if NeedsSDKGenerated() then

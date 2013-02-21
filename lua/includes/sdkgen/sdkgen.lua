@@ -30,13 +30,13 @@ function SDKGen.SortProperty(propA, propB)
 end
 
 local types = {
-	ByteProperty = { c = "unsigned char", basic = true },
-	ByteAttributeProperty = { c = "unsigned char", basic = true },
-	IntProperty = { c = "int", basic = true },
-	IntAttributeProperty = { c = "int", basic = true },
-	FloatProperty = { c = "float", basic = true },
-	FloatAttributeProperty = { c = "float", basic = true },
-	BoolProperty = { c = "bool", basic = true }, -- bool is added by LuaJIT's implementation
+	ByteProperty = { c = "unsigned char", basic = true, lua = "number" },
+	ByteAttributeProperty = { c = "unsigned char", basic = true, lua = "number" },
+	IntProperty = { c = "int", basic = true, lua = "number" },
+	IntAttributeProperty = { c = "int", basic = true, lua = "number" },
+	FloatProperty = { c = "float", basic = true, lua ="number" },
+	FloatAttributeProperty = { c = "float", basic = true, lua = "number" },
+	BoolProperty = { c = "bool", basic = true, lua = "boolean" }, -- bool is added by LuaJIT's implementation
 	StrProperty = { c = "struct FString" },
 	NameProperty = { c = "struct FName" },
 	DelegateProperty = { c = "struct FScriptDelegate" },
@@ -84,7 +84,17 @@ function SDKGen.GetPropertyType(prop)
 		propType = string.format(propType, prop.UObjectProperty.PropertyClass:GetCName())
 	elseif prop:IsA(engine.Classes.UStructProperty) then
 		prop = ffi.cast("struct UStructProperty*", prop)
-		propType = string.format(propType, prop.UStructProperty.Struct:GetCName())
+
+		local struct = prop.UStructProperty.Struct
+		local count = SDKGen.CountObject(struct.UObject.Name, engine.Classes.UScriptStruct)
+		local structText
+		if count == 1 then
+			structText = struct:GetCName()
+		else
+			structText = struct.UObject.Outer:GetCName() .. "_" .. struct:GetCName()
+		end
+
+		propType = string.format(propType, structText)
 	elseif prop:IsA(engine.Classes.UArrayProperty) then
 		prop = ffi.cast("struct UArrayProperty*", prop)
 		propType = string.format(propType, SDKGen.GetCleanPropertyType(prop.UArrayProperty.Inner))
@@ -207,10 +217,10 @@ local function ProcessPackages()
 
 		local pkg = Package.new(package_object)
 
-		--pkg:ProcessConstants()
-		--pkg:ProcessEnums()
-		--pkg:ProcessScriptStructs()
-		--pkg:ProcessClasses()
+		pkg:ProcessConstants()
+		pkg:ProcessEnums()
+		pkg:ProcessScriptStructs()
+		pkg:ProcessClasses()
 		pkg:ProcessFunctions()
 
 		pkg:Close()
@@ -246,7 +256,7 @@ for _,pkg in ipairs(packages) do
 	include("enums/" .. pkg .. ".lua")
 	include("structs/" .. pkg .. ".lua")
 	include("classes/" .. pkg .. ".lua")
-	--include("funcs/" .. pkg .. ".lua")
+	include("funcs/" .. pkg .. ".lua")
 	profiling.GetMemoryUsage("loadpackage")
 end
 

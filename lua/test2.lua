@@ -1,90 +1,5 @@
 local ffi = require("ffi")
 
-g_loadedClasses["UObject"][3] = {
-	["Trace"] = {
-		args = {
-			{ name = "TraceEnd", cdata = true,
-				type = ffi.typeof("struct FVector"),
-				castTo = ffi.typeof("struct FVector*"),
-				offset = 24
-			},
-			{
-				name = "TraceStart",
-				optional = true,
-				cdata = true,
-				type = ffi.typeof("struct FVector"),
-				castTo = ffi.typeof("struct FVector*"),
-				offset = 36
-			},
-			{
-				name = "bTraceActors",
-				optional = true,
-				type = "boolean",
-				castTo = ffi.typeof("unsigned long*"),
-				offset = 48,
-			},
-			{
-				name = "Extent",
-				optional = true,
-				cdata = true,
-				type = ffi.typeof("struct FVector"),
-				castTo = ffi.typeof("struct FVector*"),
-				offset = 52,
-			},
-			{
-				name = "ExtraTraceFlags",
-				optional = true,
-				type = "number",
-				castTo = ffi.typeof("int*"),
-				offset = 92,
-			},
-			{
-				name = "bTraceBulletListeners",
-				optional = true,
-				type = "boolean",
-				castTo = ffi.typeof("unsigned long*"),
-				offset = 96,
-			},
-			{
-				name = "BulletListenerSource",
-				optional = true,
-				cdata = true,
-				type = ffi.typeof("struct AActor*"),
-				castTo = ffi.typeof("struct AActor**"),
-				offset = 100,
-			}
-		},
-		retVals = {
-			{
-				name = "ReturnValue",
-				type = ffi.typeof("struct AActor*"),
-				castTo = ffi.typeof("struct AActor**"),
-				offset = 104
-			},
-			{
-				name = "HitLocation",
-				type = ffi.typeof("struct FVector"),
-				castTo = ffi.typeof("struct FVector*"),
-				offset = 0
-			},
-			{
-				name = "HitNormal",
-				type = ffi.typeof("struct FVector"),
-				castTo = ffi.typeof("struct FVector*"),
-				offset = 12
-			},
-			{
-				name = "HitInfo",
-				type = ffi.typeof("struct FTraceHitInfo"),
-				castTo = ffi.typeof("struct FTraceHitInfo*"),
-				offset = 64
-			}
-		},
-		dataSize = 108,
-		ptr = ffi.cast("struct UFunction*", engine.Objects:Get(7273))
-	}
-}
-
 local funcData = {
 	name = "Trace",
 	args = {
@@ -255,6 +170,11 @@ function CallFunc(funcData, obj, ...)
 	--for i=0,(funcData.dataSize-1) do
 	--	io.write(string.format("%d ", paramBlock[i]))
 	--end
+
+	-- Have we got a pointer?
+	if not funcData.ptr then
+		funcData.ptr = ffi.cast("struct UFunction*", engine.Objects:Get(funcData.index))
+	end
 
 	-- Call func
 	local func = funcData.ptr
