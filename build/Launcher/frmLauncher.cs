@@ -178,6 +178,7 @@ namespace Launcher
                     Win32.CloseHandle(hThread);
                 }
 
+                Application.Exit();
                 return;
             }
 
@@ -233,10 +234,6 @@ namespace Launcher
             if (result)
             {
                 btnLaunch.Enabled = false;
-                btnLaunch.Text = "Waiting to attach debugger...";
-
-                MessageBox.Show("Attach your debugger now");
-
                 btnLaunch.Text = "Injecting into Borderlands 2...";
 
                 this.InjectorThread.Start();

@@ -26,7 +26,7 @@ local OBJECT_HASH_BINS = 32*1024
 
 Objects = TArray.Create("struct UObject*", ffi.cast("struct TArray*", 0x19C6DC0))
 Names = TArray.Create("struct FNameEntry*", ffi.cast("struct TArray*", 0x19849E4))
-ObjHash = ffi.cast(ffi.typeof("struct UObject**"), 0x019A6CF8)
+ObjHash = ffi.cast("struct UObject**", 0x019A6CF8)
 
 ffi.cdef[[
 typedef void (__thiscall *tProcessEvent) (struct UObject*, struct UFunction*, void*, void*);
@@ -152,6 +152,7 @@ function CallFunc(funcData, obj, ...)
 	-- Have we got a pointer?
 	if not funcData.ptr then
 		funcData.ptr = ffi.cast("struct UFunction*", Objects:Get(funcData.index))
+		funcData.index = nil
 	end
 
 	-- Call func

@@ -15,8 +15,8 @@ namespace BL2SDK
 	bool										bInjectedCallNext = false;
 	bool										bLogAllEvents = false;
 
-	unsigned long								addrGObjects;
-	unsigned long								addrGNames;
+	unsigned long								pGObjects;
+	unsigned long								pGNames;
 	tProcessEvent								pProcessEvent;
 
 	void __stdcall hkProcessEvent(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
@@ -83,12 +83,12 @@ namespace BL2SDK
 
 	unsigned long GObjects()
 	{
-		return addrGObjects;
+		return pGObjects;
 	}
 
 	unsigned long GNames()
 	{
-		return addrGNames;
+		return pGNames;
 	}
 
 	int UnrealExceptionHandler(unsigned int code, struct _EXCEPTION_POINTERS *ep)
@@ -117,28 +117,26 @@ namespace BL2SDK
 		}
 
 		// Sigscan for GOBjects
-		unsigned char* pGObjects = (unsigned char*)sigscan.Scan((unsigned char*)GObjects_Pattern, GObjects_Mask);
-		if(pGObjects == NULL)
+		unsigned char* addrGObjects = (unsigned char*)sigscan.Scan((unsigned char*)GObjects_Pattern, GObjects_Mask);
+		if(addrGObjects == NULL)
 		{
 			Logging::Log("[Internal] ERROR: Code = GOBJSIGFAIL. Failed to sigscan for GObjects.\n");	
 			return false;
 		}
 
-		pGObjects += MOV_OP_OFFSET;
-		addrGObjects = *(unsigned long*)pGObjects;
-		Logging::Log("[Internal] GObjects = 0x%X\n", addrGObjects);
+		pGObjects = *(unsigned long*)addrGObjects;
+		Logging::Log("[Internal] GObjects = 0x%X\n", pGObjects);
 
 		// Sigscan for GNames
-		unsigned char* pGNames = (unsigned char*)sigscan.Scan((unsigned char*)GNames_Pattern, GNames_Mask);
-		if(pGNames == NULL)
+		unsigned char* addrGNames = (unsigned char*)sigscan.Scan((unsigned char*)GNames_Pattern, GNames_Mask);
+		if(addrGNames == NULL)
 		{
 			Logging::Log("[Internal] ERROR: Code = GNAMESSIGFAIL. Failed to sigscan for GNames.\n");	
 			return false;
 		}
 
-		pGNames += MOV_OP_OFFSET;
-		addrGNames = *(unsigned long*)pGNames;
-		Logging::Log("[Internal] GNames = 0x%X\n", addrGNames);
+		pGNames = *(unsigned long*)addrGNames;
+		Logging::Log("[Internal] GNames = 0x%X\n", pGNames);
 
 		// Sigscan for UObject::ProcessEvent which will be used for pretty much everything
 		void* addrProcEvent = sigscan.Scan((unsigned char*)ProcessEvent_Pattern, ProcessEvent_Mask);

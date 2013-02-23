@@ -15,7 +15,6 @@ end
 
 -- Using pairs is probably slower than a normal for loop, but it's a tad more convenient
 local function TArrayIter(obj, k)
-
 	if k < (obj.Count - 1) then -- If current index is before the last index
 		k = k + 1
 
@@ -26,7 +25,6 @@ local function TArrayIter(obj, k)
 			return TArrayIter(obj, k)
 		end
 	end
-
 end
 
 function TArrayMT.__pairs(self)
@@ -42,7 +40,6 @@ ffi.metatype("struct TArray", TArrayMT)
 module("TArray")
 
 function Create(innerType, cdata)
-
 	local type = ffi.typeof([[
 	struct {
 		$* Data;
