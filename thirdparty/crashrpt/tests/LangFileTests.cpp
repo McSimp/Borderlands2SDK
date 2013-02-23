@@ -1,6 +1,6 @@
 /************************************************************************************* 
 This file is a part of CrashRpt library.
-Copyright (c) 2003-2012 The CrashRpt project authors. All Rights Reserved.
+Copyright (c) 2003-2013 The CrashRpt project authors. All Rights Reserved.
 
 Use of this source code is governed by a BSD-style license
 that can be found in the License.txt file in the root of the source
@@ -79,7 +79,7 @@ void LangFileTests::Test_lang_file_versions()
             sExePath.GetBuffer(0), m_asLangAbbr[i].GetBuffer(0));
 #else
         sFileName.Format(_T("%s\\..\\..\\lang_files\\crashrpt_lang_%s.ini"), 
-            sExePath.GetBuffer(0), asLangAbbr[i].GetBuffer(0));
+            sExePath.GetBuffer(0), m_asLangAbbr[i].GetBuffer(0));
 #endif //!WIN64
 
         GetPrivateProfileString(_T("Settings"), _T("CrashRptVersion"), _T(""), szBuffer, BUFF_SIZE, sFileName);
@@ -128,7 +128,7 @@ void LangFileTests::Test_lang_file_strings()
             sExePath.GetBuffer(0), m_asLangAbbr[i].GetBuffer(0));
 #else
         sFileName.Format(_T("%s\\..\\..\\lang_files\\crashrpt_lang_%s.ini"), 
-            sExePath.GetBuffer(0), asLangAbbr[i].GetBuffer(0));
+            sExePath.GetBuffer(0), m_asLangAbbr[i].GetBuffer(0));
 #endif //!WIN64
 
 		// Get count of sections in EN file

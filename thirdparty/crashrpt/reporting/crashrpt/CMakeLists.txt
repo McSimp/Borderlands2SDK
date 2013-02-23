@@ -30,11 +30,20 @@ endif(CRASHRPT_BUILD_SHARED_LIBS)
 # Specify what libraries to link
 target_link_libraries(CrashRpt rpcrt4.dll version.lib)
 
-# Add compiler flags (/MP for multi-processor compilation, /Os to favor small code)
-set_target_properties(CrashRpt PROPERTIES COMPILE_FLAGS "/Os")
-if(${MSVC_VERSION} GREATER 1310)
-	set_target_properties(CrashRpt PROPERTIES COMPILE_FLAGS "/MP")
-endif(${MSVC_VERSION} GREATER 1310)
+foreach (flag_var
+	CMAKE_C_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELEASE )
+	string(REPLACE "/O2" "-Od" ${flag_var} "${${flag_var}}")	
+	string(REPLACE "/Ob2" "" ${flag_var} "${${flag_var}}")	
+	set(${flag_var} "${${flag_var}} /Zi /fp:except /MP") 
+endforeach()    
+
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG") 
+
+# Add compiler flags (/MP for multi-processor compilation, /fp:except to handle floating-point exceptions; /Zi, /DEBUG to generate debugging symbols)
+#set_target_properties(CrashRpt PROPERTIES  LINK_FLAGS "/DEBUG")
+#if(${MSVC_VERSION} GREATER 1310)
+#	set_target_properties(CrashRpt PROPERTIES COMPILE_FLAGS "/MP")
+#endif(${MSVC_VERSION} GREATER 1310)
 
 if(CRASHRPT_BUILD_SHARED_LIBS)
 	set_target_properties(CrashRpt PROPERTIES 

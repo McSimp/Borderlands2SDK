@@ -1,6 +1,6 @@
 ﻿/************************************************************************************* 
 This file is a part of CrashRpt library.
-Copyright (c) 2003-2012 The CrashRpt project authors. All Rights Reserved.
+Copyright (c) 2003-2013 The CrashRpt project authors. All Rights Reserved.
 
 Use of this source code is governed by a BSD-style license
 that can be found in the License.txt file in the root of the source
@@ -43,7 +43,7 @@ BOOL TestUtils::CreateErrorReport(CString sTmpFolder, CString& sErrorReportName,
     CR_INSTALL_INFOW infoW;
     memset(&infoW, 0, sizeof(CR_INSTALL_INFOW));
     infoW.cb = sizeof(CR_INSTALL_INFOW);  
-    infoW.pszAppName = L"My& app Name & ' 应用程序名称"; // Use Chineese characters for app name
+    infoW.pszAppName = L"My& app Name &"; 
     // Use appname with restricted XML characters
     infoW.pszAppVersion = L"1.0.0 &<'a应> \"<"; 
     infoW.pszErrorReportSaveDir = sTmpFolder;
@@ -185,4 +185,57 @@ int TestUtils::EnumINIFileStrings(CString sFileName, CString sSectionName, std::
 	}
 
 	return (int)aStrings.size();
+}
+
+int TestUtils::RunProgram(CString sExeName, CString sParams)
+{
+	BOOL bExecute = false;
+	SHELLEXECUTEINFO sei;
+    memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
+    DWORD dwExitCode = 1;
+
+	sei.cbSize = sizeof(SHELLEXECUTEINFO);
+    sei.fMask = SEE_MASK_NOCLOSEPROCESS|SEE_MASK_FLAG_NO_UI;
+    sei.lpVerb = _T("open");
+    sei.lpFile = sExeName;
+    sei.lpParameters = sParams;
+    
+    bExecute = ShellExecuteEx(&sei);
+    if(!bExecute)
+		return 255;
+
+	// Wait until process exits
+    WaitForSingleObject(sei.hProcess, 10000);
+
+    // Check crprober.exe process exit code - it should equal to 0
+    GetExitCodeProcess(sei.hProcess, &dwExitCode);
+
+	return (int)dwExitCode;
+}
+
+void TestUtils::wtrim(std::wstring& str, const wchar_t* szTrim)
+{
+    std::string::size_type pos = str.find_last_not_of(szTrim);
+    if(pos != std::string::npos) {
+        str.erase(pos + 1);
+        pos = str.find_first_not_of(szTrim);
+        if(pos != std::string::npos) str.erase(0, pos);
+    }
+    else str.erase(str.begin(), str.end());
+}
+
+std::wstring TestUtils::exec(LPCTSTR szCmd) 
+{
+    FILE* pipe = _tpopen(szCmd, _T("rt"));
+    if (!pipe) return L"ERROR";
+    wchar_t buffer[4096];
+    std::wstring result;
+    while(!feof(pipe)) 
+	{
+    	if(fgetws(buffer, 4096, pipe) != NULL)
+    		result += buffer;
+    }
+	wtrim(result);
+    _pclose(pipe);
+    return result;
 }

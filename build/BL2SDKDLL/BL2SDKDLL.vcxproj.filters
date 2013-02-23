@@ -63,15 +63,6 @@
     <ClCompile Include="..\..\src\Logging\Logging.cpp">
       <Filter>Source Files\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\GameSDK\WinDrv_functions.cpp">
-      <Filter>Source Files\GameSDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GameSDK\XAudio2_functions.cpp">
-      <Filter>Source Files\GameSDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GameSDK\AkAudio_functions.cpp">
-      <Filter>Source Files\GameSDK</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\GameSDK\Core_functions.cpp">
       <Filter>Source Files\GameSDK</Filter>
     </ClCompile>
@@ -79,21 +70,6 @@
       <Filter>Source Files\GameSDK</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\GameSDK\GameFramework_functions.cpp">
-      <Filter>Source Files\GameSDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GameSDK\GearboxFramework_functions.cpp">
-      <Filter>Source Files\GameSDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GameSDK\GFxUI_functions.cpp">
-      <Filter>Source Files\GameSDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GameSDK\IpDrv_functions.cpp">
-      <Filter>Source Files\GameSDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GameSDK\OnlineSubsystemSteamworks_functions.cpp">
-      <Filter>Source Files\GameSDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GameSDK\WillowGame_functions.cpp">
       <Filter>Source Files\GameSDK</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\BL2SDK\BL2SDK.cpp">
@@ -110,9 +86,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\BL2SDK\CSigScan.cpp">
       <Filter>Source Files\BL2SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Commands\SlotMachines.cpp">
-      <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Commands\LuaCommands.cpp">
       <Filter>Source Files\Commands</Filter>
@@ -155,9 +128,6 @@
     <ClInclude Include="..\..\src\Logging\Logging.h">
       <Filter>Header Files\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\AkAudio_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\GameSDK\Core_classes.h">
       <Filter>Header Files\GameSDK</Filter>
     </ClInclude>
@@ -183,75 +153,6 @@
       <Filter>Header Files\GameSDK</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\GameSDK\GameFramework_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\GearboxFramework_classes.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\GearboxFramework_f_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\GearboxFramework_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\GFxUI_classes.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\GFxUI_f_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\GFxUI_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\IpDrv_classes.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\IpDrv_f_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\IpDrv_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\OnlineSubsystemSteamworks_classes.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\OnlineSubsystemSteamworks_f_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\OnlineSubsystemSteamworks_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\WillowGame_classes.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\WillowGame_f_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\WillowGame_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\WinDrv_classes.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\WinDrv_f_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\WinDrv_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\XAudio2_classes.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\XAudio2_f_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\XAudio2_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\AkAudio_classes.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\AkAudio_f_structs.h">
       <Filter>Header Files\GameSDK</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\GameSDK\GameDefines.h">

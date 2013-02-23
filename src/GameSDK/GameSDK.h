@@ -29,11 +29,5 @@ namespace BL2SDK
 #include "GameSDK/GameFramework_structs.h"
 #include "GameSDK/GameFramework_classes.h"
 #include "GameSDK/GameFramework_f_structs.h"
-#include "GameSDK/GearboxFramework_structs.h"
-#include "GameSDK/GearboxFramework_classes.h"
-#include "GameSDK/GearboxFramework_f_structs.h"
-#include "GameSDK/WillowGame_structs.h"
-#include "GameSDK/WillowGame_classes.h"
-#include "GameSDK/WillowGame_f_structs.h"
 
 #endif

@@ -1,6 +1,6 @@
 /************************************************************************************* 
 This file is a part of CrashRpt library.
-Copyright (c) 2003-2012 The CrashRpt project authors. All Rights Reserved.
+Copyright (c) 2003-2013 The CrashRpt project authors. All Rights Reserved.
 
 Use of this source code is governed by a BSD-style license
 that can be found in the License.txt file in the root of the source
@@ -574,4 +574,19 @@ std::vector<CString> Utility::ExplodeStr(LPCTSTR szString, LPCTSTR szSeparators)
 	};
 
 	return aTokens;
+}
+
+long Utility::GetFileSize(const TCHAR *fileName)
+{
+    BOOL                        fOk;
+    WIN32_FILE_ATTRIBUTE_DATA   fileInfo;
+
+    if (NULL == fileName)
+        return -1;
+
+    fOk = GetFileAttributesEx(fileName, GetFileExInfoStandard, (void*)&fileInfo);
+    if (!fOk)
+        return -1;
+    //assert(0 == fileInfo.nFileSizeHigh);
+    return (long)fileInfo.nFileSizeLow;
 }

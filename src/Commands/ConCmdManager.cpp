@@ -61,7 +61,7 @@ namespace ConCmdManager
 
 	bool eventConCommand(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
 	{
-		UWillowConsole* console = (UWillowConsole*)pCaller;
+		UConsole* console = (UConsole*)pCaller;
 		
 		UConsole_eventConsoleCommand_Parms* parms = (UConsole_eventConsoleCommand_Parms*)pParms;
 		//Logging::Log("[ConCmd] Engine concmd = %ls\n", parms->Command);

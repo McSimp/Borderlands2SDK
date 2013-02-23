@@ -12,7 +12,7 @@ namespace Logging
 	bool				bLogToExternalConsole	= false;
 	bool				bLogToFile				= false;
 	bool				bLogToGameConsole		= false;
-	UWillowConsole*		pGameConsole			= NULL;
+	UConsole*			pGameConsole			= NULL;
 
 	void LogToFile(const char *szBuff, int len)
 	{
@@ -82,7 +82,7 @@ namespace Logging
 	void InitializeGameConsole()
 	{
 		// There should only be 1 instance so we should be right to just use it in this way
-		UWillowConsole* console = UObject::FindObject<UWillowConsole>("WillowConsole WillowGameEngine.WillowGameViewportClient.WillowConsole");
+		UConsole* console = UObject::FindObject<UConsole>("WillowConsole WillowGameEngine.WillowGameViewportClient.WillowConsole");
 
 		if(console != NULL)
 		{

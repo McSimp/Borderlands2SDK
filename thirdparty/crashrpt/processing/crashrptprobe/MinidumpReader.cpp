@@ -1,6 +1,6 @@
 /************************************************************************************* 
 This file is a part of CrashRpt library.
-Copyright (c) 2003-2012 The CrashRpt project authors. All Rights Reserved.
+Copyright (c) 2003-2013 The CrashRpt project authors. All Rights Reserved.
 
 Use of this source code is governed by a BSD-style license
 that can be found in the License.txt file in the root of the source
@@ -65,7 +65,8 @@ int CMiniDumpReader::Open(CString sFileName, CString sSymSearchPath)
 
     if(m_bLoaded)
     {
-        return 1;
+		// Already loaded
+        return 0;
     }
 
     m_sFileName = sFileName;
@@ -73,7 +74,7 @@ int CMiniDumpReader::Open(CString sFileName, CString sSymSearchPath)
 
     m_hFileMiniDump = CreateFile(
         sFileName, 
-        FILE_ALL_ACCESS, 
+        FILE_GENERIC_READ, 
         0, 
         NULL, 
         OPEN_EXISTING, 
@@ -226,6 +227,7 @@ void CMiniDumpReader::Close()
     if(m_hFileMiniDump!=INVALID_HANDLE_VALUE)
     {
         CloseHandle(m_hFileMiniDump);
+		m_hFileMiniDump = INVALID_HANDLE_VALUE;
     }
 
     m_pMiniDumpStartPtr = NULL;

@@ -1,6 +1,6 @@
 /************************************************************************************* 
 This file is a part of CrashRpt library.
-Copyright (c) 2003-2012 The CrashRpt project authors. All Rights Reserved.
+Copyright (c) 2003-2013 The CrashRpt project authors. All Rights Reserved.
 
 Use of this source code is governed by a BSD-style license
 that can be found in the License.txt file in the root of the source
@@ -215,7 +215,7 @@ LRESULT CMainDlg::OnScreenCapClicked(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*
 	
 	// Start capturing user's desktop
 	SIZE DesiredFrameSize = {0, 600};
-	int nResult = crAddVideo(CR_AS_PROCESS_WINDOWS|CR_AV_QUALITY_LOW, 6000, 300, &DesiredFrameSize, m_hWnd);    
+	int nResult = crAddVideo(CR_AS_PROCESS_WINDOWS|CR_AV_QUALITY_LOW|CR_AV_ALLOW_DELETE, 6000, 300, &DesiredFrameSize, m_hWnd);    
     ATLASSERT(nResult==0);
 	nResult;
 

@@ -1,6 +1,6 @@
 ﻿/************************************************************************************* 
 This file is a part of CrashRpt library.
-Copyright (c) 2003-2012 The CrashRpt project authors. All Rights Reserved.
+Copyright (c) 2003-2013 The CrashRpt project authors. All Rights Reserved.
 
 Use of this source code is governed by a BSD-style license
 that can be found in the License.txt file in the root of the source
@@ -22,5 +22,13 @@ int EnumINIFileSections(CString sFileName, std::vector<CString>& aSections);
 // Returns the list of strings in the specified section in an INI file.
 int EnumINIFileStrings(CString sFileName, CString sSectionName, std::vector<CString>& aStrings);
 
+// Launches the EXE program and returns its return code. 
+int RunProgram(CString sExeName, CString sParams);
+
+// Launches the EXE program and grabs its stdout output.
+std::wstring exec(LPCTSTR szCmd); 
+
+// Trims the string
+void wtrim(std::wstring& str, const wchar_t* szTrim=L" \t\r\n");
 };
 

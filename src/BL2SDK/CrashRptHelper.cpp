@@ -89,7 +89,11 @@ namespace CrashRptHelper
 
 	bool Initialize()
 	{		
-		std::wstring dllPath = Settings::GetBinFile(L"CrashRpt1400d.dll");
+#ifdef _DEBUG
+		std::wstring dllPath = Settings::GetBinFile(L"CrashRpt1401d.dll");
+#else
+		std::wstring dllPath = Settings::GetBinFile(L"CrashRpt1401.dll");
+#endif
 
 		// Load the crashrpt dll
 		hCrashRpt = LoadLibrary(dllPath.c_str());

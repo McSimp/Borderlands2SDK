@@ -26,7 +26,7 @@ CON_COMMAND(CrashMe)
 
 CON_COMMAND(GetLocalPlayer)
 {
-	AWillowPlayerController* pc = UObject::FindObject<AWillowPlayerController>("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController");
+	AActor* pc = UObject::FindObject<AActor>("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController");
 	Logging::Log("pc = 0x%X\n", pc);
 }
 
@@ -34,7 +34,7 @@ CON_COMMAND(PrintSDKVersion)
 {
 	Logging::Log("BL2 SDK Version %s\n", BL2SDK::Version.c_str());
 }
-
+/*
 CON_COMMAND(SetDNCycleRate)
 {
 	if(args.size() < 2)
@@ -56,6 +56,7 @@ CON_COMMAND(SetDNCycleRate)
 
 	Logging::Log("Day/Night cycle rate changed to %f\n", rate);
 }
+*/
 
 CON_COMMAND(DumpObj)
 {

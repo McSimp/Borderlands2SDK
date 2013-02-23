@@ -1,6 +1,6 @@
 /************************************************************************************* 
 This file is a part of CrashRpt library.
-Copyright (c) 2003-2012 The CrashRpt project authors. All Rights Reserved.
+Copyright (c) 2003-2013 The CrashRpt project authors. All Rights Reserved.
 
 Use of this source code is governed by a BSD-style license
 that can be found in the License.txt file in the root of the source
@@ -203,22 +203,6 @@ int CErrorReportSender::GetCurReport()
     return m_nCurReport;
 }
 
-//BOOL CErrorReportSender::SetCurReport(int nCurReport)
-//{
-//	CErrorReportSender* pSender = CErrorReportSender::GetInstance();
-//
-//    // Validate input params
-//    if(nCurReport<0 || nCurReport>=pSender->GetCrashInfo()->GetReportCount())
-//    {
-//        ATLASSERT(0);
-//        return FALSE;
-//    }
-//		
-//    // Update current report index
-//    m_nCurReport = nCurReport;
-//    return TRUE;
-//}
-
 // This method performs crash files collection and/or
 // error report sending work in a worker thread.
 BOOL CErrorReportSender::DoWorkAssync(int nAction)
@@ -330,7 +314,10 @@ BOOL CErrorReportSender::DoWork(int Action)
             return FALSE;
         }
 
-        // Add a message to log
+		// Create crash description XML
+		CreateCrashDescriptionXML(*m_CrashInfo.GetReport(0));
+	
+		// Add a message to log
         m_Assync.SetProgress(_T("[confirm_send_report]"), 100, false);
     }
 
@@ -458,6 +445,8 @@ BOOL CErrorReportSender::TakeDesktopScreenshot()
     // Get screenshot flags passed by the parent process
     DWORD dwFlags = m_CrashInfo.m_dwScreenshotFlags;
 
+	BOOL bAllowDelete = (dwFlags&CR_AS_ALLOW_DELETE)!=0;
+
     // Determine what image format to use (JPG or PNG)
     SCREENSHOT_IMAGE_FORMAT fmt = SCREENSHOT_FORMAT_PNG; // PNG by default
 
@@ -499,7 +488,8 @@ BOOL CErrorReportSender::TakeDesktopScreenshot()
         ERIFileItem fi;
         fi.m_sSrcFile = sFileName;
         fi.m_sDestFile = sDestFile;
-        fi.m_sDesc = Utility::GetINIString(m_CrashInfo.m_sLangFileName, _T("DetailDlg"), _T("DescScreenshot"));    
+        fi.m_sDesc = Utility::GetINIString(m_CrashInfo.m_sLangFileName, _T("DetailDlg"), _T("DescScreenshot")); 
+		fi.m_bAllowDelete = bAllowDelete;
         m_CrashInfo.GetReport(0)->AddFileItem(&fi);
     }
 
@@ -1122,13 +1112,13 @@ BOOL CErrorReportSender::CollectCrashFiles()
     for(i=0; i<eri->GetRegKeyCount(); i++)
     {
 		CString sKeyName;
-		CString sFileName;
-		eri->GetRegKeyByIndex(i, sKeyName, sFileName);
+		ERIRegKey rki;
+		eri->GetRegKeyByIndex(i, sKeyName, rki);
 
         if(m_Assync.IsCancelled())
             goto cleanup;
 
-        CString sFilePath = eri->GetErrorReportDirName() + _T("\\") + sFileName;
+		CString sFilePath = eri->GetErrorReportDirName() + _T("\\") + rki.m_sDstFileName;
 
         str.Format(_T("Dumping registry key '%s' to file '%s' "), sKeyName, sFilePath);
         m_Assync.SetProgress(str, 0, false);    
@@ -1138,19 +1128,17 @@ BOOL CErrorReportSender::CollectCrashFiles()
         DumpRegKey(sKeyName, sFilePath, sErrorMsg);
         ERIFileItem fi;
         fi.m_sSrcFile = sFilePath;
-        fi.m_sDestFile = sFileName;
+		fi.m_sDestFile = rki.m_sDstFileName;
         fi.m_sDesc = Utility::GetINIString(m_CrashInfo.m_sLangFileName, _T("DetailDlg"), _T("DescRegKey"));
         fi.m_bMakeCopy = FALSE;
+		fi.m_bAllowDelete = rki.m_bAllowDelete;
         fi.m_sErrorStatus = sErrorMsg;
         std::vector<ERIFileItem> file_list;
         file_list.push_back(fi);
         // Add file to the list of file items
         m_CrashInfo.GetReport(0)->AddFileItem(&fi);
     }
-
-    // Create crash description XML
-    CreateCrashDescriptionXML(*m_CrashInfo.GetReport(0));
-	
+	    
     // Success
     bStatus = TRUE;
 
@@ -2033,7 +2021,7 @@ CString CErrorReportSender::FormatEmailText()
 // This method sends the report over SMTP 
 BOOL CErrorReportSender::SendOverSMTP()
 {  
-    strconv_t strconv;
+	strconv_t strconv;
 
 	// Check our config - should we send the report over SMTP or not?
     if(m_CrashInfo.m_uPriorities[CR_SMTP]==CR_NEGATIVE_PRIORITY)
@@ -2543,11 +2531,14 @@ BOOL CErrorReportSender::EncodeVideo()
 		return FALSE;
 	}
 
+	bool bAllowDelete = (m_CrashInfo.m_dwVideoFlags&CR_AV_ALLOW_DELETE)!=0;
+
 	// Add file to crash report
 	ERIFileItem fi;
 	fi.m_sSrcFile = m_VideoRec.GetOutFile();
 	fi.m_sDestFile = Utility::GetFileName(fi.m_sSrcFile);
-    fi.m_sDesc = Utility::GetINIString(m_CrashInfo.m_sLangFileName, _T("DetailDlg"), _T("DescVideo"));    
+    fi.m_sDesc = Utility::GetINIString(m_CrashInfo.m_sLangFileName, _T("DetailDlg"), _T("DescVideo"));  
+	fi.m_bAllowDelete = bAllowDelete;
     m_CrashInfo.GetReport(0)->AddFileItem(&fi);
 
 	// Add a message to log

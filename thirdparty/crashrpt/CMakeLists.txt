@@ -6,13 +6,13 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE )
 project (CrashRpt)
 
 # CrashRpt version number
-set (CRASHRPT_VER 1400)
+set (CRASHRPT_VER 1401)
 
 
 # Check supported generators
-if(NOT MSVC OR ${MSVC_VERSION} LESS 1400)
-	message(FATAL_ERROR "This version of Visual Studio is not supported: ${CMAKE_GENERATOR}.")
-endif(NOT MSVC OR ${MSVC_VERSION} LESS 1400)
+#if(NOT MSVC OR ${MSVC_VERSION} LESS 1400)
+#	message(FATAL_ERROR "This version of Visual Studio is not supported: ${CMAKE_GENERATOR}.")
+#endif(NOT MSVC OR ${MSVC_VERSION} LESS 1400)
 
 # Build options
 option(CRASHRPT_BUILD_SHARED_LIBS "If set (default), CrashRpt modules are built as dynamic-link libraries, otherwise as static libs." ON)
@@ -82,6 +82,7 @@ macro(fix_default_compiler_settings_)
 			# We prefer more strict warning checking.
 			# Replaces /W3 with /W4 in defaults.
 			string(REPLACE "/W3" "-W4" ${flag_var} "${${flag_var}}")
+						
 		endforeach()
 		
 		#SET (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" CACHE STRING "MSVC C Debug MT flags " FORCE)    

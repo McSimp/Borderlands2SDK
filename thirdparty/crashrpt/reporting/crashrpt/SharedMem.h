@@ -1,6 +1,6 @@
 /************************************************************************************* 
 This file is a part of CrashRpt library.
-Copyright (c) 2003-2012 The CrashRpt project authors. All Rights Reserved.
+Copyright (c) 2003-2013 The CrashRpt project authors. All Rights Reserved.
 
 Use of this source code is governed by a BSD-style license
 that can be found in the License.txt file in the root of the source
@@ -49,6 +49,7 @@ struct REG_KEY
 {
     BYTE m_uchMagic[3];        // Magic sequence "REG"
     WORD m_wSize;              // Total bytes occupied by this block.
+	BOOL m_bAllowDelete;       // Should allow user to delete the file from crash report?
     DWORD m_dwRegKeyNameOffs;  // Registry key name.
     DWORD m_dwDstFileNameOffs; // Destination file name.
 };

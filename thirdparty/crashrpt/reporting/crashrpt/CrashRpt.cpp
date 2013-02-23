@@ -1,6 +1,6 @@
 /************************************************************************************* 
 This file is a part of CrashRpt library.
-Copyright (c) 2003-2012 The CrashRpt project authors. All Rights Reserved.
+Copyright (c) 2003-2013 The CrashRpt project authors. All Rights Reserved.
 
 Use of this source code is governed by a BSD-style license
 that can be found in the License.txt file in the root of the source
@@ -728,7 +728,7 @@ CBase::~CBase()
 void sigfpe_test()
 { 
     // Code taken from http://www.devx.com/cplus/Article/34993/1954
-
+		
     //Set the x86 floating-point control word according to what
     //exceptions you want to trap. 
     _clearfp(); //Always call _clearfp before setting the control
@@ -750,26 +750,27 @@ void sigfpe_test()
     //For any bit in the second parameter (mask) that is 1, the 
     //corresponding bit in the first parameter is used to update
     //the control word.  
-    unsigned int cwOriginal;
+    unsigned int cwOriginal = 0;
 #if _MSC_VER<1400
     cwOriginal = _controlfp(cw, MCW_EM); //Set it.
 #else
     _controlfp_s(&cwOriginal, cw, MCW_EM); //Set it.
 #endif
     //MCW_EM is defined in float.h.
-    //Restore the original value when done:
-    //_controlfp(cwOriginal, MCW_EM);
-
+        
     // Divide by zero
 
     float a = 1.0f;
     float b = 0.0f;
     float c = a/b;
-    c; 
+    c;
+
+	//Restore the original value when done:
+	//_controlfp_s(cwOriginal, MCW_EM);
 }
 
-//#define BIG_NUMBER 0x1fffffff
-#define BIG_NUMBER 0xf
+#define BIG_NUMBER 0x1fffffff
+//#define BIG_NUMBER 0xf
 #pragma warning(disable: 4717) // avoid C4717 warning
 int RecurseAlloc() 
 {
