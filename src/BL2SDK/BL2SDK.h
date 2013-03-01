@@ -11,8 +11,9 @@ namespace BL2SDK
 	//typedef int (tUnrealEH) (unsigned int, struct _EXCEPTION_POINTERS*);
 
 	void LogAllEvents(bool enabled);
+	bool GetGameVersion(std::wstring& appVersion);
 	void InjectedCallNext();
-	bool Initialize();
+	void Initialize();
 
 	const std::string Version = "October 21 2012";
 	const std::wstring VersionW = L"October 21 2012";

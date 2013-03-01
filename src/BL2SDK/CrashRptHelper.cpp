@@ -33,54 +33,6 @@ namespace CrashRptHelper
 
 	bool crashRptReady = false;
 
-	bool GetGameVersion(std::wstring& appVersion)
-	{
-		wchar_t* szFilename = L"Borderlands2.exe";
-
-		// Allocate a block of memory for the version info
-		DWORD dwDummy;
-		DWORD dwSize = GetFileVersionInfoSize(szFilename, &dwDummy);
-		if(dwSize == 0)
-		{
-			Logging::Log("[CrashRpt] ERROR: GetFileVersionInfoSize failed with error %d\n", GetLastError());
-			return false;
-		}
-		
-		LPBYTE lpVersionInfo = new BYTE[dwSize];
-
-		// Load the version info
-		if(!GetFileVersionInfo(szFilename, NULL, dwSize, &lpVersionInfo[0]))
-		{
-			Logging::Log("[CrashRpt] ERROR: GetFileVersionInfo failed with error %d\n", GetLastError());
-			return false;
-		}
-
-		// Get the version strings
-		VS_FIXEDFILEINFO* lpFfi;
-		unsigned int iProductVersionLen = 0;
-
-		if(!VerQueryValue(&lpVersionInfo[0], L"\\", (LPVOID*)&lpFfi, &iProductVersionLen))
-		{
-			Logging::Log("[CrashRpt] ERROR: Can't obtain FixedFileInfo from resources\n");
-			return false;
-		}
-
-		DWORD fileVersionMS = lpFfi->dwFileVersionMS;
-		DWORD fileVersionLS = lpFfi->dwFileVersionLS;
-
-		delete[] lpVersionInfo;
-
-		appVersion = Util::Format(L"%d.%d.%d.%d", 
-			HIWORD(fileVersionMS),
-			LOWORD(fileVersionMS),
-			HIWORD(fileVersionLS),
-			LOWORD(fileVersionLS));
-
-		Logging::Log("[CrashRpt] Game Version = %ls\n", appVersion.c_str());
-
-		return true;
-	}
-
 	BOOL WINAPI CrashCallback(LPVOID lpvState)
 	{
 		Logging::Cleanup();
@@ -99,8 +51,8 @@ namespace CrashRptHelper
 		hCrashRpt = LoadLibrary(dllPath.c_str());
 		if(hCrashRpt == NULL)
 		{
-			Logging::Log("[CrashRpt] ERROR: Failed to load CrashRpt library\n");
-			return false;
+			Logging::Log("[CrashRpt] ERROR: Failed to load CrashRpt library (LoadLibrary returned NULL)\n");
+			return false; // I'm happy for CrashRpt not to work, so I'm not going to throw an exception
 		}
 
 		// Get a pointers to cr functions
@@ -131,7 +83,7 @@ namespace CrashRptHelper
 		info.uPriorities[CR_HTTP] = 1;
 		info.dwFlags |= CR_INST_ALL_POSSIBLE_HANDLERS;
 		info.dwFlags |= CR_INST_HTTP_BINARY_ENCODING; 
-		//info.pszPrivacyPolicyURL = L"http://localhost/crash/privacypolicy.html"; 
+		//info.pszPrivacyPolicyURL = L"http://mcsi.mp/cr/privacy.html"; 
 
 		// Install exception handlers
 		int result = pcrInstallW(&info);    
@@ -148,7 +100,7 @@ namespace CrashRptHelper
 
 		// Add the version of Borderlands 2 to the report if it can be obtained
 		std::wstring gameVer;
-		if(GetGameVersion(gameVer))
+		if(BL2SDK::GetGameVersion(gameVer))
 		{
 			pcrAddPropertyW(L"BL2VER", gameVer.c_str());
 		}
@@ -185,8 +137,7 @@ namespace CrashRptHelper
 	{
 		if(!crashRptReady)
 		{
-			Logging::Log("[CrashRpt] Cannot cause crash - CrashRpt is not initialized properly\n");
-			return;
+			Logging::Log("[CrashRpt] Cannot report error - CrashRpt is not initialized properly\n");
 		}
 
 		CR_EXCEPTION_INFO ei;

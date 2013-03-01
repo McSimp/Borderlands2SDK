@@ -5,6 +5,7 @@
 #include "Commands/ConCommand.h"
 #include "BL2SDK/CrashRptHelper.h"
 #include "BL2SDK/Util.h"
+#include "BL2SDK/Exceptions.h"
 
 // TODO: Get these out of here
 CON_COMMAND(CrashMe)
@@ -114,15 +115,16 @@ CON_COMMAND(Derp)
 	Logging::Log("=== END OBJECT DUMP ===\n");
 }
 
-
-DWORD WINAPI onAttach(LPVOID lpParameter)
-{	
-	if(!BL2SDK::Initialize())
+extern "C" __declspec(dllexport) DWORD InitializeSDK(LPVOID lpParameter)
+{
+	try
 	{
-		// This usually wouldn't run because CrashRpt should handle things.
-		// If CrashRpt doesn't install properly for some reason, this will have to do.
-		Util::Popup(L"SDK Error", L"An error occurred initializing the BL2 SDK, please check the logfile for details.");
-		Util::CloseGame();
+		BL2SDK::Initialize();
+	}
+	catch(FatalSDKException &ex)
+	{
+		Util::Popup(L"SDK Error", Util::Widen(ex.what()));
+		CrashRptHelper::SoftCrash();
 	}
 
 	return 0;
@@ -133,8 +135,7 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 	switch(dwReason)
 	{
 		case DLL_PROCESS_ATTACH:
-			DisableThreadLibraryCalls(hModule);	
-			CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)onAttach, NULL, 0, NULL);
+			DisableThreadLibraryCalls(hModule);
 			return TRUE;
 		break;
 

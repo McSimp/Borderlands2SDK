@@ -101,6 +101,17 @@ namespace Launcher
             InheritParentAffinity = 0x010000
         }
 
+        [Flags]
+        public enum LoadLibraryExFlags : uint
+        {
+            DontResolveDLLReferences = 0x00000001,
+            LoadLibraryAsDatafile = 0x00000002,
+            LoadLibraryWithAlteredSearchPath = 0x00000008,
+            LoadIgnoreCodeAuthzLevel = 0x00000010,
+            LoadLibraryAsDatafileExclusive = 0x00000040,
+            LoadLibraryAsImageResource = 0x00000020
+        }
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public struct STARTUPINFO
         {
@@ -220,5 +231,8 @@ namespace Launcher
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TerminateProcess(IntPtr hProcess, uint uExitCode);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr LoadLibraryEx(string lpFileName, IntPtr hReservedNull, LoadLibraryExFlags dwFlags);
     }
 }

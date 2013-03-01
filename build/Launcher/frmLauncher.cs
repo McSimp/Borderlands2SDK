@@ -166,7 +166,7 @@ namespace Launcher
                     ResetButton();
                     return;
                 }
-
+                
                 foreach (ProcessThread thread in bl2Proc.Threads)
                 {
                     IntPtr hThread = Win32.OpenThread(
@@ -177,7 +177,7 @@ namespace Launcher
                     Win32.ResumeThread(hThread);
                     Win32.CloseHandle(hThread);
                 }
-
+                
                 Application.Exit();
                 return;
             }

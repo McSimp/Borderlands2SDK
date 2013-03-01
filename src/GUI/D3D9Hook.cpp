@@ -1,7 +1,8 @@
 #include "GUI/D3D9Hook.h"
 #include "GUI/GwenManager.h"
 #include "Logging/Logging.h"
-#include "BL2SDK/CrashRptHelper.h"
+#include "BL2SDK/Exceptions.h"
+#include "BL2SDK/Util.h"
 #include <d3d9.h>
 #include <d3dx9.h>
 
@@ -31,30 +32,28 @@ namespace D3D9Hook
 	{
 		HRESULT result = pCreateDevice(pD3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
 
+		if(result != D3D_OK)
+		{
+			Logging::Log("[DirectX Hooking] Call to CreateDevice failed (Return = 0x%X)\n", result);
+			return result;
+		}
+
 		DWORD dwProtect;
 
 		// Restore the original CreateDevice function to the D3D VTable
-		if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), PAGE_READWRITE, &dwProtect) != 0)
-		{
-			*(PDWORD)&D3DVTable[CREATEDEVICE_IDX] = *(PDWORD)&pCreateDevice;
-			pCreateDevice = NULL;
-
-			if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), dwProtect, &dwProtect) == 0)
-			{
-				Logging::Log("[DirectX Hooking] VirtualProtect failed for removing CreateDevice hook\n");
-				return D3DERR_INVALIDCALL;	
-			}
-		}
-		else
+		if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), PAGE_READWRITE, &dwProtect) == 0)
 		{
 			Logging::Log("[DirectX Hooking] VirtualProtect failed for removing CreateDevice hook\n");
 			return D3DERR_INVALIDCALL;
 		}
 
-		if(result != D3D_OK)
+		*(PDWORD)&D3DVTable[CREATEDEVICE_IDX] = *(PDWORD)&pCreateDevice;
+		pCreateDevice = NULL;
+
+		if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), dwProtect, &dwProtect) == 0)
 		{
-			Logging::Log("[DirectX Hooking] Call to CreateDevice failed (Return = 0x%X)\n", result);
-			return result;
+			Logging::Log("[DirectX Hooking] VirtualProtect failed for removing CreateDevice hook\n");
+			return D3DERR_INVALIDCALL;	
 		}
 
 		D3DDVTable = (PDWORD)*(PDWORD)*ppReturnedDeviceInterface;
@@ -72,13 +71,12 @@ namespace D3D9Hook
 	}
 
 
-	bool HookVTable()
+	void Initialize()
 	{
 		IDirect3D9* d3d = Direct3DCreate9(D3D_SDK_VERSION);
 		if(d3d == NULL)
 		{
-			Logging::Log("[DirectX Hooking] Failed to call Direct3DCreate9\n");
-			return false;
+			throw FatalSDKException(5000, Util::Format("Failed to call Direct3DCreate9 (Error = 0x%)", GetLastError()).c_str());
 		}
 
 		D3DVTable = (PDWORD)*(PDWORD)d3d;
@@ -87,35 +85,19 @@ namespace D3D9Hook
 		DWORD dwProtect;
 
 		// Rewrite the pointer to CreateDevice in the VTable to our own function
-		if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), PAGE_READWRITE, &dwProtect) != 0)
+		if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), PAGE_READWRITE, &dwProtect) == 0)
 		{
-			*(PDWORD)&pCreateDevice = D3DVTable[CREATEDEVICE_IDX];
-			*(PDWORD)&D3DVTable[CREATEDEVICE_IDX] = (DWORD)hkCreateDevice;
-
-			if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), dwProtect, &dwProtect) == 0)
-			{
-				Logging::Log("[DirectX Hooking] VirtualProtect failed for adding CreateDevice hook\n");
-				return false;
-			}
+			throw FatalSDKException(5001, Util::Format("VirtualProtect failed for adding CreateDevice hook (Error = 0x%)", GetLastError()).c_str());
 		}
-		else
+
+		*(PDWORD)&pCreateDevice = D3DVTable[CREATEDEVICE_IDX];
+		*(PDWORD)&D3DVTable[CREATEDEVICE_IDX] = (DWORD)hkCreateDevice;
+
+		if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), dwProtect, &dwProtect) == 0)
 		{
-			Logging::Log("[DirectX Hooking] VirtualProtect failed for adding CreateDevice hook\n");
-			return false;
+			throw FatalSDKException(5002, Util::Format("VirtualProtect failed for adding CreateDevice hook (Error = 0x%)", GetLastError()).c_str());
 		}
 
 		Logging::Log("[DirectX Hooking] CreateDevice hooked successfully\n");
-		return true;
-	}
-
-	bool Initialize()
-	{
-		if(!HookVTable())
-		{
-			CrashRptHelper::SoftCrash();
-			return false;
-		}
-
-		return true;
 	}
 }

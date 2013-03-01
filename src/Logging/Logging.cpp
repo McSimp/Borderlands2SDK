@@ -5,6 +5,7 @@
 #include "BL2SDK/BL2SDK.h"
 #include "Logging/Logging.h"
 #include "BL2SDK/Util.h"
+#include "BL2SDK/Exceptions.h"
 
 namespace Logging
 {
@@ -56,26 +57,25 @@ namespace Logging
 		}
 	}
 
-	bool InitializeExtern()
+	void InitializeExtern()
 	{
 		BOOL result = AllocConsole();
 		if(result)
 		{
 			bLogToExternalConsole = true;
 		}
-		return result != 0;
 	}
 
-	bool InitializeFile(const std::wstring& fileName)
+	// Everything else can fail, but InitializeFile must work.
+	void InitializeFile(const std::wstring& fileName)
 	{
 		hLogFile = CreateFile(fileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if(hLogFile == INVALID_HANDLE_VALUE)
 		{
-			return false;
+			throw FatalSDKException(1000, "Failed to initialize log file (INVALID_HANDLE_VALUE)");
 		}
 		
 		bLogToFile = true;
-		return true;
 	}
 
 	// TODO: Cleanup

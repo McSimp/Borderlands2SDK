@@ -9,6 +9,7 @@
 #include "Commands/ConCmdManager.h"
 #include "GUI/D3D9Hook.h"
 #include "LuaInterface/LuaManager.h"
+#include "BL2SDK/Exceptions.h"
 
 namespace BL2SDK
 {
@@ -105,77 +106,80 @@ namespace BL2SDK
 		return EXCEPTION_EXECUTE_HANDLER;
 	}
 
+	bool GetGameVersion(std::wstring& appVersion)
+	{
+		wchar_t* szFilename = L"Borderlands2.exe";
+
+		// Allocate a block of memory for the version info
+		DWORD dwDummy;
+		DWORD dwSize = GetFileVersionInfoSize(szFilename, &dwDummy);
+		if(dwSize == 0)
+		{
+			Logging::Log("[BL2SDK] ERROR: GetFileVersionInfoSize failed with error %d\n", GetLastError());
+			return false;
+		}
+		
+		LPBYTE lpVersionInfo = new BYTE[dwSize];
+
+		// Load the version info
+		if(!GetFileVersionInfo(szFilename, NULL, dwSize, &lpVersionInfo[0]))
+		{
+			Logging::Log("[BL2SDK] ERROR: GetFileVersionInfo failed with error %d\n", GetLastError());
+			return false;
+		}
+
+		// Get the version strings
+		VS_FIXEDFILEINFO* lpFfi;
+		unsigned int iProductVersionLen = 0;
+
+		if(!VerQueryValue(&lpVersionInfo[0], L"\\", (LPVOID*)&lpFfi, &iProductVersionLen))
+		{
+			Logging::Log("[BL2SDK] ERROR: Can't obtain FixedFileInfo from resources\n");
+			return false;
+		}
+
+		DWORD fileVersionMS = lpFfi->dwFileVersionMS;
+		DWORD fileVersionLS = lpFfi->dwFileVersionLS;
+
+		delete[] lpVersionInfo;
+
+		appVersion = Util::Format(L"%d.%d.%d.%d", 
+			HIWORD(fileVersionMS),
+			LOWORD(fileVersionMS),
+			HIWORD(fileVersionLS),
+			LOWORD(fileVersionLS));
+
+		return true;
+	}
+
 	// TODO: Make less shit
-	bool HookGame()
+	void HookGame()
 	{
 		CSigScan sigscan(L"Borderlands2.exe");
 
-		if(!sigscan.IsReady())
-		{
-			Logging::Log("[Internal] ERROR: Code = SDKMEMBASEERR. Failed to find base of Borderlands2.exe\n");
-			return false;
-		}
-
 		// Sigscan for GOBjects
-		unsigned char* addrGObjects = (unsigned char*)sigscan.Scan((unsigned char*)GObjects_Pattern, GObjects_Mask);
-		if(addrGObjects == NULL)
-		{
-			Logging::Log("[Internal] ERROR: Code = GOBJSIGFAIL. Failed to sigscan for GObjects.\n");	
-			return false;
-		}
-
-		pGObjects = *(unsigned long*)addrGObjects;
+		pGObjects = *(unsigned long*)sigscan.Scan((unsigned char*)GObjects_Pattern, GObjects_Mask);
 		Logging::Log("[Internal] GObjects = 0x%X\n", pGObjects);
 
 		// Sigscan for GNames
-		unsigned char* addrGNames = (unsigned char*)sigscan.Scan((unsigned char*)GNames_Pattern, GNames_Mask);
-		if(addrGNames == NULL)
-		{
-			Logging::Log("[Internal] ERROR: Code = GNAMESSIGFAIL. Failed to sigscan for GNames.\n");	
-			return false;
-		}
-
-		pGNames = *(unsigned long*)addrGNames;
+		pGNames = *(unsigned long*)sigscan.Scan((unsigned char*)GNames_Pattern, GNames_Mask);
 		Logging::Log("[Internal] GNames = 0x%X\n", pGNames);
 
 		// Sigscan for UObject::ProcessEvent which will be used for pretty much everything
-		void* addrProcEvent = sigscan.Scan((unsigned char*)ProcessEvent_Pattern, ProcessEvent_Mask);
-		if(addrProcEvent == NULL)
-		{
-			Logging::Log("[Internal] ERROR: Code = PROCEVENTSIGFAIL. Failed to sigscan for UObject::ProcessEvent().\n");	
-			return false;
-		}
-
-		pProcessEvent = reinterpret_cast<tProcessEvent>(addrProcEvent);
+		pProcessEvent = reinterpret_cast<tProcessEvent>(sigscan.Scan((unsigned char*)ProcessEvent_Pattern, ProcessEvent_Mask));
 		Logging::Log("[Internal] UObject::ProcessEvent() = 0x%X\n", pProcessEvent);
-
-		// Detour UObject::ProcessEvent()
-		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkRawProcessEvent);
-		if(!detProcessEvent.Attach())
-		{
-			Logging::Log("[Internal] ERROR: Code = PROCEVENTDETOURFAIL. Failed to attach to UObject::ProcessEvent().\n");
-			return false;
-		}
 
 		// Sigscan for Unreal exception handler
 		void* addrUnrealEH = sigscan.Scan((unsigned char*)CrashHandler_Pattern, CrashHandler_Mask);
-		if(addrUnrealEH == NULL)
-		{
-			Logging::Log("[Internal] ERROR: Code = CRASHHANDLERSIGFAIL. Failed to sigscan for Unreal Exception Handler.\n");	
-			return false;
-		}
-
 		Logging::Log("[Internal] Unreal Crash handler = 0x%X\n", addrUnrealEH);
+
+		// Detour UObject::ProcessEvent()
+		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkRawProcessEvent);
+		detProcessEvent.Attach();
 
 		// Detour Unreal exception handler
 		SETUP_SIMPLE_DETOUR(detUnrealEH, addrUnrealEH, UnrealExceptionHandler);
-		if(!detUnrealEH.Attach())
-		{
-			Logging::Log("[Internal] ERROR: Code = CRASHHANDLERDETOURFAIL. Failed to attach to Unreal Exception Handler.\n");
-			return false;
-		}
-
-		return true;
+		detUnrealEH.Attach();
 	}
 
 	// This function is used to ensure that everything gets called in the game thread once the game itself has loaded
@@ -195,38 +199,23 @@ namespace BL2SDK
 		return true;
 	}
 
-	bool Initialize()
+	void Initialize()
 	{
 		if(Settings::Initialize() != ERROR_SUCCESS)
 		{
-			// Can't use Crashrpt because it won't be started. This error shouldn't
-			// ever really happen though.
-			Util::Popup(L"SDK Error", L"Could not locate settings in registry. Did you use the Launcher?");
-			return false;
+			throw FatalSDKException(1, "Could not locate settings in registry. Did you use the Launcher?");
 		}
 
 		Logging::InitializeFile(Settings::GetLogFilePath());
+		//Logging::InitializeFile(Settings::GetBinFile(L"."));
 		Logging::Log("[Internal] Launching SDK...\n");
 
 		CrashRptHelper::Initialize();
 
-		if(!HookGame())
-		{
-			// Close the game and get the crashrpt dialog to come up in the hope that
-			// the user will tell us what went wrong.
-			Logging::Log("[Internal] Failed to hook game, terminating process\n");
-			CrashRptHelper::SoftCrash();
-			return false;
-		}
+		HookGame();
 
-		if(!D3D9Hook::Initialize())
-		{
-			Logging::Log("[DirectX Hooking] Failed to hook DirectX, terminating process\n");
-			return false;
-		}
+		D3D9Hook::Initialize();
 
 		EngineHooks::Register("Function WillowGame.WillowGameInfo.InitGame", "StartupSDK", &GameReady);	
-
-		return true;
 	}
 }

@@ -230,5 +230,8 @@
     <ClInclude Include="..\..\thirdparty\LuaJIT\src\lualib.h">
       <Filter>Header Files\Third Party\Lua521</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\BL2SDK\Exceptions.h">
+      <Filter>Header Files\BL2SDK</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

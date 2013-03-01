@@ -6,7 +6,7 @@
 
 namespace D3D9Hook
 {
-	bool Initialize();
+	void Initialize();
 }
 
 #endif

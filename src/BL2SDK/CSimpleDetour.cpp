@@ -1,4 +1,6 @@
 #include "BL2SDK/CSimpleDetour.h"
+#include "BL2SDK/Exceptions.h"
+#include "BL2SDK/Util.h"
 
 CSimpleDetour::CSimpleDetour(void **old, void *replacement)
 {
@@ -13,8 +15,13 @@ bool CSimpleDetour::Attach()
 
 	DetourAttach(m_fnOld, m_fnReplacement);
 
-	m_bAttached = (DetourTransactionCommit() == NO_ERROR);
-	return m_bAttached;
+	LONG result = DetourTransactionCommit();
+	if(result != NO_ERROR)
+	{
+		throw FatalSDKException(4000, Util::Format("Failed to attach detour (Old = 0x%X, Hook = 0x%X, Result = 0x%X)", m_fnOld, m_fnReplacement, result).c_str());
+	}
+
+	m_bAttached = true;
 }
 
 bool CSimpleDetour::Detach()
@@ -27,5 +34,11 @@ bool CSimpleDetour::Detach()
 
 	DetourDetach(m_fnOld, m_fnReplacement);
 
-	return (DetourTransactionCommit() == NO_ERROR);
+	LONG result = DetourTransactionCommit();
+	if(result != NO_ERROR)
+	{
+		throw FatalSDKException(4001, Util::Format("Failed to detach detour (Old = 0x%X, Hook = 0x%X, Result = 0x%X)", m_fnOld, m_fnReplacement, result).c_str());
+	}
+
+	m_bAttached = false;
 }

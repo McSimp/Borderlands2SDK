@@ -10,8 +10,6 @@ local CPF_OutParm = 0x0000000000000100
 local CPF_SkipParm = 0x0000000000000200
 local CPF_ReturnParm = 0x0000000000000400
 
-print(CPF_OutParm)
-
 function Package:ProcessClassForFuncs(class)
 	if class == DefaultClass then return end
 

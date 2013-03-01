@@ -5,8 +5,8 @@
 namespace Logging
 {
 	void Log(const char *szFmt, ...);
-	bool InitializeExtern();
-	bool InitializeFile(const std::wstring& fileName);
+	void InitializeExtern();
+	void InitializeFile(const std::wstring& fileName);
 	void InitializeGameConsole();
 	void PrintLogHeader();
 	void Cleanup();

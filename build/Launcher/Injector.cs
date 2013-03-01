@@ -68,6 +68,72 @@ namespace Launcher
 
     public static class Injector
     {
+        public static IntPtr CallFunction(Process proc, IntPtr hFunction, IntPtr pFuncArg = default(IntPtr))
+        {
+            // Get a native handle to the process
+            Win32.ProcessAccessFlags access =
+                  Win32.ProcessAccessFlags.CreateThread
+                | Win32.ProcessAccessFlags.VMOperation
+                | Win32.ProcessAccessFlags.VMRead
+                | Win32.ProcessAccessFlags.VMWrite
+                | Win32.ProcessAccessFlags.QueryInformation;
+
+            IntPtr hProcess = Win32.OpenProcess(access, false, proc.Id);
+            if(hProcess == IntPtr.Zero)
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to get handle to process");
+            }
+
+            IntPtr result;
+            try
+            {
+                result = CallFunction(hProcess, hFunction, pFuncArg);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                Win32.CloseHandle(hProcess);
+            }
+
+            return result;
+        }
+
+        public static IntPtr CallFunction(IntPtr hProcess, IntPtr hFunction, IntPtr pFuncArg = default(IntPtr))
+        {
+            IntPtr hThread = Win32.CreateRemoteThread(
+                    hProcess,
+                    IntPtr.Zero,
+                    0U,
+                    hFunction,
+                    pFuncArg,
+                    0U,
+                    IntPtr.Zero);
+            if(hThread == IntPtr.Zero)
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to execute remote function");
+            }
+
+            // Wait for the thread to do its thing, error out if it doesn't manage to
+            if(Win32.WaitForSingleObject(hThread, (uint)Win32.ThreadWaitValue.Infinite) != (uint)Win32.ThreadWaitValue.Object0)
+            {
+                Win32.CloseHandle(hThread);
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to wait for remote thread");
+            }
+
+            // Get the result of the function call - throw exception if it didn't appear to load
+            IntPtr exitCode;
+            if(!Win32.GetExitCodeThread(hThread, out exitCode))
+            {
+                Win32.CloseHandle(hThread);
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to get exit code from thread");
+            }
+
+            return exitCode;
+        }
+
         public static void Inject(string libPath, Process proc)
         {
             // Check if DLL is present
@@ -78,14 +144,22 @@ namespace Launcher
 
             // Get a handle on LoadLibraryW so we can call it in the game process later
             IntPtr hKernel32 = Win32.GetModuleHandle("kernel32.dll");
-            IntPtr hLoadLib = Win32.GetProcAddress(hKernel32, "LoadLibraryW");
-            if (hKernel32 == IntPtr.Zero || hLoadLib == IntPtr.Zero)
+            if(hKernel32 == IntPtr.Zero )
             {
-                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to get handle to LoadLibraryW");
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to get handle to kernel32.dll");
             }
 
+            IntPtr hLoadLib = Win32.GetProcAddress(hKernel32, "LoadLibraryW");
+            if(hLoadLib == IntPtr.Zero)
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to get handle to kernel32.dll functions");
+            }
+
+            // Create unicode version of the path to the DLL
+            byte[] unicodePath = Encoding.Unicode.GetBytes(libPath);
+
             // Get a native handle to the process
-            Win32.ProcessAccessFlags access = 
+            Win32.ProcessAccessFlags access =
                   Win32.ProcessAccessFlags.CreateThread
                 | Win32.ProcessAccessFlags.VMOperation
                 | Win32.ProcessAccessFlags.VMRead
@@ -93,50 +167,57 @@ namespace Launcher
                 | Win32.ProcessAccessFlags.QueryInformation;
 
             IntPtr hProcess = Win32.OpenProcess(access, false, proc.Id);
-            if (hProcess == IntPtr.Zero)
+            if(hProcess == IntPtr.Zero)
             {
-                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to get handle to game process");
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to get handle to process");
             }
 
-            // Create unicode version of the path to the DLL
-            byte[] unicodePath = Encoding.Unicode.GetBytes(libPath);
-
-            // Allocate memory in the remote process for the path
-            using (RemoteMemory remoteMem = new RemoteMemory(hProcess, (uint)unicodePath.Length))
+            try
             {
-                // Write the path to the memory
-                remoteMem.WriteMemory(unicodePath);
-
-                // Execute LoadLibraryW on the path in the remote process
-                IntPtr hThread = Win32.CreateRemoteThread(
-                    hProcess,
-                    IntPtr.Zero,
-                    0U,
-                    hLoadLib,
-                    remoteMem.Address,
-                    0U,
-                    IntPtr.Zero);
-                if (hThread == IntPtr.Zero)
+                // Allocate memory in the remote process for the path and call LoadLibraryW on it
+                IntPtr hRemoteSDKDLL;
+                using(RemoteMemory remoteMem = new RemoteMemory(hProcess, (uint)unicodePath.Length))
                 {
-                    Win32.CloseHandle(hProcess);
-                    throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to execute remote LoadLibraryW");
+                    // Write the path to the memory
+                    remoteMem.WriteMemory(unicodePath);
+
+                    hRemoteSDKDLL = CallFunction(hProcess, hLoadLib, remoteMem.Address);
+                    if(hRemoteSDKDLL == IntPtr.Zero)
+                    {
+                        throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to load library");
+                    }
                 }
 
-                // Wait for the thread to do its thing, error out if it doesn't manage to
-                if (Win32.WaitForSingleObject(hThread, (uint)Win32.ThreadWaitValue.Infinite) != (uint)Win32.ThreadWaitValue.Object0)
+                // I hate this. I supppose this is what I get for doing this in C#.
+                // Load the SDK DLL into this process to get the location of the initialize function.
+                IntPtr hLocalSDKDLL = Win32.LoadLibraryEx("BL2SDKDLL.dll", IntPtr.Zero, Win32.LoadLibraryExFlags.DontResolveDLLReferences);
+                if(hLocalSDKDLL == IntPtr.Zero)
                 {
-                    Win32.CloseHandle(hThread);
-                    Win32.CloseHandle(hProcess);
-                    throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to wait for remote thread");
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to load library");
                 }
 
-                // Get the result of LoadLibraryW - throw exception if it didn't appear to load
-                IntPtr hInjectedDLL;
-                if (!Win32.GetExitCodeThread(hThread, out hInjectedDLL) || hInjectedDLL == IntPtr.Zero)
+                IntPtr hLocalInit = Win32.GetProcAddress(hLocalSDKDLL, "InitializeSDK");
+                if(hLocalInit == IntPtr.Zero)
                 {
-                    Win32.CloseHandle(hThread);
-                    Win32.CloseHandle(hProcess);
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to find function in SDK DLL");
                 }
+
+                ProcessModule modFound = null;
+                foreach(ProcessModule mod in proc.Modules)
+                {
+                    if(mod.ModuleName == "BL2SDKDLL.dll")
+                    {
+                        modFound = mod;
+                        break;
+                    }
+                }
+
+                IntPtr remoteInit = new IntPtr(modFound.BaseAddress.ToInt32() + (hLocalInit.ToInt32() - hLocalSDKDLL.ToInt32()));
+                CallFunction(hProcess, remoteInit, IntPtr.Zero);
+            }
+            finally
+            {
+                Win32.CloseHandle(hProcess);
             }
 
             // Looks like we made it!

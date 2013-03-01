@@ -95,4 +95,9 @@ namespace Util
 	{
 		TerminateProcess(GetCurrentProcess(), 1);
 	}
+
+	void SuspendThreads()
+	{
+
+	}
 }

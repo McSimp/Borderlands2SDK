@@ -121,6 +121,7 @@
     <ClInclude Include="..\..\src\BL2SDK\CrashRptHelper.h" />
     <ClInclude Include="..\..\src\BL2SDK\CSigScan.h" />
     <ClInclude Include="..\..\src\BL2SDK\EngineHooks.h" />
+    <ClInclude Include="..\..\src\BL2SDK\Exceptions.h" />
     <ClInclude Include="..\..\src\BL2SDK\Settings.h" />
     <ClInclude Include="..\..\src\BL2SDK\Util.h" />
     <ClInclude Include="..\..\src\Commands\ConCommand.h" />
