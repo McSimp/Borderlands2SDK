@@ -4,11 +4,13 @@
 #include <Windows.h>
 #include <string>
 
-#define LOGFILE L"BL2SDKLog.txt"
+struct LauncherStruct {
+	const LPWSTR BinPath;
+};
 
 namespace Settings
 {
-	LONG Initialize();
+	void Initialize(LauncherStruct* args);
 	std::wstring GetLogFilePath();
 	std::wstring GetBinFile(const std::wstring &filename);
 }

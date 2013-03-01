@@ -2,6 +2,7 @@
 #define BL2SDK_H
 
 #include "GameSDK/GameSDK.h"
+#include "BL2SDK/Settings.h"
 
 #include <string>
 
@@ -13,7 +14,7 @@ namespace BL2SDK
 	void LogAllEvents(bool enabled);
 	bool GetGameVersion(std::wstring& appVersion);
 	void InjectedCallNext();
-	void Initialize();
+	void Initialize(LauncherStruct* args);
 
 	const std::string Version = "October 21 2012";
 	const std::wstring VersionW = L"October 21 2012";

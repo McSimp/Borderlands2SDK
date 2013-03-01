@@ -6,6 +6,7 @@
 #include "BL2SDK/CrashRptHelper.h"
 #include "BL2SDK/Util.h"
 #include "BL2SDK/Exceptions.h"
+#include "BL2SDK/Settings.h"
 
 // TODO: Get these out of here
 CON_COMMAND(CrashMe)
@@ -117,9 +118,12 @@ CON_COMMAND(Derp)
 
 extern "C" __declspec(dllexport) DWORD InitializeSDK(LPVOID lpParameter)
 {
+	// The launcher will pass the configuration settings through lpParameter parameter as a struct
+	LauncherStruct* args = reinterpret_cast<LauncherStruct*>(lpParameter);
+
 	try
 	{
-		BL2SDK::Initialize();
+		BL2SDK::Initialize(args);
 	}
 	catch(FatalSDKException &ex)
 	{
@@ -141,8 +145,8 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 
 		case DLL_PROCESS_DETACH:
 			// TODO: Graceful detach
-			Logging::Cleanup();
-			CrashRptHelper::Cleanup();
+			//Logging::Cleanup();
+			//CrashRptHelper::Cleanup();
 			return FALSE;
 		break;
 	}

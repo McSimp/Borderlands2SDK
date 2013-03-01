@@ -7,6 +7,8 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Threading;
+using Syringe;
+using Syringe.Win32;
 
 namespace Launcher
 {
@@ -83,23 +85,6 @@ namespace Launcher
             }
         }
 
-        private void SetupRegistry()
-        {
-            // Check if we already have our key setup
-            RegistryKey SDKSubKey = Registry.CurrentUser.OpenSubKey(@"Software\BL2SDK", RegistryKeyPermissionCheck.ReadWriteSubTree);
-            if (SDKSubKey == null)
-            {
-                // Key doesn't exist, create it
-                SDKSubKey = Registry.CurrentUser.CreateSubKey(@"Software\BL2SDK", RegistryKeyPermissionCheck.ReadWriteSubTree);
-            }
-
-            string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            SDKSubKey.SetValue("BinPath", Path.Combine(currentDir + "\\"));
-            SDKSubKey.SetValue("LuaPath", Path.Combine(currentDir, "lua\\"));
-            SDKSubKey.SetValue("GwenPath", Path.Combine(currentDir, "gwen\\"));
-        }
-
         private void btnBrowse_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -123,66 +108,69 @@ namespace Launcher
             ));
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        struct SettingsStruct
+        {
+            [CustomMarshalAs(CustomUnmanagedType.LPWStr)]
+            public string BinPath;
+        }
+
         private void WaitAndInject()
         {
             DateTime start = DateTime.Now;
             string procName = Path.GetFileNameWithoutExtension(this.GamePath);
 
             // Wait 30 seconds for Steam to get its shit together
-            while ((DateTime.Now - start).Seconds < 30)
+            while((DateTime.Now - start).Seconds < 30)
             {
                 Process[] procs = Process.GetProcessesByName(procName);
-                if (procs[0] == null)
+                Process bl2Proc = procs[0];
+                if(bl2Proc == null)
                 {
                     continue;
                 }
-
-                Process bl2Proc = procs[0];
-
-                string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-                // Yuck.
+           
+                // We have found the process, so we can inject into it
                 try
                 {
-                    Injector.Inject(Path.Combine(currentDir, "BL2SDKDLL.dll"), bl2Proc);
+                    Injector syringe = new Injector(bl2Proc);
+                    syringe.InjectLibrary("BL2SDKDLL.dll");
+
+                    SettingsStruct arg = new SettingsStruct() { BinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" };
+                    syringe.CallExport("BL2SDKDLL.dll", "InitializeSDK", arg);
                 }
-                catch (Win32Exception e)
+                catch(Win32Exception e)
                 {
-                    MessageBox.Show("Failed to inject SDK into Borderlands 2. Exception Message = " + e.Message + " Code = " + e.NativeErrorCode, "Failed to launch", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    //Win32.TerminateProcess(lpProcessInformation.hProcess, 0);
+                    MessageBox.Show("Failed to inject SDK into Borderlands 2. Error Message = " + e.Message + ", Error Code = " + e.NativeErrorCode, "Failed to launch", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     bl2Proc.Kill();
-
                     ResetButton();
                     return;
                 }
-                catch (Exception e)
+                catch(Exception e)
                 {
-                    MessageBox.Show("Failed to inject SDK into Borderlands 2. Exception = " + e.Message, "Failed to launch", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    //Win32.TerminateProcess(lpProcessInformation.hProcess, 0);
+                    MessageBox.Show("Failed to inject SDK into Borderlands 2. Error Message = " + e.Message, "Failed to launch", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     bl2Proc.Kill();
-
                     ResetButton();
                     return;
                 }
                 
+                // Resume all the suspended threads
                 foreach (ProcessThread thread in bl2Proc.Threads)
                 {
-                    IntPtr hThread = Win32.OpenThread(
-                        Win32.ThreadAccessFlags.SuspendResume,
+                    IntPtr hThread = Imports.OpenThread(
+                        ThreadAccessFlags.SuspendResume,
                         false,
                         (uint)thread.Id);
 
-                    Win32.ResumeThread(hThread);
-                    Win32.CloseHandle(hThread);
+                    Imports.ResumeThread(hThread);
+                    Imports.CloseHandle(hThread);
                 }
                 
                 Application.Exit();
                 return;
             }
 
-            MessageBox.Show("Failed to find game after 30 seconds", "Failed to launch", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Failed to find game process after 30 seconds", "Failed to launch", MessageBoxButtons.OK, MessageBoxIcon.Error);
             ResetButton();
         }
 
@@ -194,8 +182,6 @@ namespace Launcher
                 CreateInjectorThread();
             }
 
-            SetupRegistry();
-            
             string gamePath = txtGamePath.Text;
             if (!File.Exists(gamePath))
             {
@@ -212,20 +198,20 @@ namespace Launcher
             this.GamePath = gamePath;
             string gameDir = Path.GetDirectoryName(gamePath);
 
-            Win32.STARTUPINFO lpStartupInfo = new Win32.STARTUPINFO();
+            STARTUPINFO lpStartupInfo = new STARTUPINFO();
 
             Environment.SetEnvironmentVariable("SteamGameId", "49520");
             Environment.SetEnvironmentVariable("SteamAppId", "49520");
 
-            Win32.PROCESS_INFORMATION lpProcessInformation;
+            PROCESS_INFORMATION lpProcessInformation;
 
-            bool result = Win32.CreateProcess(
+            bool result = Imports.CreateProcess(
                 gamePath,
                 "-nolauncher",
                 IntPtr.Zero,
                 IntPtr.Zero,
                 false,
-                Win32.CreateProcessFlags.CreateSuspended,
+                ProcessCreationFlags.CreateSuspended,
                 IntPtr.Zero,
                 gameDir,
                 ref lpStartupInfo, 
@@ -238,8 +224,8 @@ namespace Launcher
 
                 this.InjectorThread.Start();
 
-                Win32.CloseHandle(lpProcessInformation.hProcess);
-                Win32.CloseHandle(lpProcessInformation.hThread);
+                Imports.CloseHandle(lpProcessInformation.hProcess);
+                Imports.CloseHandle(lpProcessInformation.hThread);
             }
             else
             {

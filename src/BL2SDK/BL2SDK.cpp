@@ -199,12 +199,9 @@ namespace BL2SDK
 		return true;
 	}
 
-	void Initialize()
+	void Initialize(LauncherStruct* args)
 	{
-		if(Settings::Initialize() != ERROR_SUCCESS)
-		{
-			throw FatalSDKException(1, "Could not locate settings in registry. Did you use the Launcher?");
-		}
+		Settings::Initialize(args);
 
 		Logging::InitializeFile(Settings::GetLogFilePath());
 		//Logging::InitializeFile(Settings::GetBinFile(L"."));
