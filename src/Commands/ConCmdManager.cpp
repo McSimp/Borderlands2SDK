@@ -64,7 +64,7 @@ namespace ConCmdManager
 		UConsole* console = (UConsole*)pCaller;
 		
 		UConsole_eventConsoleCommand_Parms* parms = (UConsole_eventConsoleCommand_Parms*)pParms;
-		//Logging::Log("[ConCmd] Engine concmd = %ls\n", parms->Command);
+		//Logging::LogF("[ConCmd] Engine concmd = %ls\n", parms->Command);
 
 		// Because 'say' is appended to everything, take that off
 		wchar_t* ptr = parms->Command.Data;
@@ -72,7 +72,7 @@ namespace ConCmdManager
 		{
 			ptr = ptr + 4;
 		}
-		//Logging::Log("[ConCmd] New command = \"%ls\"\n", ptr);
+		//Logging::LogF("[ConCmd] New command = \"%ls\"\n", ptr);
 
 		// Convert to a normal string because #1 I don't give a fuck and #2 That's terror
 		std::wstring temp(ptr);

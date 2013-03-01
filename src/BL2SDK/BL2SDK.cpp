@@ -40,8 +40,8 @@ namespace BL2SDK
 			std::string FunctionName = pFunction->GetFullName();
 
 			Logging::Log("===== ProcessEvent called =====\n");
-			Logging::Log("pCaller Name = %s\n", CallerName.c_str());
-			Logging::Log("pFunction Name = %s\n", FunctionName.c_str());
+			Logging::LogF("pCaller Name = %s\n", CallerName.c_str());
+			Logging::LogF("pFunction Name = %s\n", FunctionName.c_str());
 		}
 		
 		if(!EngineHooks::ProcessHooks(pCaller, pFunction, pParms, pResult))
@@ -115,7 +115,7 @@ namespace BL2SDK
 		DWORD dwSize = GetFileVersionInfoSize(szFilename, &dwDummy);
 		if(dwSize == 0)
 		{
-			Logging::Log("[BL2SDK] ERROR: GetFileVersionInfoSize failed with error %d\n", GetLastError());
+			Logging::LogF("[BL2SDK] ERROR: GetFileVersionInfoSize failed with error %d\n", GetLastError());
 			return false;
 		}
 		
@@ -124,7 +124,7 @@ namespace BL2SDK
 		// Load the version info
 		if(!GetFileVersionInfo(szFilename, NULL, dwSize, &lpVersionInfo[0]))
 		{
-			Logging::Log("[BL2SDK] ERROR: GetFileVersionInfo failed with error %d\n", GetLastError());
+			Logging::LogF("[BL2SDK] ERROR: GetFileVersionInfo failed with error %d\n", GetLastError());
 			return false;
 		}
 
@@ -159,19 +159,19 @@ namespace BL2SDK
 
 		// Sigscan for GOBjects
 		pGObjects = *(unsigned long*)sigscan.Scan((unsigned char*)GObjects_Pattern, GObjects_Mask);
-		Logging::Log("[Internal] GObjects = 0x%X\n", pGObjects);
+		Logging::LogF("[Internal] GObjects = 0x%X\n", pGObjects);
 
 		// Sigscan for GNames
 		pGNames = *(unsigned long*)sigscan.Scan((unsigned char*)GNames_Pattern, GNames_Mask);
-		Logging::Log("[Internal] GNames = 0x%X\n", pGNames);
+		Logging::LogF("[Internal] GNames = 0x%X\n", pGNames);
 
 		// Sigscan for UObject::ProcessEvent which will be used for pretty much everything
 		pProcessEvent = reinterpret_cast<tProcessEvent>(sigscan.Scan((unsigned char*)ProcessEvent_Pattern, ProcessEvent_Mask));
-		Logging::Log("[Internal] UObject::ProcessEvent() = 0x%X\n", pProcessEvent);
+		Logging::LogF("[Internal] UObject::ProcessEvent() = 0x%X\n", pProcessEvent);
 
 		// Sigscan for Unreal exception handler
 		void* addrUnrealEH = sigscan.Scan((unsigned char*)CrashHandler_Pattern, CrashHandler_Mask);
-		Logging::Log("[Internal] Unreal Crash handler = 0x%X\n", addrUnrealEH);
+		Logging::LogF("[Internal] Unreal Crash handler = 0x%X\n", addrUnrealEH);
 
 		// Detour UObject::ProcessEvent()
 		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkRawProcessEvent);
@@ -185,10 +185,10 @@ namespace BL2SDK
 	// This function is used to ensure that everything gets called in the game thread once the game itself has loaded
 	bool GameReady(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult) 
 	{
-		Logging::Log("[GameReady] Thread: %i\n", GetCurrentThreadId());
+		Logging::LogF("[GameReady] Thread: %i\n", GetCurrentThreadId());
 	
 		Logging::InitializeExtern();
-		//Logging::InitializeGameConsole();
+		Logging::InitializeGameConsole();
 		Logging::PrintLogHeader();
 	
 		LuaManager::Initialize();

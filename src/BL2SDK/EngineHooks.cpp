@@ -78,11 +78,11 @@ namespace EngineHooks
 
 		if(sizeDiff == 0)
 		{
-			Logging::Log("[Engine Hooks] Failed to remove hook \"%s\" for function \"%s\"\n", hookName.c_str(), funcName.c_str());
+			Logging::LogF("[Engine Hooks] Failed to remove hook \"%s\" for function \"%s\"\n", hookName.c_str(), funcName.c_str());
 			return false;
 		}
 
-		Logging::Log("[Engine Hooks] Hook \"%s\" removed for function \"%s\" successfully\n", hookName.c_str(), funcName.c_str());
+		Logging::LogF("[Engine Hooks] Hook \"%s\" removed for function \"%s\" successfully\n", hookName.c_str(), funcName.c_str());
 		return true;
 	}
 
@@ -91,7 +91,7 @@ namespace EngineHooks
 		tHookMap* hookTable = GetVirtualHookTable(funcName);
 		if(hookTable == NULL)
 		{
-			Logging::Log("[Engine Hooks] ERROR: Failed to remove virtual hook \"%s\" for \"%s\"\n", hookName.c_str(), funcName);
+			Logging::LogF("[Engine Hooks] ERROR: Failed to remove virtual hook \"%s\" for \"%s\"\n", hookName.c_str(), funcName);
 			return false;
 		}
 
@@ -104,7 +104,7 @@ namespace EngineHooks
 		tHookMap* hookTable = GetStaticHookTable(pFunction);
 		if(hookTable == NULL)
 		{
-			Logging::Log("[Engine Hooks] ERROR: Failed to remove static hook \"%s\" for \"%s\"\n", hookName.c_str(), pFunction->GetFullName());
+			Logging::LogF("[Engine Hooks] ERROR: Failed to remove static hook \"%s\" for \"%s\"\n", hookName.c_str(), pFunction->GetFullName());
 			return false;
 		}
 
@@ -126,7 +126,7 @@ namespace EngineHooks
 				int size = iVHooks->second.size();
 				StaticHooks.insert(std::make_pair(pFunction, iVHooks->second));
 				VirtualHooks.erase(iVHooks);
-				Logging::Log("[Engine Hooks] Function pointer found for \"%s\", added map with %i elements to static hooks map\n", funcName.c_str(), size);
+				Logging::LogF("[Engine Hooks] Function pointer found for \"%s\", added map with %i elements to static hooks map\n", funcName.c_str(), size);
 			}
 		}
 
@@ -171,14 +171,14 @@ namespace EngineHooks
 			// The function was not found, so we need to create a virtual hook for it
 			AddVirtualHook(funcName, hookPair);
 
-			Logging::Log("[Engine Hooks] Hook \"%s\" added as virtual hook for \"%s\"\n", hookName.c_str(), funcName.c_str());
+			Logging::LogF("[Engine Hooks] Hook \"%s\" added as virtual hook for \"%s\"\n", hookName.c_str(), funcName.c_str());
 		}
 		else
 		{
 			// The function WAS found, so we can just hook it straight away
 			AddStaticHook(pFunction, hookPair);
 
-			Logging::Log("[Engine Hooks] Hook \"%s\" added as static hook for \"%s\"\n", hookName.c_str(), funcName.c_str());
+			Logging::LogF("[Engine Hooks] Hook \"%s\" added as static hook for \"%s\"\n", hookName.c_str(), funcName.c_str());
 		}
 	}
 

@@ -91,7 +91,7 @@ namespace CrashRptHelper
 		{    
 			// Something goes wrong. Get error message.
 			CRASHRPT_ERROR(szErrorMsg);
-			Logging::Log("[CrashRpt] ERROR: Failed to install CrashRpt. Result = %i, Error = %ls\n", result, szErrorMsg);
+			Logging::LogF("[CrashRpt] ERROR: Failed to install CrashRpt. Result = %i, Error = %ls\n", result, szErrorMsg);
 			return false;
 		} 
 
@@ -107,14 +107,8 @@ namespace CrashRptHelper
 			pcrAddPropertyW(L"BL2VER", gameVer.c_str());
 		}
 
-		// Add the BL2SDK registry key
-		int regResult = pcrAddRegKeyW(L"HKEY_CURRENT_USER\\Software\\BL2SDK", L"regkey.xml", 0);
-		if(regResult != 0)
-		{
-			CRASHRPT_ERROR(szErrorMsg);
-			Logging::Log("[CrashRpt] ERROR: Failed to add registry key to crashrpt. Result = %i, Error = %ls\n", regResult, szErrorMsg);
-			return false;
-		}
+		// Add the bin path
+		pcrAddPropertyW(L"BinPath", Settings::GetBinFile(L"").c_str());
 
 		return true;
 	}
@@ -172,7 +166,7 @@ namespace CrashRptHelper
 		if(result != 0)
 		{
 			CRASHRPT_ERROR(szErrorMsg);
-			Logging::Log("[CrashRpt] ERROR: Failed to generate report. Result = %i, Error = %ls\n", result, szErrorMsg);
+			Logging::LogF("[CrashRpt] ERROR: Failed to generate report. Result = %i, Error = %ls\n", result, szErrorMsg);
 			return false;
 		}
 		else

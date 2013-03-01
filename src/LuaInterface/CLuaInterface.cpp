@@ -17,15 +17,16 @@ static int luabl2_print (lua_State *L) {
 		lua_pushvalue(L, -1);  /* function to be called */
 		lua_pushvalue(L, i);   /* value to print */
 		lua_call(L, 1, 1);
-		s = lua_tostring(L, -1);  /* get result */
+		size_t len;
+		s = lua_tolstring(L, -1, &len); /* get result */
 		if (s == NULL)
 			return luaL_error(L, LUA_QL("tostring") " must return a string to "
 			LUA_QL("print"));
 		if (i>1) Logging::Log("\t");
-		Logging::Log(s, stdout);
+		Logging::Log(s, len);
 		lua_pop(L, 1);  /* pop result */
 	}
-	Logging::Log("\n", stdout);
+	Logging::Log("\n");
 	return 0;
 }
 
@@ -61,16 +62,16 @@ void StackDump(lua_State* L)
 		int t = lua_type(L, i);
 		switch (t) {
 		case LUA_TSTRING:
-			Logging::Log("%d:`%s'\n", i, lua_tostring(L, i));
+			Logging::LogF("%d:`%s'\n", i, lua_tostring(L, i));
 			break;
 		case LUA_TBOOLEAN:
-			Logging::Log("%d: %s\n",i,lua_toboolean(L, i) ? "true" : "false");
+			Logging::LogF("%d: %s\n",i,lua_toboolean(L, i) ? "true" : "false");
 			break;
 		case LUA_TNUMBER:
-			Logging::Log("%d: %g\n",  i, lua_tonumber(L, i));
+			Logging::LogF("%d: %g\n",  i, lua_tonumber(L, i));
 			break;
 		default: 
-			Logging::Log("%d: %s\n", i, lua_typename(L, t));
+			Logging::LogF("%d: %s\n", i, lua_typename(L, t));
 			break;
 		}
 		i--;
@@ -137,7 +138,7 @@ void CLuaInterface::PushSpecial(int type)
 	}
 	else
 	{
-		Logging::Log("[CLuaInterface] ERROR: PushSpecial - type %i is not a valid special table\n", type);
+		Logging::LogF("[CLuaInterface] ERROR: PushSpecial - type %i is not a valid special table\n", type);
 		index = LUA_REFNIL; // Check
 	}
 
@@ -181,7 +182,7 @@ void CLuaInterface::SetTable(int i)
 {
 	if(!lua_istable(m_pState, i))
 	{
-		Logging::Log("[CLuaInterface] ERROR: SetTable - not a table at stack pos %i\n", i);
+		Logging::LogF("[CLuaInterface] ERROR: SetTable - not a table at stack pos %i\n", i);
 		return;
 	}
 	lua_settable(m_pState, i);
@@ -384,7 +385,7 @@ void CLuaInterface::GetTable(int i)
 {
 	if(!lua_istable(m_pState, i))
 	{
-		Logging::Log("[CLuaInterface] ERROR: GetTable - not a table at stack pos %i\n", i);
+		Logging::LogF("[CLuaInterface] ERROR: GetTable - not a table at stack pos %i\n", i);
 		return;
 	}
 
@@ -486,7 +487,7 @@ void CLuaInterface::Pop(int i)
 	int top = this->Top();
 	if(top < i)
 	{
-		Logging::Log("[CLuaInterface] ERROR: Pop - Tried to pop higher than the top (top = %i, i = %i)\n", top, i);
+		Logging::LogF("[CLuaInterface] ERROR: Pop - Tried to pop higher than the top (top = %i, i = %i)\n", top, i);
 		return;
 	}
 
@@ -615,7 +616,7 @@ const char* CLuaInterface::GetTypeName(int iType)
 {
 	if(iType < 0 || iType >= Lua::TYPE_COUNT)
 	{
-		Logging::Log("[CLuaInterface] WARNING: GetTypeName - type %i is out of range\n", iType);
+		Logging::LogF("[CLuaInterface] WARNING: GetTypeName - type %i is out of range\n", iType);
 		return "invalid";
 	}
 
@@ -671,7 +672,7 @@ void CLuaInterface::Call(int args, int returns)
 	int funcStackPos = -(args)-1;
 	if(!lua_isfunction(m_pState, funcStackPos))
 	{
-		Logging::Log("[CLuaInterface] ERROR: Call - stack pos %i is not a function\n", funcStackPos);
+		Logging::LogF("[CLuaInterface] ERROR: Call - stack pos %i is not a function\n", funcStackPos);
 		return;
 	}
 
@@ -684,13 +685,13 @@ int CLuaInterface::PCall(int args, int returns, int iErrorFunc)
 	int funcStackPos = -(args)-1;
 	if(!lua_isfunction(m_pState, funcStackPos))
 	{
-		Logging::Log("[CLuaInterface] ERROR: PCall - stack pos %i is not a function\n", funcStackPos);
+		Logging::LogF("[CLuaInterface] ERROR: PCall - stack pos %i is not a function\n", funcStackPos);
 		return -1;
 	}
 
 	if(iErrorFunc && !lua_isfunction(m_pState, iErrorFunc))
 	{
-		Logging::Log("[CLuaInterface] ERROR: PCall - stack pos %i (for error func) is not a function\n", iErrorFunc);
+		Logging::LogF("[CLuaInterface] ERROR: PCall - stack pos %i (for error func) is not a function\n", iErrorFunc);
 		return -1;
 	}
 
@@ -732,7 +733,7 @@ void CLuaInterface::SetMetaTable(int i)
 
 	if(lua_isnil(m_pState, i))
 	{
-		Logging::Log("[CLuaInterface] ERROR: SetMetaTable - stack pos %i is nil\n", i);
+		Logging::LogF("[CLuaInterface] ERROR: SetMetaTable - stack pos %i is nil\n", i);
 		return;
 	}
 
@@ -744,7 +745,7 @@ int CLuaInterface::RunString(const char* string)
 	int error = luaL_dostring(m_pState, string);
 	if(error != 0)
 	{
-		Logging::Log("[CLuaInterface] ERROR: RunString failed - %s\n", lua_tostring(m_pState, -1));
+		Logging::LogF("[CLuaInterface] ERROR: RunString failed - %s\n", lua_tostring(m_pState, -1));
 		lua_pop(m_pState, 1);
 	}
 	return error;
@@ -760,7 +761,7 @@ int CLuaInterface::DoFileAbsolute(const char* path)
 	int status = luaL_dofile(m_pState, path);
 	if(status != 0)
 	{
-		Logging::Log("[CLuaInterface] ERROR: DoFile failed to run file - %s\n", lua_tostring(m_pState, -1));
+		Logging::LogF("[CLuaInterface] ERROR: DoFile failed to run file - %s\n", lua_tostring(m_pState, -1));
 		this->Pop();
 	}
 	return status;
@@ -770,7 +771,7 @@ void CLuaInterface::SetPaths()
 {
 	// Set path to Lua folder, without trailing slash
 	m_luaPath = Util::Narrow(Settings::GetBinFile(L"lua"));
-	Logging::Log("[CLuaInterface] Lua Path = %s\n", m_luaPath.c_str());
+	Logging::LogF("[CLuaInterface] Lua Path = %s\n", m_luaPath.c_str());
 
 	CLuaObject* pkg = this->GetGlobal(LUA_LOADLIBNAME);
 	CLuaObject* pathobj = pkg->GetMember("path");

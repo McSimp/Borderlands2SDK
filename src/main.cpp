@@ -11,7 +11,7 @@
 // TODO: Get these out of here
 CON_COMMAND(CrashMe)
 {
-	Logging::Log("Thread: %i\n", GetCurrentThreadId());
+	Logging::LogF("Thread: %i\n", GetCurrentThreadId());
 	abort();
 	/*
 	// Define the infinite loop where some processing will be done 
@@ -29,12 +29,12 @@ CON_COMMAND(CrashMe)
 CON_COMMAND(GetLocalPlayer)
 {
 	AActor* pc = UObject::FindObject<AActor>("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController");
-	Logging::Log("pc = 0x%X\n", pc);
+	Logging::LogF("pc = 0x%X\n", pc);
 }
 
 CON_COMMAND(PrintSDKVersion)
 {
-	Logging::Log("BL2 SDK Version %s\n", BL2SDK::Version.c_str());
+	Logging::LogF("BL2 SDK Version %s\n", BL2SDK::Version.c_str());
 }
 /*
 CON_COMMAND(SetDNCycleRate)
@@ -56,7 +56,7 @@ CON_COMMAND(SetDNCycleRate)
 	UWillowSeqAct_DayNightCycle* seqact = UObject::FindObject<UWillowSeqAct_DayNightCycle>("WillowSeqAct_DayNightCycle PersistentLevel.Main_Sequence.WillowSeqAct_DayNightCycle");
 	seqact->PlayRate = rate;
 
-	Logging::Log("Day/Night cycle rate changed to %f\n", rate);
+	Logging::LogF("Day/Night cycle rate changed to %f\n", rate);
 }
 */
 
@@ -68,11 +68,11 @@ CON_COMMAND(DumpObj)
 		UObject* Object = UObject::GObjObjects()->Data[i];
 		if(Object)
 		{
-			Logging::Log("%d | 0x%X | %s\n", i, Object, Object->GetFullName());
+			Logging::LogF("%d | 0x%X | %s\n", i, Object, Object->GetFullName());
 		}
 		else
 		{
-			Logging::Log("[DEBUGLOG] Got a null UObject at idx %d?\n", i);
+			Logging::LogF("[DEBUGLOG] Got a null UObject at idx %d?\n", i);
 		}
 	} 
 	Logging::Log("=== END OBJECT DUMP ===\n");
@@ -87,28 +87,28 @@ CON_COMMAND(CountNullObj)
 		UObject* Object = UObject::GObjObjects()->Data[i];
 		if(!Object)
 		{
-			Logging::Log("%d\n", i);
+			Logging::LogF("%d\n", i);
 			count++;
 		}
 	} 
-	Logging::Log("Count Null = %d\n", count);
+	Logging::LogF("Count Null = %d\n", count);
 	Logging::Log("=== END OBJECT DUMP ===\n");
 }
 
 CON_COMMAND(Derp)
 {
 	Logging::Log("=== OBJECT DUMP ===\n");
-	Logging::Log("%40s | %10s\n", "Name", "ArrayDim");
+	Logging::LogF("%40s | %10s\n", "Name", "ArrayDim");
 	for(int i = 0; i < UObject::GObjObjects()->Count; i++) 
 	{ 
 		UObject* Object = UObject::GObjObjects()->Data[i];
-		//Logging::Log("%d | 0x%X | %s\n", i, Object, Object->GetFullName()); 
+		//Logging::LogF("%d | 0x%X | %s\n", i, Object, Object->GetFullName()); 
 		if(Object->IsA(UProperty::StaticClass()))
 		{
 			UProperty* prop = (UProperty*)Object;
 			if(prop->ArrayDim > 1 || prop->IsA(UArrayProperty::StaticClass()))
 			{
-				Logging::Log(" %40s | %10i | %10i\n", prop->Name.GetName(), prop->ArrayDim, prop->IsA(UArrayProperty::StaticClass()));
+				Logging::LogF(" %40s | %10i | %10i\n", prop->Name.GetName(), prop->ArrayDim, prop->IsA(UArrayProperty::StaticClass()));
 			}
 		}
 		

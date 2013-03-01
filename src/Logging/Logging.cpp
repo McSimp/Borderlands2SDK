@@ -15,7 +15,7 @@ namespace Logging
 	bool				bLogToGameConsole		= false;
 	UConsole*			pGameConsole			= NULL;
 
-	void LogToFile(const char *szBuff, int len)
+	void LogToFile(const char* szBuff, int len)
 	{
 		if(hLogFile != INVALID_HANDLE_VALUE)
 		{
@@ -25,36 +25,43 @@ namespace Logging
 		}
 	}
 
-	void LogWinConsole(const char *szBuff, int len)
+	void LogWinConsole(const char* szBuff, int len)
 	{
 		HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 		DWORD dwBytesWritten = 0;
 		WriteFile(hOutput, szBuff, len, &dwBytesWritten, NULL);
 	}
 
-	void Log(const char *szFmt, ...)
+	void Log(const char* formatted, int length)
+	{
+		if(length == 0)
+			length = strlen(formatted);
+
+		if(bLogToExternalConsole)
+			LogWinConsole(formatted, length);
+
+		if(bLogToFile)
+			LogToFile(formatted, length);
+		
+		if(bLogToGameConsole)
+		{
+			if(pGameConsole != NULL)
+			{
+				std::wstring wfmt = Util::Widen(formatted);
+				BL2SDK::InjectedCallNext();
+				pGameConsole->eventOutputText(FString((wchar_t*)wfmt.c_str()));
+			}
+		}
+	}
+
+	void LogF(const char* szFmt, ...)
 	{
 		va_list args;
 		va_start(args, szFmt);
 		std::string formatted = Util::FormatInternal(szFmt, args); 
 		va_end(args);
 
-		if(bLogToExternalConsole)
-			LogWinConsole(formatted.c_str(), formatted.length());
-
-		if(bLogToFile)
-			LogToFile(formatted.c_str(), formatted.length());
-		
-		if(bLogToGameConsole)
-		{
-			if(pGameConsole != NULL)
-			{
-				// TODO: Abstract away char -> wchar conversion (perhaps use Boost::widen)
-				std::wstring wfmt = Util::Widen(formatted);
-				BL2SDK::InjectedCallNext();
-				pGameConsole->eventOutputText(FString((wchar_t*)wfmt.c_str()));
-			}
-		}
+		Log(formatted.c_str(), formatted.length());
 	}
 
 	void InitializeExtern()
@@ -97,7 +104,7 @@ namespace Logging
 
 	void PrintLogHeader()
 	{
-		Log("======== BL2 Mod SDK Loaded (Version %s) ========\n", BL2SDK::Version.c_str());
+		LogF("======== BL2 Mod SDK Loaded (Version %s) ========\n", BL2SDK::Version.c_str());
 	}
 
 	void Cleanup()

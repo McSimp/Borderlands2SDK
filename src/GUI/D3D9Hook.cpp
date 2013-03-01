@@ -34,7 +34,7 @@ namespace D3D9Hook
 
 		if(result != D3D_OK)
 		{
-			Logging::Log("[DirectX Hooking] Call to CreateDevice failed (Return = 0x%X)\n", result);
+			Logging::LogF("[DirectX Hooking] Call to CreateDevice failed (Return = 0x%X)\n", result);
 			return result;
 		}
 
