@@ -7,17 +7,7 @@
 
 namespace Util
 {
-	std::string Format(const char* fmt, ...)
-	{
-		va_list args;
-		va_start(args, fmt);
-		std::string formatted = Format(fmt, args);
-		va_end(args);
-
-		return formatted;
-	}
-
-	std::string Format(const char* fmt, va_list args)
+	std::string FormatInternal(const char* fmt, va_list args)
 	{
 		std::string str;
 
@@ -39,17 +29,17 @@ namespace Util
 		return str;
 	}
 
-	std::wstring Format(const wchar_t* fmt, ...)
+	std::string Format(const char* fmt, ...)
 	{
 		va_list args;
 		va_start(args, fmt);
-		std::wstring formatted = Format(fmt, args);
+		std::string formatted = FormatInternal(fmt, args);
 		va_end(args);
 
 		return formatted;
 	}
 
-	std::wstring Format(const wchar_t* fmt, va_list args)
+	std::wstring FormatInternal(const wchar_t* fmt, va_list args)
 	{
 		std::wstring str;
 
@@ -69,6 +59,16 @@ namespace Util
 		delete[] szBuff;
 
 		return str;
+	}
+
+	std::wstring Format(const wchar_t* fmt, ...)
+	{
+		va_list args;
+		va_start(args, fmt);
+		std::wstring formatted = FormatInternal(fmt, args);
+		va_end(args);
+
+		return formatted;
 	}
 
 	// TODO: Benchmarking and whatnot to see how these perform
@@ -96,8 +96,23 @@ namespace Util
 		TerminateProcess(GetCurrentProcess(), 1);
 	}
 
-	void SuspendThreads()
+	// This will convert a string like "Hello World" to "48 65 6C 6C 6F 20 57 6F 72 6C 64"
+	// Taken mostly from http://stackoverflow.com/questions/3381614/c-convert-string-to-hexadecimal-and-vice-versa
+	std::string StringToHex(const unsigned char* input, size_t len)
 	{
+		static const char* const lut = "0123456789ABCDEF";
 
+		std::string output;
+		output.reserve((2 * len) + len);
+		for(size_t i = 0; i < len; ++i)
+		{
+			const unsigned char c = input[i];
+			output.push_back(lut[c >> 4]);
+			output.push_back(lut[c & 15]);
+			output.push_back(' ');
+		}
+		output.resize(output.size() - 1); // Remove that last space
+
+		return output;
 	}
 }

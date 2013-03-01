@@ -59,7 +59,7 @@ namespace Syringe
                 try
                 {
                     // Load module into local process address space
-                    hModule = Imports.LoadLibraryEx(Module.FileName, IntPtr.Zero, 0);
+                    hModule = Imports.LoadLibraryEx(Module.FileName, IntPtr.Zero, LoadLibraryExFlags.DontResolveDllReferences);
                     if(hModule == IntPtr.Zero)
                         throw new Win32Exception(Marshal.GetLastWin32Error());
 

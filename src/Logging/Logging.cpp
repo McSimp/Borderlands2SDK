@@ -36,7 +36,7 @@ namespace Logging
 	{
 		va_list args;
 		va_start(args, szFmt);
-		std::string formatted = Util::Format(szFmt, args); 
+		std::string formatted = Util::FormatInternal(szFmt, args); 
 		va_end(args);
 
 		if(bLogToExternalConsole)

@@ -204,7 +204,6 @@ namespace BL2SDK
 		Settings::Initialize(args);
 
 		Logging::InitializeFile(Settings::GetLogFilePath());
-		//Logging::InitializeFile(Settings::GetBinFile(L"."));
 		Logging::Log("[Internal] Launching SDK...\n");
 
 		CrashRptHelper::Initialize();

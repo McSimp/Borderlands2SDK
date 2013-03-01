@@ -10,8 +10,8 @@ class CSimpleDetour
 public:
 	CSimpleDetour(void **old, void *replacement);
 
-	bool Attach();
-	bool Detach();
+	void Attach();
+	void Detach();
 private:
 	void **m_fnOld;
 	void *m_fnReplacement;

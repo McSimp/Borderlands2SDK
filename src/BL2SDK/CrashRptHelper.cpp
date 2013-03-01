@@ -94,6 +94,8 @@ namespace CrashRptHelper
 			Logging::Log("[CrashRpt] ERROR: Failed to install CrashRpt. Result = %i, Error = %ls\n", result, szErrorMsg);
 			return false;
 		} 
+
+		crashRptReady = true;
 		
 		// Add our log file to the error report
 		pcrAddFile2W(Settings::GetLogFilePath().c_str(), NULL, L"Log File", CR_AF_MAKE_FILE_COPY);
@@ -114,7 +116,6 @@ namespace CrashRptHelper
 			return false;
 		}
 
-		crashRptReady = true;
 		return true;
 	}
 

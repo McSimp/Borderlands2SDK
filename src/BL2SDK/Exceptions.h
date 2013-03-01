@@ -10,7 +10,7 @@ private:
 	int m_errorCode;
 
 public:
-	FatalSDKException(int errorCode, const char* errorStr)
+	FatalSDKException(int errorCode, const std::string& errorStr)
 		: std::runtime_error(errorStr),
 		m_errorCode(errorCode)
 	{

@@ -76,7 +76,7 @@ namespace D3D9Hook
 		IDirect3D9* d3d = Direct3DCreate9(D3D_SDK_VERSION);
 		if(d3d == NULL)
 		{
-			throw FatalSDKException(5000, Util::Format("Failed to call Direct3DCreate9 (Error = 0x%)", GetLastError()).c_str());
+			throw FatalSDKException(5000, Util::Format("Failed to call Direct3DCreate9 (Error = %d)", GetLastError()));
 		}
 
 		D3DVTable = (PDWORD)*(PDWORD)d3d;
@@ -87,7 +87,7 @@ namespace D3D9Hook
 		// Rewrite the pointer to CreateDevice in the VTable to our own function
 		if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), PAGE_READWRITE, &dwProtect) == 0)
 		{
-			throw FatalSDKException(5001, Util::Format("VirtualProtect failed for adding CreateDevice hook (Error = 0x%)", GetLastError()).c_str());
+			throw FatalSDKException(5001, Util::Format("VirtualProtect failed for adding CreateDevice hook (Error = %d)", GetLastError()));
 		}
 
 		*(PDWORD)&pCreateDevice = D3DVTable[CREATEDEVICE_IDX];
@@ -95,7 +95,7 @@ namespace D3D9Hook
 
 		if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), dwProtect, &dwProtect) == 0)
 		{
-			throw FatalSDKException(5002, Util::Format("VirtualProtect failed for adding CreateDevice hook (Error = 0x%)", GetLastError()).c_str());
+			throw FatalSDKException(5002, Util::Format("VirtualProtect failed for adding CreateDevice hook (Error = %d)", GetLastError()));
 		}
 
 		Logging::Log("[DirectX Hooking] CreateDevice hooked successfully\n");

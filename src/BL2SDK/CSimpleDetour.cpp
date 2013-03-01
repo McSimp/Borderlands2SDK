@@ -8,7 +8,7 @@ CSimpleDetour::CSimpleDetour(void **old, void *replacement)
 	m_fnReplacement = replacement;
 }
 
-bool CSimpleDetour::Attach()
+void CSimpleDetour::Attach()
 {
 	DetourTransactionBegin();
 	DetourUpdateThread(GetCurrentThread());
@@ -18,16 +18,16 @@ bool CSimpleDetour::Attach()
 	LONG result = DetourTransactionCommit();
 	if(result != NO_ERROR)
 	{
-		throw FatalSDKException(4000, Util::Format("Failed to attach detour (Old = 0x%X, Hook = 0x%X, Result = 0x%X)", m_fnOld, m_fnReplacement, result).c_str());
+		throw FatalSDKException(4000, Util::Format("Failed to attach detour (Old = 0x%X, Hook = 0x%X, Result = 0x%X)", m_fnOld, m_fnReplacement, result));
 	}
 
 	m_bAttached = true;
 }
 
-bool CSimpleDetour::Detach()
+void CSimpleDetour::Detach()
 {
 	if(!m_bAttached)
-		return false;
+		return;
 
 	DetourTransactionBegin();
 	DetourUpdateThread(GetCurrentThread());
@@ -37,7 +37,7 @@ bool CSimpleDetour::Detach()
 	LONG result = DetourTransactionCommit();
 	if(result != NO_ERROR)
 	{
-		throw FatalSDKException(4001, Util::Format("Failed to detach detour (Old = 0x%X, Hook = 0x%X, Result = 0x%X)", m_fnOld, m_fnReplacement, result).c_str());
+		throw FatalSDKException(4001, Util::Format("Failed to detach detour (Old = 0x%X, Hook = 0x%X, Result = 0x%X)", m_fnOld, m_fnReplacement, result));
 	}
 
 	m_bAttached = false;

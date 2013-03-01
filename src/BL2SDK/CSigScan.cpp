@@ -9,7 +9,7 @@ CSigScan::CSigScan(wchar_t* moduleName)
 	m_moduleHandle = GetModuleHandle(moduleName);
 	if(m_moduleHandle == NULL)
 	{
-		throw FatalSDKException(3000, Util::Format("Sigscan failed (GetModuleHandle returned NULL, Error = 0x%X)", GetLastError()).c_str());
+		throw FatalSDKException(3000, Util::Format("Sigscan failed (GetModuleHandle returned NULL, Error = %d)", GetLastError()));
 	}
 
 	void* pAddr = m_moduleHandle;
@@ -18,7 +18,7 @@ CSigScan::CSigScan(wchar_t* moduleName)
  
     if(!VirtualQuery(pAddr, &mem, sizeof(mem)))
 	{
-		throw FatalSDKException(3001, Util::Format("Sigscan failed (VirtualQuery returned NULL, Error = 0x%X)", GetLastError()).c_str());
+		throw FatalSDKException(3001, Util::Format("Sigscan failed (VirtualQuery returned NULL, Error = %d)", GetLastError()));
 	}
  
 	m_pModuleBase = (unsigned char*)mem.AllocationBase;
@@ -67,5 +67,5 @@ void* CSigScan::Scan(unsigned char* sig, char* mask, int sigLength)
         pData++;
     }
 
-	throw FatalSDKException(3010, Util::Format("Sigscan failed (Signature not found, Mask = %s)", mask).c_str());
+	throw FatalSDKException(3010, Util::Format("Sigscan failed (Signature not found, Mask = %s)", Util::StringToHex(sig, sigLength).c_str()));
 }
