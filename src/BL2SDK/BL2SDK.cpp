@@ -10,6 +10,7 @@
 #include "GUI/D3D9Hook.h"
 #include "LuaInterface/LuaManager.h"
 #include "BL2SDK/Exceptions.h"
+#include "BL2SDK/AntiDebug.h"
 
 namespace BL2SDK
 {
@@ -205,6 +206,8 @@ namespace BL2SDK
 
 		Logging::InitializeFile(Settings::GetLogFilePath());
 		Logging::Log("[Internal] Launching SDK...\n");
+
+		HookAntiDebug();
 
 		CrashRptHelper::Initialize();
 

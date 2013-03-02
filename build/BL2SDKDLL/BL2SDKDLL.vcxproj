@@ -94,6 +94,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\BL2SDK\AntiDebug.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\BL2SDK.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\CrashRptHelper.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\CSigScan.cpp" />
@@ -117,6 +118,7 @@
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\BL2SDK\AntiDebug.h" />
     <ClInclude Include="..\..\src\BL2SDK\BL2SDK.h" />
     <ClInclude Include="..\..\src\BL2SDK\CrashRptHelper.h" />
     <ClInclude Include="..\..\src\BL2SDK\CSigScan.h" />

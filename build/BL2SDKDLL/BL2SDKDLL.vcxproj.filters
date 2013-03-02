@@ -123,6 +123,9 @@
     <ClCompile Include="..\..\src\LuaInterface\LuaManager.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\BL2SDK\AntiDebug.cpp">
+      <Filter>Source Files\BL2SDK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Logging\Logging.h">
@@ -231,6 +234,9 @@
       <Filter>Header Files\Third Party\Lua521</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\BL2SDK\Exceptions.h">
+      <Filter>Header Files\BL2SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BL2SDK\AntiDebug.h">
       <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
   </ItemGroup>
