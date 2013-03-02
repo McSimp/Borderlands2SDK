@@ -5,6 +5,7 @@
 #include <string>
 
 struct LauncherStruct {
+	bool DisableAntiDebug;
 	const LPWSTR BinPath;
 };
 

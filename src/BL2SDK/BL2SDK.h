@@ -15,6 +15,7 @@ namespace BL2SDK
 	bool GetGameVersion(std::wstring& appVersion);
 	void InjectedCallNext();
 	void Initialize(LauncherStruct* args);
+	void Cleanup();
 
 	const std::string Version = "October 21 2012";
 	const std::wstring VersionW = L"October 21 2012";

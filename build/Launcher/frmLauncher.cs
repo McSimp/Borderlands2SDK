@@ -111,6 +111,7 @@ namespace Launcher
         [StructLayout(LayoutKind.Sequential)]
         struct SettingsStruct
         {
+            public bool DisableAntiDebug;
             [CustomMarshalAs(CustomUnmanagedType.LPWStr)]
             public string BinPath;
         }
@@ -136,7 +137,11 @@ namespace Launcher
                     Injector syringe = new Injector(bl2Proc);
                     syringe.InjectLibrary("BL2SDKDLL.dll");
 
-                    SettingsStruct arg = new SettingsStruct() { BinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" };
+                    SettingsStruct arg = new SettingsStruct() 
+                    {
+                        DisableAntiDebug = disableAntiDebugToolStripMenuItem.Checked,
+                        BinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\"
+                    };
                     syringe.CallExport("BL2SDKDLL.dll", "InitializeSDK", arg);
                 }
                 catch(Win32Exception e)
@@ -236,6 +241,11 @@ namespace Launcher
         private void frmLauncher_Load(object sender, EventArgs e)
         {
             txtGamePath.Text = GetAbsoluteGamePath();
+        }
+
+        private void disableAntiDebugToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            disableAntiDebugToolStripMenuItem.Checked = !disableAntiDebugToolStripMenuItem.Checked;
         }
     }
 }

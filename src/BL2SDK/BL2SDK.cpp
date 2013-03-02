@@ -187,7 +187,10 @@ namespace BL2SDK
 		Logging::InitializeFile(Settings::GetLogFilePath());
 		Logging::Log("[Internal] Launching SDK...\n");
 
-		HookAntiDebug();
+		if(args->DisableAntiDebug)
+		{
+			HookAntiDebug();
+		}
 
 		CrashRptHelper::Initialize();
 
@@ -196,5 +199,12 @@ namespace BL2SDK
 		D3D9Hook::Initialize();
 
 		EngineHooks::Register("Function WillowGame.WillowGameInfo.InitGame", "StartupSDK", &GameReady);	
+	}
+
+	// This is called when the process is closing
+	// TODO: Other things might need cleaning up
+	void Cleanup()
+	{
+		Logging::Cleanup();
 	}
 }

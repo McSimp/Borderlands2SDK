@@ -144,9 +144,7 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 		break;
 
 		case DLL_PROCESS_DETACH:
-			// TODO: Graceful detach
-			Logging::Cleanup();
-			CrashRptHelper::Cleanup();
+			BL2SDK::Cleanup();
 			return FALSE;
 		break;
 	}
