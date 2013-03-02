@@ -21,16 +21,15 @@ namespace BL2SDK
 	unsigned long								pGNames;
 	tProcessEvent								pProcessEvent;
 
-	void __stdcall hkProcessEvent(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
+	void __stdcall hkProcessEvent(UFunction* pFunction, void* pParms, void* pResult)
 	{
-		// Save the registers
-		_asm pushad;
+		// Get "this"
+		UObject* pCaller;
+		_asm mov pCaller, ecx;
 
 		if(bInjectedCallNext)
 		{
 			bInjectedCallNext = false;
-			// Sooooo tempted to use a goto here
-			_asm popad;
 			pProcessEvent(pCaller, pFunction, pParms, pResult);
 			return;
 		}
@@ -48,29 +47,10 @@ namespace BL2SDK
 		if(!EngineHooks::ProcessHooks(pCaller, pFunction, pParms, pResult))
 		{
 			// The engine hook manager told us not to pass this function to the engine
-			_asm popad;
 			return;
 		}
 		
-		_asm popad;
 		pProcessEvent(pCaller, pFunction, pParms, pResult);
-		return;
-	}
-
-	void __declspec(naked) hkRawProcessEvent()
-	{
-		__asm
-		{
-			push ebp
-			mov ebp, esp
-			push [ebp+16]
-			push [ebp+12]
-			push [ebp+8]
-			push ecx
-			call hkProcessEvent
-			pop ebp
-			retn 12
-		}
 	}
 
 	void InjectedCallNext()
@@ -175,7 +155,7 @@ namespace BL2SDK
 		Logging::LogF("[Internal] Unreal Crash handler = 0x%X\n", addrUnrealEH);
 
 		// Detour UObject::ProcessEvent()
-		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkRawProcessEvent);
+		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkProcessEvent);
 		detProcessEvent.Attach();
 
 		// Detour Unreal exception handler

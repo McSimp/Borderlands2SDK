@@ -8,15 +8,6 @@
 
 namespace BL2SDK
 {
-	typedef PVOID (WINAPI* tAVEH) (ULONG, PVECTORED_EXCEPTION_HANDLER);
-	tAVEH pAddVectoredExceptionHandler = AddVectoredExceptionHandler;
-
-	PVOID WINAPI hkAVEH(ULONG FirstHandler, PVECTORED_EXCEPTION_HANDLER VectoredHandler)
-	{
-		Logging::LogF("[AntiDebug] AddVectoredExceptionHandler called (%d, 0x%X)\n", FirstHandler, VectoredHandler);
-		return NULL;
-	}
-
 	typedef NTSTATUS (WINAPI* tNtSIT) (HANDLE, THREAD_INFORMATION_CLASS, PVOID, ULONG);
 	tNtSIT pNtSetInformationThread = NULL;
 
@@ -55,10 +46,6 @@ namespace BL2SDK
 
 	void HookAntiDebug()
 	{
-		SETUP_SIMPLE_DETOUR(detAVEH, pAddVectoredExceptionHandler, hkAVEH);
-		detAVEH.Attach();
-		Logging::Log("[AntiDebug] Hook added for AddVectoredExceptionHandler\n");
-
 		pNtSetInformationThread = (tNtSIT)GetProcAddress(GetModuleHandle(L"ntdll.dll"), "NtSetInformationThread"); // TODO: Error handling
 		SETUP_SIMPLE_DETOUR(detNtSIT, pNtSetInformationThread, hkNtSetInformationThread);
 		detNtSIT.Attach();
