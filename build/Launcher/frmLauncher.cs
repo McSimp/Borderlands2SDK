@@ -247,5 +247,10 @@ namespace Launcher
         {
             disableAntiDebugToolStripMenuItem.Checked = !disableAntiDebugToolStripMenuItem.Checked;
         }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("http://mcsi.mp/bl2/about/");
+        }
     }
 }
