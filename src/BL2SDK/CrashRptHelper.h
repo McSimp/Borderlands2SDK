@@ -7,7 +7,7 @@ namespace CrashRptHelper
 	bool Initialize();
 	void Cleanup();
 	//int InstallThread();
-	void SoftCrash();
+	void SoftCrash(int code);
 	bool GenerateReport(unsigned int code, PEXCEPTION_POINTERS ep);
 }
 

@@ -130,6 +130,11 @@ namespace Launcher
                 {
                     continue;
                 }
+
+                if(disableAntiDebugToolStripMenuItem.Checked) // Since they want to disable the game's anti-debug code, they probably want to attach a debugger...
+                {
+                    MessageBox.Show("You can attach a debugger to the game now. Click OK when you're ready.", "Attach Debugger", MessageBoxButtons.OK);
+                }
            
                 // We have found the process, so we can inject into it
                 try

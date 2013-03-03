@@ -128,7 +128,7 @@ namespace CrashRptHelper
 	}
 	*/
 
-	void SoftCrash()
+	void SoftCrash(int code = 0)
 	{
 		if(!crashRptReady)
 		{
@@ -138,7 +138,8 @@ namespace CrashRptHelper
 		CR_EXCEPTION_INFO ei;
 		memset(&ei, 0, sizeof(CR_EXCEPTION_INFO));
 		ei.cb = sizeof(CR_EXCEPTION_INFO);
-		ei.exctype = CR_CPP_SIGTERM;
+		ei.exctype = CR_SEH_EXCEPTION;
+		ei.code = code;
 		ei.bManual = true;
 		if(pcrGenerateErrorReport(&ei) != 0)
 		{

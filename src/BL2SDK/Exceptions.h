@@ -15,6 +15,11 @@ public:
 		m_errorCode(errorCode)
 	{
 	}
+
+	int GetErrorCode()
+	{
+		return m_errorCode;
+	}
 };
 
 #endif

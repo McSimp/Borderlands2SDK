@@ -128,7 +128,8 @@ extern "C" __declspec(dllexport) DWORD InitializeSDK(LPVOID lpParameter)
 	catch(FatalSDKException &ex)
 	{
 		Util::Popup(L"SDK Error", Util::Widen(ex.what()));
-		CrashRptHelper::SoftCrash();
+		Logging::LogF("[ERROR] FatalSDKException(%d): %s\n", ex.GetErrorCode(), ex.what());
+		CrashRptHelper::SoftCrash(ex.GetErrorCode());
 	}
 
 	return 0;
