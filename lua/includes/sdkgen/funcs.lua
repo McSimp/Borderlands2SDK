@@ -37,7 +37,9 @@ local function ProcessRetval(field)
 	if not propData then return "" end
 	local propType = SDKGen.GetPropertyType(field)
 
-	if not propData.basic then -- not basic means it's cdata
+	-- not basic means it's cdata, and not doNotCopy means that it's cdata, but a pointer
+	-- so it doesn't need to be cloned.
+	if not propData.basic and not propData.doNotCopy then
 		text = text .. string.format("\t\t\t\tcType = ffi.typeof(%q),\n", propType)
 	end
 
