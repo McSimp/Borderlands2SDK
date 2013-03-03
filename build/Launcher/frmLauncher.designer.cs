@@ -34,9 +34,10 @@
             this.txtGamePath = new System.Windows.Forms.TextBox();
             this.btnLaunch = new System.Windows.Forms.Button();
             this.msMenu = new System.Windows.Forms.MenuStrip();
-            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.disableAntiDebugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.logAllEventsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gbGamePath.SuspendLayout();
             this.msMenu.SuspendLayout();
             this.SuspendLayout();
@@ -96,17 +97,11 @@
             this.msMenu.TabIndex = 0;
             this.msMenu.Text = "msMenu";
             // 
-            // aboutToolStripMenuItem
-            // 
-            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
-            this.aboutToolStripMenuItem.Text = "About";
-            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-            // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.disableAntiDebugToolStripMenuItem});
+            this.disableAntiDebugToolStripMenuItem,
+            this.logAllEventsToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "Options";
@@ -118,6 +113,21 @@
             this.disableAntiDebugToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
             this.disableAntiDebugToolStripMenuItem.Text = "Disable Anti-Debug";
             this.disableAntiDebugToolStripMenuItem.Click += new System.EventHandler(this.disableAntiDebugToolStripMenuItem_Click);
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
+            this.aboutToolStripMenuItem.Text = "About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            // 
+            // logAllEventsToolStripMenuItem
+            // 
+            this.logAllEventsToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("logAllEventsToolStripMenuItem.Image")));
+            this.logAllEventsToolStripMenuItem.Name = "logAllEventsToolStripMenuItem";
+            this.logAllEventsToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.logAllEventsToolStripMenuItem.Text = "Log all events";
+            this.logAllEventsToolStripMenuItem.Click += new System.EventHandler(this.logAllEventsToolStripMenuItem_Click);
             // 
             // frmLauncher
             // 
@@ -154,6 +164,7 @@
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem disableAntiDebugToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem logAllEventsToolStripMenuItem;
     }
 }
 

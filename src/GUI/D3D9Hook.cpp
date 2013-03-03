@@ -65,7 +65,7 @@ namespace D3D9Hook
 		
 		Logging::Log("[DirectX Hooking] EndScene hooked successfully\n");
 
-		GwenManager::Initialize(pD3DDev);
+		GwenManager::InitializeRenderer(pD3DDev);
 
 		return result;
 	}

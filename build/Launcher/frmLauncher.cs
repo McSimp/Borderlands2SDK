@@ -111,7 +111,10 @@ namespace Launcher
         [StructLayout(LayoutKind.Sequential)]
         struct SettingsStruct
         {
+            [MarshalAs(UnmanagedType.I1)]
             public bool DisableAntiDebug;
+            [MarshalAs(UnmanagedType.I1)]
+            public bool LogAllEvents;
             [CustomMarshalAs(CustomUnmanagedType.LPWStr)]
             public string BinPath;
         }
@@ -145,6 +148,7 @@ namespace Launcher
                     SettingsStruct arg = new SettingsStruct() 
                     {
                         DisableAntiDebug = disableAntiDebugToolStripMenuItem.Checked,
+                        LogAllEvents = logAllEventsToolStripMenuItem.Checked,
                         BinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\"
                     };
                     syringe.CallExport("BL2SDKDLL.dll", "InitializeSDK", arg);
@@ -251,6 +255,11 @@ namespace Launcher
         private void disableAntiDebugToolStripMenuItem_Click(object sender, EventArgs e)
         {
             disableAntiDebugToolStripMenuItem.Checked = !disableAntiDebugToolStripMenuItem.Checked;
+        }
+
+        private void logAllEventsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            logAllEventsToolStripMenuItem.Checked = !logAllEventsToolStripMenuItem.Checked;
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)

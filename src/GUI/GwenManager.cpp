@@ -6,6 +6,7 @@
 #include "Gwen/UnitTest/UnitTest.h"
 #include "Gwen/Input/Windows.h"
 #include "Gwen/Renderers/DirectX9.h"
+#include "BL2SDK/Settings.h"
 
 namespace GwenManager
 {
@@ -13,21 +14,28 @@ namespace GwenManager
 	Gwen::Skin::TexturedBase* pSkin = NULL;
 	Gwen::Controls::Canvas* pCanvas = NULL;
 
-	bool Initialize(IDirect3DDevice9* pD3DDev)
+	void InitializeRenderer(IDirect3DDevice9* pD3DDev)
 	{
-		Logging::Log("[Gwen] Initializing...\n");
+		if(pRenderer) delete pRenderer;
+		if(pSkin) delete pSkin;
+
+		Logging::Log("[Gwen] Initializing Renderer\n");
 		pRenderer = new Gwen::Renderer::DirectX9(pD3DDev);
 
 		pSkin = new Gwen::Skin::TexturedBase(pRenderer);
-		pSkin->Init("DefaultSkin.png"); // TODO: Load from GWEN location in registry
+		pSkin->Init(Settings::GetBinFile(L"DefaultSkin.png"));
+	}
 
+	void CreateCanvas(int x, int y)
+	{
+		if(pCanvas) delete pCanvas;
+
+		Logging::LogF("[Gwen] Creating canvas (%dx%d)\n", x, y);
 		pCanvas = new Gwen::Controls::Canvas(pSkin);
-		pCanvas->SetSize(1024, 768); // TODO: Set Size dynamically
-		//pCanvas->SetDrawBackground(true);
-		//pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 255));
+		pCanvas->SetSize(x, y);
 
-		Logging::Log("[Gwen] Ready\n");
-		return true;
+		//pCanvas->SetDrawBackground(true);
+		//pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 100));
 	}
 
 	void OnEndScene()

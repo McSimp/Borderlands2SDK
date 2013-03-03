@@ -11,6 +11,7 @@
 #include "LuaInterface/LuaManager.h"
 #include "BL2SDK/Exceptions.h"
 #include "BL2SDK/AntiDebug.h"
+#include "GUI/GwenManager.h"
 
 namespace BL2SDK
 {
@@ -163,13 +164,25 @@ namespace BL2SDK
 		detUnrealEH.Attach();
 	}
 
+	// This function is used to get the dimensions of the game window for Gwen's renderer
+	bool GetCanvasPostRender(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
+	{
+		UGameViewportClient_eventPostRender_Parms* realParms = reinterpret_cast<UGameViewportClient_eventPostRender_Parms*>(pParms);
+		UCanvas* pCanvas = realParms->Canvas;
+
+		GwenManager::CreateCanvas(pCanvas->SizeX, pCanvas->SizeY);
+
+		EngineHooks::RemoveStaticHook(pFunction, "GetCanvas");
+		return true;
+	}
+
 	// This function is used to ensure that everything gets called in the game thread once the game itself has loaded
 	bool GameReady(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult) 
 	{
 		Logging::LogF("[GameReady] Thread: %i\n", GetCurrentThreadId());
-	
+
 		Logging::InitializeExtern();
-		Logging::InitializeGameConsole();
+		//Logging::InitializeGameConsole();
 		Logging::PrintLogHeader();
 	
 		LuaManager::Initialize();
@@ -177,6 +190,8 @@ namespace BL2SDK
 		ConCmdManager::Initialize();
 
 		EngineHooks::RemoveStaticHook(pFunction, "StartupSDK");
+
+		EngineHooks::Register("Function WillowGame.WillowGameViewportClient.PostRender", "GetCanvas", &GetCanvasPostRender);
 		return true;
 	}
 
@@ -187,14 +202,15 @@ namespace BL2SDK
 		Logging::InitializeFile(Settings::GetLogFilePath());
 		Logging::Log("[Internal] Launching SDK...\n");
 
+		CrashRptHelper::Initialize();
+
 		if(args->DisableAntiDebug)
 		{
 			HookAntiDebug();
 		}
 
-		CrashRptHelper::Initialize();
-
 		HookGame();
+		LogAllEvents(args->LogAllEvents);
 
 		D3D9Hook::Initialize();
 

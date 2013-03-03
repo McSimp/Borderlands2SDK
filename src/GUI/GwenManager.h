@@ -5,7 +5,8 @@
 
 namespace GwenManager
 {
-	bool Initialize(IDirect3DDevice9* pD3DDev);
+	void InitializeRenderer(IDirect3DDevice9* pD3DDev);
+	void CreateCanvas(int x, int y);
 	void OnEndScene();
 }
 
