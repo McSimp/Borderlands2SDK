@@ -100,6 +100,7 @@
     <ClCompile Include="..\..\src\BL2SDK\CrashRptHelper.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\CSigScan.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\EngineHooks.cpp" />
+    <ClCompile Include="..\..\src\BL2SDK\Logging.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Settings.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Util.cpp" />
     <ClCompile Include="..\..\src\Commands\ConCommand.cpp" />
@@ -112,7 +113,6 @@
     <ClCompile Include="..\..\src\GUI\D3D9Hook.cpp" />
     <ClCompile Include="..\..\src\GUI\DirectX9.cpp" />
     <ClCompile Include="..\..\src\GUI\GwenManager.cpp" />
-    <ClCompile Include="..\..\src\Logging\Logging.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\CLuaInterface.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\CLuaObject.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\LuaManager.cpp" />
@@ -125,6 +125,7 @@
     <ClInclude Include="..\..\src\BL2SDK\CSigScan.h" />
     <ClInclude Include="..\..\src\BL2SDK\EngineHooks.h" />
     <ClInclude Include="..\..\src\BL2SDK\Exceptions.h" />
+    <ClInclude Include="..\..\src\BL2SDK\Logging.h" />
     <ClInclude Include="..\..\src\BL2SDK\Settings.h" />
     <ClInclude Include="..\..\src\BL2SDK\Util.h" />
     <ClInclude Include="..\..\src\Commands\ConCommand.h" />
@@ -144,7 +145,6 @@
     <ClInclude Include="..\..\src\GameSDK\GameSDK.h" />
     <ClInclude Include="..\..\src\GUI\D3D9Hook.h" />
     <ClInclude Include="..\..\src\GUI\GwenManager.h" />
-    <ClInclude Include="..\..\src\Logging\Logging.h" />
     <ClInclude Include="..\..\src\LuaInterface\CLuaInterface.h" />
     <ClInclude Include="..\..\src\LuaInterface\CLuaObject.h" />
     <ClInclude Include="..\..\src\LuaInterface\ILuaTable.h" />

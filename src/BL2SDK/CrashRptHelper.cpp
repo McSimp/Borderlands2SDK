@@ -1,7 +1,7 @@
 #include "BL2SDK/BL2SDK.h"
 #include "BL2SDK/CrashRptHelper.h"
 #include "BL2SDK/Settings.h"
-#include "Logging/Logging.h"
+#include "BL2SDK/Logging.h"
 #include "BL2SDK/Util.h"
 
 // Am I a horrible person for using this?

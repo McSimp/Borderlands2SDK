@@ -1,6 +1,6 @@
 #include "BL2SDK/BL2SDK.h"
 #include "BL2SDK/CSimpleDetour.h"
-#include "Logging/Logging.h"
+#include "BL2SDK/Logging.h"
 
 #include <winternl.h>
 #define STATUS_SUCCESS ((NTSTATUS)0x00000000L)

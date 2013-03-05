@@ -1,5 +1,5 @@
 #include "BL2SDK/EngineHooks.h"
-#include "Logging/Logging.h"
+#include "BL2SDK/Logging.h"
 #include <map>
 
 namespace EngineHooks

@@ -1,6 +1,6 @@
 #include "GUI/D3D9Hook.h"
 #include "GUI/GwenManager.h"
-#include "Logging/Logging.h"
+#include "BL2SDK/Logging.h"
 #include "BL2SDK/Exceptions.h"
 #include "BL2SDK/Util.h"
 #include <d3d9.h>

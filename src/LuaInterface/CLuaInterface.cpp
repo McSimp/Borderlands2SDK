@@ -1,7 +1,7 @@
 // This file is based on garry's implementation as well as BlackAwps' backwards headers
 #include "LuaInterface/CLuaInterface.h"
 #include "LuaInterface/UserData.h"
-#include "Logging/Logging.h"
+#include "BL2SDK/Logging.h"
 #include "BL2SDK/Settings.h"
 #include "BL2SDK/Util.h"
 #include "LuaInterface/LuaManager.h"

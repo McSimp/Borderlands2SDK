@@ -1,5 +1,5 @@
 #include "LuaInterface/LuaManager.h"
-#include "Logging/Logging.h"
+#include "BL2SDK/Logging.h"
 #include "Commands/ConCommand.h"
 
 namespace LuaManager

@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Logging">
-      <UniqueIdentifier>{4072eddc-3f0c-4bac-b2d3-e90bae5ba6d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Logging">
-      <UniqueIdentifier>{845e7694-df46-444f-b2a8-57f0e581c558}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\GameSDK">
       <UniqueIdentifier>{4ef315b5-b08b-4c21-84c0-d34735521771}</UniqueIdentifier>
     </Filter>
@@ -60,9 +54,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\Logging\Logging.cpp">
-      <Filter>Source Files\Logging</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\GameSDK\Core_functions.cpp">
       <Filter>Source Files\GameSDK</Filter>
     </ClCompile>
@@ -126,11 +117,11 @@
     <ClCompile Include="..\..\src\BL2SDK\AntiDebug.cpp">
       <Filter>Source Files\BL2SDK</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\BL2SDK\Logging.cpp">
+      <Filter>Source Files\BL2SDK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\Logging\Logging.h">
-      <Filter>Header Files\Logging</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\GameSDK\Core_classes.h">
       <Filter>Header Files\GameSDK</Filter>
     </ClInclude>
@@ -237,6 +228,9 @@
       <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\BL2SDK\AntiDebug.h">
+      <Filter>Header Files\BL2SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BL2SDK\Logging.h">
       <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
   </ItemGroup>

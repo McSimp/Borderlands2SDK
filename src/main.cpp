@@ -1,7 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include "BL2SDK/BL2SDK.h"
-#include "Logging/Logging.h"
+#include "BL2SDK/Logging.h"
 #include "Commands/ConCommand.h"
 #include "BL2SDK/CrashRptHelper.h"
 #include "BL2SDK/Util.h"

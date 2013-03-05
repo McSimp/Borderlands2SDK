@@ -1,5 +1,5 @@
 #include "GUI/GwenManager.h"
-#include "Logging/Logging.h"
+#include "BL2SDK/Logging.h"
 #include "Gwen/Gwen.h"
 #include "Gwen/Skins/Simple.h"
 #include "Gwen/Skins/TexturedBase.h"

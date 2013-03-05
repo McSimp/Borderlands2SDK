@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "BL2SDK/BL2SDK.h"
-#include "Logging/Logging.h"
+#include "BL2SDK/Logging.h"
 #include "BL2SDK/Util.h"
 #include "BL2SDK/Exceptions.h"
 

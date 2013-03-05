@@ -1,5 +1,5 @@
 #include "BL2SDK/BL2SDK.h"
-#include "Logging/Logging.h"
+#include "BL2SDK/Logging.h"
 #include "Commands/ConCmdManager.h"
 #include "Commands/ConCommand.h"
 #include "LuaInterface/LuaManager.h"
