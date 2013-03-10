@@ -249,6 +249,8 @@ local LOADER_TEMPLATE =
 
 include("TArrayTypes.lua")
 
+profiling.TrackMemory("loadsdk", "Loading everything")
+
 for _,pkg in ipairs(packages) do
 	profiling.TrackMemory("loadpackage", "Loading " .. pkg)
 	include("consts/" .. pkg .. ".lua")
@@ -258,6 +260,8 @@ for _,pkg in ipairs(packages) do
 	include("funcs/" .. pkg .. ".lua")
 	profiling.GetMemoryUsage("loadpackage")
 end
+
+profiling.GetMemoryUsage("loadsdk")
 
 print("[SDKGen] Generated SDK loaded")
 ]]

@@ -165,7 +165,7 @@ namespace EngineHooks
 		tFuncNameHookPair hookPair = std::make_pair(hookName, funcHook);
 
 		// Find func
-		UFunction* pFunction = UObject::FindObject<UFunction>((char*)funcName.c_str());
+		UFunction* pFunction = UObject::FindObject<UFunction>(funcName.c_str());
 		if(pFunction == NULL)
 		{
 			// The function was not found, so we need to create a virtual hook for it
@@ -184,7 +184,7 @@ namespace EngineHooks
 
 	bool Remove(const std::string& funcName, const std::string& hookName)
 	{
-		UFunction* pFunction = UObject::FindObject<UFunction>((char*)funcName.c_str());
+		UFunction* pFunction = UObject::FindObject<UFunction>(funcName.c_str());
 		if(pFunction == NULL)
 		{
 			// Function wasn't found, so virtual hook removal time!
@@ -199,6 +199,18 @@ namespace EngineHooks
 			// will keep the virtual hook, and we won't delete it here.
 			return RemoveStaticHook(pFunction, hookName);
 		}
+	}
+
+	extern "C" __declspec(dllexport) int LUAFUNC_HookFunction(const char* funcName, tProcessEventHook* funcHook)
+	{
+		Register(funcName, "LuaHook", funcHook);
+		return 1;
+	}
+
+	extern "C" __declspec(dllexport) int LUAFUNC_RemoveHook(const char* funcName)
+	{
+		Remove(funcName, "LuaHook");
+		return 1;
 	}
 }
 

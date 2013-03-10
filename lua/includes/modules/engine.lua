@@ -19,6 +19,7 @@ local type = type
 local tostring = tostring
 local setmetatable = setmetatable
 local ipairs = ipairs
+local pairs = pairs
 
 module("engine")
 
@@ -35,6 +36,7 @@ local pProcessEvent = ffi.cast("tProcessEvent", 0x65C820)
 
 _ClassesInternal = {}
 Classes = {}
+_FuncsInternal = {}
 local BaseObjFuncs = UObject.BaseFuncs
 
 local TArrayMT = TArray.BaseMT
@@ -157,6 +159,7 @@ function CallFunc(funcData, obj, ...)
 
 	-- Call func
 	local func = funcData.ptr
+	-- TODO: This is not the right approach, do some RE of ProcessEvent in the engine
 	func.UFunction.FunctionFlags = bit.bor(func.UFunction.FunctionFlags, bit.bnot(0x400))
 	
 	local native = func.UFunction.iNative
@@ -231,11 +234,26 @@ end
 local UObjectDataMT = { __index = NilIndex }
 local UObjectMT = { __index = UObjectIndex }
 
+local function InitializeFunctions(funcsTable)
+	-- Foreach function, get its pointer and add it to the _FuncsInternal map
+	local count = 0
+	for _,funcData in pairs(funcsTable) do -- NOOO NOT PAIRS
+		funcData.ptr = ffi.cast("struct UFunction*", Objects:Get(funcData.index))
+		funcData.index = nil
+		_FuncsInternal[PtrToNum(funcData.ptr)] = funcData
+		count = count + 1
+	end
+
+	return count
+end
+
 local function InitializeClasses()
 	for i=1,#g_loadedClasses do
 		ffi.metatype("struct " .. g_loadedClasses[i][1], UObjectMT) -- Everything is a UObject, so set its MT on everything
 		ffi.metatype("struct " .. g_loadedClasses[i][1] .. "_Data", UObjectDataMT) -- Makes the _Data types return nil
 	end
+
+	local funcCount = 0
 
 	for i=1,#g_loadedClasses do
 		local class = g_loadedClasses[i] -- 1 = name, 2 = Full Name, 3 = Base name
@@ -259,11 +277,15 @@ local function InitializeClasses()
 
 		_ClassesInternal[PtrToNum(members.static)] = members
 		Classes[class[1]] = members
+
+		funcCount = funcCount + InitializeFunctions(members.funcs)
 	end
 
 	print(string.format("[Lua] %d classes initialized", #g_loadedClasses))
+	print(string.format("[Lua] %d functions initialized", funcCount))
 
 	g_loadedClasses = nil
+	g_classFuncs = nil
 end
 
 local function InitializeTArrays()

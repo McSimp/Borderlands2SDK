@@ -158,7 +158,25 @@ function Benchmark2()
 	print(string.format("%.3f = %d", elapsed, sum))
 end
 
+--[[
 print(bit.band(0x80, 0x100))
 if bit.band(0x400880, 0x100) then
 	print("LOLOOLL")
 end
+]]
+
+function TestCallback(pObject, pFunction, pParms, pResult)
+	print("Got called: " .. pFunction:GetName())
+	print(#engine._FuncsInternal[PtrToNum(pFunction)].args)
+	
+	ffi.C.LUAFUNC_RemoveHook("Function WillowGame.WillowGameViewportClient.PostRender")
+	return true
+end
+
+ffi.cdef[[
+typedef bool (tProcessEventHook) (struct UObject*, struct UFunction*, void*, void*);
+int LUAFUNC_HookFunction(const char* funcName, tProcessEventHook* funcHook);
+int LUAFUNC_RemoveHook(const char* funcName);
+]]
+
+ffi.C.LUAFUNC_HookFunction("Function WillowGame.WillowGameViewportClient.PostRender", TestCallback)
