@@ -152,9 +152,10 @@ function CallFunc(funcData, obj, ...)
 	--end
 
 	-- Have we got a pointer?
-	if not funcData.ptr then
-		funcData.ptr = ffi.cast("struct UFunction*", Objects:Get(funcData.index))
-		funcData.index = nil
+	if not funcData.ptr or funcData.ptr == nil then
+		error("Function does not have a valid pointer")
+		--funcData.ptr = ffi.cast("struct UFunction*", Objects:Get(funcData.index))
+		--funcData.index = nil
 	end
 
 	-- Call func

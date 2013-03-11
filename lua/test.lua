@@ -165,18 +165,75 @@ if bit.band(0x400880, 0x100) then
 end
 ]]
 
+local pc = engine.FindObject("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
+local time = 1/40
+
+function DebugHook(type)
+	local info = debug.getinfo(2,"nS")
+
+	--print(info.short_src .. ":" .. line)
+	print(info.short_src .. ":" .. info.linedefined)
+end
+
+function MyHook(pCanvas)
+	print("Getting target")
+	local target = pc.Pawn.WorldInfo.PawnList
+	print(target)
+	while NotNull(target) do
+		print("Target iter")
+		print(target:GetName())
+		if not target.bDeleteMe and target ~= pc.Pawn then
+			print("passed check")
+			pc:DrawDebugBox(target.Location,target.Mesh.Bounds.BoxExtent,0,255,0,false,time)
+			print("func called")
+		end
+		target = target.NextPawn
+		print("next pawn")
+	end
+
+	return true
+end
+
+function GetArg(arg, pParms)
+	local field = ffi.cast(arg.castTo, pParms + arg.offset)
+	print(arg.castTo, arg.offset, pParms, field)
+
+	return field[0]
+	--return true
+end
+
+function CallFuncHook(pObject, pFunction, pParms, pResult)
+	print("Func hook called")
+	--debug.sethook(DebugHook, "c")
+	local args = engine._FuncsInternal[PtrToNum(pFunction)].args
+
+	local argData = {}
+	for i=1,#args do
+		print("Getting arg")
+		table.insert(argData, GetArg(args[i], pParms))
+	end
+
+	print("Calling myhook with the shit")
+	MyHook(unpack(argData))
+
+	print("Unhookinh")
+	ffi.C.LUAFUNC_RemoveHook("Function WillowGame.WillowGameViewportClient.PostRender")
+
+	--debug.sethook()
+	return true
+end
+
 function TestCallback(pObject, pFunction, pParms, pResult)
 	print("Got called: " .. pFunction:GetName())
 	print(#engine._FuncsInternal[PtrToNum(pFunction)].args)
-	
+
 	ffi.C.LUAFUNC_RemoveHook("Function WillowGame.WillowGameViewportClient.PostRender")
 	return true
 end
 
 ffi.cdef[[
-typedef bool (tProcessEventHook) (struct UObject*, struct UFunction*, void*, void*);
+typedef bool (tProcessEventHook) (struct UObject*, struct UFunction*, char*, void*);
 int LUAFUNC_HookFunction(const char* funcName, tProcessEventHook* funcHook);
 int LUAFUNC_RemoveHook(const char* funcName);
 ]]
-
-ffi.C.LUAFUNC_HookFunction("Function WillowGame.WillowGameViewportClient.PostRender", TestCallback)
+ffi.C.LUAFUNC_HookFunction("Function WillowGame.WillowGameViewportClient.PostRender", CallFuncHook)

@@ -115,6 +115,8 @@ namespace Launcher
             public bool DisableAntiDebug;
             [MarshalAs(UnmanagedType.I1)]
             public bool LogAllEvents;
+            [MarshalAs(UnmanagedType.I1)]
+            public bool DisableCrashRpt;
             [CustomMarshalAs(CustomUnmanagedType.LPWStr)]
             public string BinPath;
         }
@@ -149,6 +151,7 @@ namespace Launcher
                     {
                         DisableAntiDebug = disableAntiDebugToolStripMenuItem.Checked,
                         LogAllEvents = logAllEventsToolStripMenuItem.Checked,
+                        DisableCrashRpt = disableCrashReportingToolStripMenuItem.Checked,
                         BinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\"
                     };
                     syringe.CallExport("BL2SDKDLL.dll", "InitializeSDK", arg);
@@ -265,6 +268,11 @@ namespace Launcher
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Process.Start("http://mcsi.mp/bl2/about/");
+        }
+
+        private void disableCrashReportingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            disableCrashReportingToolStripMenuItem.Checked = !disableCrashReportingToolStripMenuItem.Checked;
         }
     }
 }
