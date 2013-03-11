@@ -104,18 +104,18 @@ ffi.cdef[[
 		struct UField_Data 		UField;
 		struct UStruct_Data 	UStruct;
 		struct UFunction_Data 	UFunction;
-	}
+	};
 
 	struct UState_Data {
 		unsigned char Unknown[0x44];
-	}
+	};
 
 	struct UState {
 		struct UObject_Data 	UObject;
 		struct UField_Data 		UField;
 		struct UStruct_Data 	UStruct;
 		struct UState_Data 		UState;
-	}
+	};
 
 	struct UClass_Data {
 		unsigned char Unknown[0x100];

@@ -166,7 +166,10 @@ end
 ]]
 
 local pc = engine.FindObject("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
-local time = 1/40
+LocalPlayer = pc
+pc = ffi.cast("struct AWillowPlayerController*", pc)
+--local time = 1/40
+local time = 2
 
 function DebugHook(type)
 	local info = debug.getinfo(2,"nS")
@@ -175,20 +178,33 @@ function DebugHook(type)
 	print(info.short_src .. ":" .. info.linedefined)
 end
 
-function MyHook(pCanvas)
-	print("Getting target")
-	local target = pc.Pawn.WorldInfo.PawnList
-	print(target)
+-- l print(LocalPlayer.Pawn.WorldInfo.PawnList.Mesh.Bounds.BoxExtent)
+
+function MyHook()
+	local target = pc.AController.Pawn.AActor.WorldInfo.AWorldInfo.PawnList
 	while NotNull(target) do
-		print("Target iter")
-		print(target:GetName())
+		if not target.AActor.bDeleteMe and target ~= pc.AController.Pawn then
+			local extent = target.APawn.Mesh.UPrimitiveComponent.Bounds.BoxExtent
+			local location = target.AActor.Location
+			
+			pc:DrawDebugBox(location, extent, 0, 255, 0, false)
+		end
+		target = target.APawn.NextPawn
+	end
+
+	return true
+end
+
+function MyHook2()
+	local target = pc.Pawn.WorldInfo.PawnList
+	while NotNull(target) do
 		if not target.bDeleteMe and target ~= pc.Pawn then
-			print("passed check")
-			pc:DrawDebugBox(target.Location,target.Mesh.Bounds.BoxExtent,0,255,0,false,time)
-			print("func called")
+			local extent = target.Mesh.Bounds.BoxExtent
+			local location = target.Location
+			
+			pc:DrawDebugBox(location, extent, 0, 255, 0, false)
 		end
 		target = target.NextPawn
-		print("next pawn")
 	end
 
 	return true
@@ -196,28 +212,28 @@ end
 
 function GetArg(arg, pParms)
 	local field = ffi.cast(arg.castTo, pParms + arg.offset)
-	print(arg.castTo, arg.offset, pParms, field)
+	--print(arg.castTo, arg.offset, pParms, field)
 
 	return field[0]
 	--return true
 end
 
 function CallFuncHook(pObject, pFunction, pParms, pResult)
-	print("Func hook called")
+	--print("Func hook called")
 	--debug.sethook(DebugHook, "c")
 	local args = engine._FuncsInternal[PtrToNum(pFunction)].args
 
 	local argData = {}
 	for i=1,#args do
-		print("Getting arg")
+		--print("Getting arg")
 		table.insert(argData, GetArg(args[i], pParms))
 	end
 
-	print("Calling myhook with the shit")
-	MyHook(unpack(argData))
+	--print("Calling myhook with the shit")
+	MyHook2(unpack(argData))
 
-	print("Unhookinh")
-	ffi.C.LUAFUNC_RemoveHook("Function WillowGame.WillowGameViewportClient.PostRender")
+	--print("Unhookinh")
+	--ffi.C.LUAFUNC_RemoveHook("Function WillowGame.WillowGameViewportClient.PostRender")
 
 	--debug.sethook()
 	return true
@@ -237,3 +253,10 @@ int LUAFUNC_HookFunction(const char* funcName, tProcessEventHook* funcHook);
 int LUAFUNC_RemoveHook(const char* funcName);
 ]]
 ffi.C.LUAFUNC_HookFunction("Function WillowGame.WillowGameViewportClient.PostRender", CallFuncHook)
+
+function RemoveHook()
+	ffi.C.LUAFUNC_RemoveHook("Function WillowGame.WillowGameViewportClient.PostRender")
+end
+
+--MyHook(nil)
+-- l print(engine._ClassesInternal[PtrToNum(LocalPlayer.UObject.Class)])

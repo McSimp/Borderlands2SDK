@@ -20,6 +20,7 @@ local tostring = tostring
 local setmetatable = setmetatable
 local ipairs = ipairs
 local pairs = pairs
+local jit = jit
 
 module("engine")
 
@@ -105,8 +106,10 @@ function GetObjectHash(objName)
 	return bit.band(bit.bxor(objName.Index, objName.Number), OBJECT_HASH_BINS - 1)
 end
 
+local NO_MEMBER = 1471815114
 local function NilIndex()
-	return nil
+	--return nil
+	return NO_MEMBER
 end
 
 local function GetReturn(retVal, pParamBlockBase)
@@ -166,7 +169,7 @@ function CallFunc(funcData, obj, ...)
 	local native = func.UFunction.iNative
 	func.UFunction.iNative = 0
 
-	pProcessEvent(obj, func, paramBlock, nil)
+	pProcessEvent(ffi.cast("struct UObject*", obj), func, paramBlock, nil)
 
 	func.UFunction.iNative = native
 
@@ -188,9 +191,13 @@ end
 
 local FuncMT = { __call = CallFunc }
 
+LogObjectIndex = false
+
 local function UObjectIndex(self, k)
 	-- First check the base functions
 	if BaseObjFuncs[k] ~= nil then return BaseObjFuncs[k] end
+
+	if LogObjectIndex then print("Calling object index", self, k) end
 
 	-- Get the actual class information for this object
 	local classInfo = _ClassesInternal[PtrToNum(self.UObject.Class)]
@@ -205,20 +212,27 @@ local function UObjectIndex(self, k)
 	end
 
 	-- Cast this object to the right type
-	self = ffi.cast(classInfo.ptrType, self)
+	local casted = ffi.cast(classInfo.ptrType, self)
+
+	-- Unfortunately, LuaJIT seems to have a problem with 
+	-- casted[base["name"]][k], so I have to turn JIT compilation off.
+	-- TODO: Figure out what exactly the problem is, maybe create a bug report.
+	jit.off()
 
 	-- Since we have casted, check the actual class type first
 	-- Then while this class has a base class, check that.
 	local base = classInfo
 	while base do
-		if self[base["name"]][k] ~= nil then
-			return self[base["name"]][k]
+		if casted[base["name"]][k] ~= NO_MEMBER then
+			return casted[base["name"]][k]
 		elseif base["funcs"][k] ~= nil then
 			return setmetatable(base["funcs"][k], FuncMT)
 		else
 			base = base["base"]
 		end
 	end
+
+	jit.on()
 
 	return nil
 end
