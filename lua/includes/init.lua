@@ -30,6 +30,8 @@ if NeedsSDKGenerated() then
 else
 	include("../sdkgen/loader.lua")
 	engine.Initialize()
+
+	require("engineHook")
 end
 
 jit.v.off()

@@ -231,6 +231,8 @@ local function UObjectIndex(self, k)
 			base = base["base"]
 		end
 	end
+	
+	print("[Lua] Warning: Object index not found", k)
 
 	jit.on()
 

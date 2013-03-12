@@ -201,16 +201,25 @@ namespace EngineHooks
 		}
 	}
 
-	extern "C" __declspec(dllexport) int LUAFUNC_HookFunction(const char* funcName, tProcessEventHook* funcHook)
+	extern "C" __declspec(dllexport) void LUAFUNC_AddHook(const char* funcName, tProcessEventHook* funcHook)
 	{
 		Register(funcName, "LuaHook", funcHook);
-		return 1;
 	}
 
-	extern "C" __declspec(dllexport) int LUAFUNC_RemoveHook(const char* funcName)
+	extern "C" __declspec(dllexport) void LUAFUNC_RemoveHook(const char* funcName)
 	{
 		Remove(funcName, "LuaHook");
-		return 1;
+	}
+
+	extern "C" __declspec(dllexport) void LUAFUNC_AddStaticHook(UFunction* pFunction, tProcessEventHook* funcHook)
+	{
+		tFuncNameHookPair hookPair = std::make_pair("LuaHook", funcHook);
+		AddStaticHook(pFunction, hookPair);
+	}
+
+	extern "C" __declspec(dllexport) void LUAFUNC_RemoveStaticHook(UFunction* pFunction)
+	{
+		RemoveStaticHook(pFunction, "LuaHook");
 	}
 }
 

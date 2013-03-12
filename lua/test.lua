@@ -166,8 +166,8 @@ end
 ]]
 
 local pc = engine.FindObject("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
-LocalPlayer = pc
 pc = ffi.cast("struct AWillowPlayerController*", pc)
+LocalPlayer = pc
 --local time = 1/40
 local time = 2
 
@@ -185,6 +185,7 @@ function MyHook()
 	while NotNull(target) do
 		if not target.AActor.bDeleteMe and target ~= pc.AController.Pawn then
 			local extent = target.APawn.Mesh.UPrimitiveComponent.Bounds.BoxExtent
+			print(extent.X, extent.Y, extent.Z)
 			local location = target.AActor.Location
 			
 			pc:DrawDebugBox(location, extent, 0, 255, 0, false)
@@ -199,10 +200,7 @@ function MyHook2()
 	local target = pc.Pawn.WorldInfo.PawnList
 	while NotNull(target) do
 		if not target.bDeleteMe and target ~= pc.Pawn then
-			local extent = target.Mesh.Bounds.BoxExtent
-			local location = target.Location
-			
-			pc:DrawDebugBox(location, extent, 0, 255, 0, false)
+			pc:DrawDebugBox(target.Location, target.Mesh.Bounds.BoxExtent, 0, 255, 0, false)
 		end
 		target = target.NextPawn
 	end
@@ -248,15 +246,25 @@ function TestCallback(pObject, pFunction, pParms, pResult)
 end
 
 ffi.cdef[[
-typedef bool (tProcessEventHook) (struct UObject*, struct UFunction*, char*, void*);
-int LUAFUNC_HookFunction(const char* funcName, tProcessEventHook* funcHook);
-int LUAFUNC_RemoveHook(const char* funcName);
+//typedef bool (tProcessEventHook) (struct UObject*, struct UFunction*, char*, void*);
+//int LUAFUNC_HookFunction(const char* funcName, tProcessEventHook* funcHook);
+//int LUAFUNC_RemoveHook(const char* funcName);
 ]]
-ffi.C.LUAFUNC_HookFunction("Function WillowGame.WillowGameViewportClient.PostRender", CallFuncHook)
+--[[
+FuncHook = ffi.cast("tProcessEventHook*", CallFuncHook)
+
+function AddHook()
+	ffi.C.LUAFUNC_HookFunction("Function WillowGame.WillowGameViewportClient.PostRender", FuncHook)
+end
 
 function RemoveHook()
 	ffi.C.LUAFUNC_RemoveHook("Function WillowGame.WillowGameViewportClient.PostRender")
+	FuncHook:free()
 end
-
+]]
 --MyHook(nil)
 -- l print(engine._ClassesInternal[PtrToNum(LocalPlayer.UObject.Class)])
+
+function AddHook()
+	engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "Shazbot", MyHook2)
+end

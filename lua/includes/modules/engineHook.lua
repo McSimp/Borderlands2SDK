@@ -1,0 +1,82 @@
+local ffi = require("ffi")
+local engine = engine
+local PtrToNum = PtrToNum
+local table = table
+local type = type
+local print = print
+local error = error
+local unpack = unpack
+local pairs = pairs
+local string = string
+
+ffi.cdef[[
+typedef bool (tProcessEventHook) (struct UObject*, struct UFunction*, char*, void*);
+void LUAFUNC_AddHook(const char* funcName, tProcessEventHook* funcHook);
+void LUAFUNC_RemoveHook(const char* funcName);
+void LUAFUNC_AddStaticHook(struct UFunction* pFunction, tProcessEventHook* funcHook);
+void LUAFUNC_RemoveStaticHook(struct UFunction* pFunction);
+]]
+
+module("engineHook")
+
+RegisteredHooks = {}
+
+local function GetArg(arg, pParms)
+	return ffi.cast(arg.castTo, pParms + arg.offset)[0]
+end
+
+function ProcessHooks(pObject, pFunction, pParms, pResult)
+	local ptrNum = PtrToNum(pFunction)
+	local hookTable = RegisteredHooks[ptrNum]
+
+	if hookTable == nil then
+		print(string.format("[Lua] Warning: ProcessHooks called for %s (0x%X) with no hook table",
+			pFunction:GetName(),
+			ptrNum))
+		return true
+	end
+
+	local args = engine._FuncsInternal[ptrNum].args
+
+	local argData = {}
+	for i=1,#args do
+		table.insert(argData, GetArg(args[i], pParms))
+	end
+
+	for _,v in pairs(hookTable) do
+		v(unpack(argData)) -- TODO: Return value
+	end
+
+	return true
+end
+
+local EngineCallback = ffi.cast("tProcessEventHook*", ProcessHooks)
+
+function Add(funcData, hookName, hookFunc)
+	if type(funcData) ~= "table" then error("Function must be a function data table") end
+	if not funcData.ptr then error("Function has no pointer") end
+	if type(hookName) ~= "string" then error("Hook name must be a string") end
+	if type(hookFunc) ~= "function" then error("Hook function must be a function") end
+
+	local ptrNum = PtrToNum(funcData.ptr)
+	if RegisteredHooks[ptrNum] == nil then
+		RegisteredHooks[ptrNum] = {}
+		ffi.C.LUAFUNC_AddStaticHook(funcData.ptr, EngineCallback)
+	end
+
+	RegisteredHooks[ptrNum][hookName] = hookFunc
+
+	print(string.format("[Lua] Engine Hook added for function at 0x%X", ptrNum))
+end
+
+function Remove(funcData, hookName)
+	if type(funcData) ~= "table" then error("Function must be a function data table") end
+	if not funcData.ptr then error("Function has no pointer") end
+	if type(hookName) ~= "string" then error("Hook name must be a string") end
+
+	local ptrNum = PtrToNum(funcData.ptr)
+	if RegisteredHooks[ptrNum] == nil then error("Hook table for function does not exist") end
+
+	RegisteredHooks[ptrNum][hookName] = nil
+	ffi.C.LUAFUNC_RemoveStaticHook(funcData.ptr) -- TODO: Only remove when last gone
+end
