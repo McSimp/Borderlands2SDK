@@ -266,5 +266,19 @@ end
 -- l print(engine._ClassesInternal[PtrToNum(LocalPlayer.UObject.Class)])
 
 function AddHook()
-	engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "Shazbot", MyHook2)
+	--engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "Shazbot", MyHook2)
+	engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GiveMeBoxes", function(pCanvas)
+		local target = pc.Pawn.WorldInfo.PawnList
+		while NotNull(target) do
+			if not target.bDeleteMe and target ~= pc.Pawn then
+				pc:DrawDebugBox(target.Location, target.Mesh.Bounds.BoxExtent, 0, 255, 0, false)
+			end
+			target = target.NextPawn
+		end
+	end)
 end
+
+function RemoveHook()
+	engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GiveMeBoxes")
+end
+

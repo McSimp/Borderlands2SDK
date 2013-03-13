@@ -75,6 +75,16 @@ function table.find(table, value)
 	return nil
 end
 
+-- Returns the number of elements in a table with any type of key
+function table.count(table)
+	local count = 0
+	for k,v in pairs(table) do
+		count = count + 1
+	end
+
+	return count
+end
+
 local ffi = require("ffi")
 
 local uint_t = ffi.typeof("unsigned int")

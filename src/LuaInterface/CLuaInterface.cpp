@@ -4,6 +4,7 @@
 #include "BL2SDK/Logging.h"
 #include "BL2SDK/Settings.h"
 #include "BL2SDK/Util.h"
+#include "BL2SDK/BL2SDK.h"
 #include "LuaInterface/LuaManager.h"
 #include <algorithm>
 #undef GetObject // FUCKING WINDOWS 98
@@ -101,6 +102,8 @@ CLuaInterface::CLuaInterface()
 	//m_pE = new CLuaObject(this, this->CreateReference());
 
 	//m_pErrorNoHalt = GetGlobal( "ErrorNoHalt" );
+
+	this->SetSDKValues();
 }
 
 // VIRT
@@ -782,4 +785,18 @@ void CLuaInterface::SetPaths()
 
 	pathobj->UnReference();
 	pkg->UnReference();
+}
+
+void CLuaInterface::SetSDKValues()
+{
+	CLuaObject* sdkTable = this->GetNewTable();
+
+	sdkTable->SetMember("addrGNames", static_cast<double>(BL2SDK::GNames()));
+	sdkTable->SetMember("addrGObjects", static_cast<double>(BL2SDK::GObjects()));
+	sdkTable->SetMember("addProcessEvent", static_cast<double>(BL2SDK::addrProcessEvent()));
+	sdkTable->SetMember("addrGObjHash", static_cast<double>(BL2SDK::GObjHash()));
+
+	this->Global()->SetMember("bl2sdk", sdkTable);
+
+	sdkTable->UnReference();
 }

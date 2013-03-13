@@ -146,6 +146,7 @@ public:
 	int				DoFile( const char* filename );
 	int				DoFileAbsolute( const char* path );
 	void			SetPaths();
+	void			SetSDKValues();
 
 private:
 	lua_State*			m_pState;

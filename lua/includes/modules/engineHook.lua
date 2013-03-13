@@ -11,8 +11,6 @@ local string = string
 
 ffi.cdef[[
 typedef bool (tProcessEventHook) (struct UObject*, struct UFunction*, char*, void*);
-void LUAFUNC_AddHook(const char* funcName, tProcessEventHook* funcHook);
-void LUAFUNC_RemoveHook(const char* funcName);
 void LUAFUNC_AddStaticHook(struct UFunction* pFunction, tProcessEventHook* funcHook);
 void LUAFUNC_RemoveStaticHook(struct UFunction* pFunction);
 ]]
@@ -78,5 +76,10 @@ function Remove(funcData, hookName)
 	if RegisteredHooks[ptrNum] == nil then error("Hook table for function does not exist") end
 
 	RegisteredHooks[ptrNum][hookName] = nil
-	ffi.C.LUAFUNC_RemoveStaticHook(funcData.ptr) -- TODO: Only remove when last gone
+	if table.count(RegisteredHooks[ptrNum]) == 0 then
+		ffi.C.LUAFUNC_RemoveStaticHook(funcData.ptr)
+		RegisteredHooks[ptrNum] = nil
+	end
+
+	print(string.format("[Lua] Engine Hook removed for function at 0x%X", ptrNum))
 end

@@ -50,6 +50,8 @@ namespace EngineHooks
 			// Otherwise it's fine, add it into the existing table
 			vHookMap->insert(hookPair); // TODO: Dereference pointer?
 		}
+
+		Logging::LogF("[Engine Hooks] Hook \"%s\" added as virtual hook for \"%s\"\n", hookPair.first.c_str(), funcName.c_str());
 	}
 
 	void AddStaticHook(UFunction* pFunction, tFuncNameHookPair& hookPair)
@@ -67,6 +69,8 @@ namespace EngineHooks
 			// Otherwise it's fine, add it into the existing table
 			hookMap->insert(hookPair); // TODO: Dereference pointer?
 		}
+
+		Logging::LogF("[Engine Hooks] Hook \"%s\" added as static hook for \"%s\"\n", hookPair.first.c_str(), pFunction->GetName());
 	}
 
 	bool RemoveFromTable(tHookMap& hookTable, const std::string& funcName, const std::string& hookName)
@@ -170,15 +174,11 @@ namespace EngineHooks
 		{
 			// The function was not found, so we need to create a virtual hook for it
 			AddVirtualHook(funcName, hookPair);
-
-			Logging::LogF("[Engine Hooks] Hook \"%s\" added as virtual hook for \"%s\"\n", hookName.c_str(), funcName.c_str());
 		}
 		else
 		{
 			// The function WAS found, so we can just hook it straight away
 			AddStaticHook(pFunction, hookPair);
-
-			Logging::LogF("[Engine Hooks] Hook \"%s\" added as static hook for \"%s\"\n", hookName.c_str(), funcName.c_str());
 		}
 	}
 

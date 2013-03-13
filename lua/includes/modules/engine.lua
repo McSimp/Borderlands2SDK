@@ -21,19 +21,20 @@ local setmetatable = setmetatable
 local ipairs = ipairs
 local pairs = pairs
 local jit = jit
+local bl2sdk = bl2sdk
 
 module("engine")
 
 local OBJECT_HASH_BINS = 32*1024
 
-Objects = TArray.Create("struct UObject*", ffi.cast("struct TArray*", 0x19C6DC0))
-Names = TArray.Create("struct FNameEntry*", ffi.cast("struct TArray*", 0x19849E4))
-ObjHash = ffi.cast("struct UObject**", 0x019A6CF8)
+Objects = TArray.Create("struct UObject*", ffi.cast("struct TArray*", bl2sdk.addrGObjects))
+Names = TArray.Create("struct FNameEntry*", ffi.cast("struct TArray*", bl2sdk.addrGNames))
+ObjHash = ffi.cast("struct UObject**", bl2sdk.addrGObjHash)
 
 ffi.cdef[[
 typedef void (__thiscall *tProcessEvent) (struct UObject*, struct UFunction*, void*, void*);
 ]]
-local pProcessEvent = ffi.cast("tProcessEvent", 0x65C820)
+local pProcessEvent = ffi.cast("tProcessEvent", bl2sdk.addrProcessEvent)
 
 _ClassesInternal = {}
 Classes = {}
@@ -252,6 +253,8 @@ local UObjectDataMT = { __index = NilIndex }
 local UObjectMT = { __index = UObjectIndex }
 
 local function InitializeFunctions(funcsTable)
+	if funcsTable == nil then return 0 end
+
 	-- Foreach function, get its pointer and add it to the _FuncsInternal map
 	local count = 0
 	for _,funcData in pairs(funcsTable) do -- NOOO NOT PAIRS

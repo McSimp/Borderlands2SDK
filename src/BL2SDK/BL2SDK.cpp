@@ -20,6 +20,7 @@ namespace BL2SDK
 
 	unsigned long								pGObjects;
 	unsigned long								pGNames;
+	unsigned long								pGObjHash;
 	tProcessEvent								pProcessEvent;
 
 	void __stdcall hkProcessEvent(UFunction* pFunction, void* pParms, void* pResult)
@@ -72,6 +73,16 @@ namespace BL2SDK
 	unsigned long GNames()
 	{
 		return pGNames;
+	}
+
+	unsigned long addrProcessEvent()
+	{
+		return (unsigned long)pProcessEvent;
+	}
+
+	unsigned long GObjHash()
+	{
+		return pGObjHash;
 	}
 
 	int UnrealExceptionHandler(unsigned int code, struct _EXCEPTION_POINTERS *ep)
@@ -150,6 +161,10 @@ namespace BL2SDK
 		// Sigscan for UObject::ProcessEvent which will be used for pretty much everything
 		pProcessEvent = reinterpret_cast<tProcessEvent>(sigscan.Scan((unsigned char*)ProcessEvent_Pattern, ProcessEvent_Mask));
 		Logging::LogF("[Internal] UObject::ProcessEvent() = 0x%X\n", pProcessEvent);
+
+		// Sigscan for UObject::GObjHash
+		pGObjHash = *(unsigned long*)sigscan.Scan((unsigned char*)GObjHash_Pattern, GObjHash_Mask);
+		Logging::LogF("[Internal] GObjHash = 0x%X\n", pGObjHash);
 
 		// Sigscan for Unreal exception handler
 		void* addrUnrealEH = sigscan.Scan((unsigned char*)CrashHandler_Pattern, CrashHandler_Mask);
