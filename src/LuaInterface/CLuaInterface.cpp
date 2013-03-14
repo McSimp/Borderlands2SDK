@@ -793,7 +793,7 @@ void CLuaInterface::SetSDKValues()
 
 	sdkTable->SetMember("addrGNames", static_cast<double>(BL2SDK::GNames()));
 	sdkTable->SetMember("addrGObjects", static_cast<double>(BL2SDK::GObjects()));
-	sdkTable->SetMember("addProcessEvent", static_cast<double>(BL2SDK::addrProcessEvent()));
+	sdkTable->SetMember("addrProcessEvent", static_cast<double>(BL2SDK::addrProcessEvent()));
 	sdkTable->SetMember("addrGObjHash", static_cast<double>(BL2SDK::GObjHash()));
 
 	this->Global()->SetMember("bl2sdk", sdkTable);

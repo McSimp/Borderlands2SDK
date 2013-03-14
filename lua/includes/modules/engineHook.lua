@@ -10,8 +10,8 @@ local pairs = pairs
 local string = string
 
 ffi.cdef[[
-typedef bool (tProcessEventHook) (struct UObject*, struct UFunction*, char*, void*);
-void LUAFUNC_AddStaticHook(struct UFunction* pFunction, tProcessEventHook* funcHook);
+typedef bool (*tProcessEventHook) (struct UObject*, struct UFunction*, char*, void*);
+void LUAFUNC_AddStaticHook(struct UFunction* pFunction, tProcessEventHook funcHook);
 void LUAFUNC_RemoveStaticHook(struct UFunction* pFunction);
 ]]
 
@@ -48,7 +48,7 @@ function ProcessHooks(pObject, pFunction, pParms, pResult)
 	return true
 end
 
-local EngineCallback = ffi.cast("tProcessEventHook*", ProcessHooks)
+local EngineCallback = ffi.cast("tProcessEventHook", ProcessHooks)
 
 function Add(funcData, hookName, hookFunc)
 	if type(funcData) ~= "table" then error("Function must be a function data table") end
