@@ -61,13 +61,20 @@ ffi.cdef[[
 		struct UConst_Data 		UConst;
 	};
 
+	struct TArray_char_ {
+		char* Data;
+		int Count;
+		int Max;
+	};
+
 	struct UStruct_Data {
 		unsigned char 	Unknown1[0x8];
 		struct UField* 	SuperField;
 		struct UField* 	Children;
 		unsigned short 	PropertySize;
 		unsigned short 	Unknown2;
-		unsigned char 	Unknown3[0x38];
+		struct TArray_char_ Script;
+		unsigned char 	Unknown3[0x2C];
 	};
 
 	struct UStruct {
