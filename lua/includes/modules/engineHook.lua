@@ -52,7 +52,7 @@ local EngineCallback = ffi.cast("tProcessEventHook", ProcessHooks)
 
 function Add(funcData, hookName, hookFunc)
 	if type(funcData) ~= "table" then error("Function must be a function data table") end
-	if not funcData.ptr then error("Function has no pointer") end
+	if not funcData.ptr or funcData.ptr == nil then error("Function has no pointer") end
 	if type(hookName) ~= "string" then error("Hook name must be a string") end
 	if type(hookFunc) ~= "function" then error("Hook function must be a function") end
 

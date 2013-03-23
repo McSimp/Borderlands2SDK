@@ -45,6 +45,14 @@ local function ProcessRetval(field)
 
 	text = text .. string.format("\t\t\t\tcastTo = ffi.typeof(%q),\n", propType .. "*")
 
+	-- Byte properties usually mean an enum, so list that
+	if field:IsA(engine.Classes.UByteProperty) then
+		field = ffi.cast("struct UByteProperty*", field)
+		if NotNull(field.UByteProperty.Enum) then
+			text = text .. string.format("\t\t\t\tenumName = %q,\n", field.UByteProperty.Enum:GetName())
+		end
+	end
+
 	-- Offset and closing bracket
 	text = text .. string.format("\t\t\t\toffset = %d\n\t\t\t},\n", field.UProperty.Offset)
 
@@ -75,6 +83,14 @@ local function ProcessArgument(field)
 	end
 
 	text = text .. string.format("\t\t\t\tcastTo = ffi.typeof(%q),\n", propType .. "*")
+
+	-- Byte properties usually mean an enum, so list that
+	if field:IsA(engine.Classes.UByteProperty) then
+		field = ffi.cast("struct UByteProperty*", field)
+		if NotNull(field.UByteProperty.Enum) then
+			text = text .. string.format("\t\t\t\tenumName = %q,\n", field.UByteProperty.Enum:GetName())
+		end
+	end
 
 	-- Offset and closing bracket
 	text = text .. string.format("\t\t\t\toffset = %d\n\t\t\t},\n", field.UProperty.Offset)

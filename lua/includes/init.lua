@@ -20,8 +20,11 @@ require("UObject")
 -- Load engine functions
 require("engine")
 
+local generateSDK = false
+
 local function NeedsSDKGenerated()
-	return false
+	engine.LogObjectIndex = generateSDK
+	return generateSDK
 end
 
 if NeedsSDKGenerated() then

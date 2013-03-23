@@ -63,7 +63,7 @@ namespace BL2SDK
 	void LogAllEvents(bool enabled)
 	{
 		bLogAllEvents = enabled;
-	}	
+	}
 
 	unsigned long GObjects()
 	{
@@ -240,5 +240,10 @@ namespace BL2SDK
 	void Cleanup()
 	{
 		Logging::Cleanup();
+	}
+
+	extern "C" __declspec(dllexport) void LUAFUNC_LogAllEvents(bool enabled)
+	{
+		bLogAllEvents = enabled;
 	}
 }

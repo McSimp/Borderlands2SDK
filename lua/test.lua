@@ -180,63 +180,6 @@ end
 
 -- l print(LocalPlayer.Pawn.WorldInfo.PawnList.Mesh.Bounds.BoxExtent)
 
-function MyHook()
-	local target = pc.AController.Pawn.AActor.WorldInfo.AWorldInfo.PawnList
-	while NotNull(target) do
-		if not target.AActor.bDeleteMe and target ~= pc.AController.Pawn then
-			local extent = target.APawn.Mesh.UPrimitiveComponent.Bounds.BoxExtent
-			print(extent.X, extent.Y, extent.Z)
-			local location = target.AActor.Location
-			
-			pc:DrawDebugBox(location, extent, 0, 255, 0, false)
-		end
-		target = target.APawn.NextPawn
-	end
-
-	return true
-end
-
-function MyHook2()
-	local target = pc.Pawn.WorldInfo.PawnList
-	while NotNull(target) do
-		if not target.bDeleteMe and target ~= pc.Pawn then
-			pc:DrawDebugBox(target.Location, target.Mesh.Bounds.BoxExtent, 0, 255, 0, false)
-		end
-		target = target.NextPawn
-	end
-
-	return true
-end
-
-function GetArg(arg, pParms)
-	local field = ffi.cast(arg.castTo, pParms + arg.offset)
-	--print(arg.castTo, arg.offset, pParms, field)
-
-	return field[0]
-	--return true
-end
-
-function CallFuncHook(pObject, pFunction, pParms, pResult)
-	--print("Func hook called")
-	--debug.sethook(DebugHook, "c")
-	local args = engine._FuncsInternal[PtrToNum(pFunction)].args
-
-	local argData = {}
-	for i=1,#args do
-		--print("Getting arg")
-		table.insert(argData, GetArg(args[i], pParms))
-	end
-
-	--print("Calling myhook with the shit")
-	MyHook2(unpack(argData))
-
-	--print("Unhookinh")
-	--ffi.C.LUAFUNC_RemoveHook("Function WillowGame.WillowGameViewportClient.PostRender")
-
-	--debug.sethook()
-	return true
-end
-
 function TestCallback(pObject, pFunction, pParms, pResult)
 	print("Got called: " .. pFunction:GetName())
 	print(#engine._FuncsInternal[PtrToNum(pFunction)].args)
@@ -244,26 +187,6 @@ function TestCallback(pObject, pFunction, pParms, pResult)
 	ffi.C.LUAFUNC_RemoveHook("Function WillowGame.WillowGameViewportClient.PostRender")
 	return true
 end
-
-ffi.cdef[[
-//typedef bool (tProcessEventHook) (struct UObject*, struct UFunction*, char*, void*);
-//int LUAFUNC_HookFunction(const char* funcName, tProcessEventHook* funcHook);
-//int LUAFUNC_RemoveHook(const char* funcName);
-]]
---[[
-FuncHook = ffi.cast("tProcessEventHook*", CallFuncHook)
-
-function AddHook()
-	ffi.C.LUAFUNC_HookFunction("Function WillowGame.WillowGameViewportClient.PostRender", FuncHook)
-end
-
-function RemoveHook()
-	ffi.C.LUAFUNC_RemoveHook("Function WillowGame.WillowGameViewportClient.PostRender")
-	FuncHook:free()
-end
-]]
---MyHook(nil)
--- l print(engine._ClassesInternal[PtrToNum(LocalPlayer.UObject.Class)])
 
 function AddHook()
 	--engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "Shazbot", MyHook2)
@@ -282,3 +205,14 @@ function RemoveHook()
 	engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GiveMeBoxes")
 end
 
+function KeyHook(ControllerId, Key, Event, AmountDepressed, bGamePad)
+	print(Key:GetName())
+end
+
+function AddKeyHook()
+	engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.InputKey, "KeyHook", KeyHook)
+end
+
+function RemoveKeyHook()
+	engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.InputKey, "KeyHook")
+end
