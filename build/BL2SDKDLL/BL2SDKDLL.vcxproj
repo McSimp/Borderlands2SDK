@@ -97,9 +97,10 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\BL2SDK\AntiDebug.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\BL2SDK.cpp" />
+    <ClCompile Include="..\..\src\BL2SDK\CHookManager.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\CrashRptHelper.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\CSigScan.cpp" />
-    <ClCompile Include="..\..\src\BL2SDK\EngineHooks.cpp" />
+    <ClCompile Include="..\..\src\BL2SDK\GameHooks.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Logging.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Settings.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Util.cpp" />
@@ -121,9 +122,10 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\BL2SDK\AntiDebug.h" />
     <ClInclude Include="..\..\src\BL2SDK\BL2SDK.h" />
+    <ClInclude Include="..\..\src\BL2SDK\CHookManager.h" />
     <ClInclude Include="..\..\src\BL2SDK\CrashRptHelper.h" />
     <ClInclude Include="..\..\src\BL2SDK\CSigScan.h" />
-    <ClInclude Include="..\..\src\BL2SDK\EngineHooks.h" />
+    <ClInclude Include="..\..\src\BL2SDK\GameHooks.h" />
     <ClInclude Include="..\..\src\BL2SDK\Exceptions.h" />
     <ClInclude Include="..\..\src\BL2SDK\Logging.h" />
     <ClInclude Include="..\..\src\BL2SDK\Settings.h" />

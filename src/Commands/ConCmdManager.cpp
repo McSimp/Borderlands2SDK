@@ -3,7 +3,7 @@
 #include "Commands/ConCmdManager.h"
 #include "Commands/ConCommand.h"
 #include "LuaInterface/LuaManager.h"
-#include "BL2SDK/EngineHooks.h"
+#include "BL2SDK/GameHooks.h"
 
 #include <map>
 #include <sstream>
@@ -123,7 +123,7 @@ namespace ConCmdManager
 	void Initialize()
 	{
 		// Hook into the engine's concmd system
-		EngineHooks::Register("Function Engine.Console.ConsoleCommand", "SDKConcmd", &ConCmdManager::eventConCommand);
+		GameHooks::EngineHookManager->Register("Function Engine.Console.ConsoleCommand", "SDKConcmd", ConCmdManager::eventConCommand);
 		ConCommand::RegisterCommands();
 	}
 

@@ -102,9 +102,6 @@
     <ClCompile Include="..\..\src\GUI\DirectX9.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\BL2SDK\EngineHooks.cpp">
-      <Filter>Source Files\BL2SDK</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\LuaInterface\CLuaInterface.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
@@ -118,6 +115,12 @@
       <Filter>Source Files\BL2SDK</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\BL2SDK\Logging.cpp">
+      <Filter>Source Files\BL2SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\BL2SDK\CHookManager.cpp">
+      <Filter>Source Files\BL2SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\BL2SDK\GameHooks.cpp">
       <Filter>Source Files\BL2SDK</Filter>
     </ClCompile>
   </ItemGroup>
@@ -191,9 +194,6 @@
     <ClInclude Include="..\..\src\GUI\D3D9Hook.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\BL2SDK\EngineHooks.h">
-      <Filter>Header Files\BL2SDK</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\LuaInterface\UserData.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
@@ -231,6 +231,12 @@
       <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\BL2SDK\Logging.h">
+      <Filter>Header Files\BL2SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BL2SDK\CHookManager.h">
+      <Filter>Header Files\BL2SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BL2SDK\GameHooks.h">
       <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
   </ItemGroup>

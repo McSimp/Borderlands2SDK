@@ -3,7 +3,7 @@
 #include "BL2SDK/Logging.h"
 #include "BL2SDK/CSigScan.h"
 #include "BL2SDK/CrashRptHelper.h"
-#include "BL2SDK/EngineHooks.h"
+#include "BL2SDK/GameHooks.h"
 #include "BL2SDK/Settings.h"
 #include "BL2SDK/Util.h"
 #include "Commands/ConCmdManager.h"
@@ -47,7 +47,7 @@ namespace BL2SDK
 			Logging::LogF("pFunction Name = %s\n", FunctionName.c_str());
 		}
 		
-		if(!EngineHooks::ProcessHooks(pCaller, pFunction, pParms, pResult))
+		if(!GameHooks::ProcessEngineHooks(pCaller, pFunction, pParms, pResult))
 		{
 			// The engine hook manager told us not to pass this function to the engine
 			return;
@@ -215,7 +215,7 @@ namespace BL2SDK
 
 		GwenManager::CreateCanvas(pCanvas->SizeX, pCanvas->SizeY);
 
-		EngineHooks::RemoveStaticHook(pFunction, "GetCanvas");
+		GameHooks::EngineHookManager->RemoveStaticHook(pFunction, "GetCanvas");
 		return true;
 	}
 
@@ -232,9 +232,9 @@ namespace BL2SDK
 
 		ConCmdManager::Initialize();
 
-		EngineHooks::RemoveStaticHook(pFunction, "StartupSDK");
+		GameHooks::EngineHookManager->RemoveStaticHook(pFunction, "StartupSDK");
 
-		EngineHooks::Register("Function WillowGame.WillowGameViewportClient.PostRender", "GetCanvas", &GetCanvasPostRender);
+		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient.PostRender", "GetCanvas", GetCanvasPostRender);
 		return true;
 	}
 
@@ -260,7 +260,7 @@ namespace BL2SDK
 
 		D3D9Hook::Initialize();
 
-		EngineHooks::Register("Function WillowGame.WillowGameInfo.InitGame", "StartupSDK", &GameReady);	
+		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameInfo.InitGame", "StartupSDK", GameReady);	
 	}
 
 	// This is called when the process is closing
