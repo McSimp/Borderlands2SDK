@@ -8,6 +8,7 @@ namespace GameHooks
 	extern CHookManager* EngineHookManager;
 	extern CHookManager* UnrealScriptHookManager;
 
+	void Initialize();
 	bool ProcessEngineHooks(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult);
 }
 

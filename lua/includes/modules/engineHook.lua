@@ -11,8 +11,8 @@ local string = string
 
 ffi.cdef[[
 typedef bool (*tProcessEventHook) (struct UObject*, struct UFunction*, char*, void*);
-void LUAFUNC_AddStaticHook(struct UFunction* pFunction, tProcessEventHook funcHook);
-void LUAFUNC_RemoveStaticHook(struct UFunction* pFunction);
+void LUAFUNC_AddStaticEngineHook(struct UFunction* pFunction, tProcessEventHook funcHook);
+void LUAFUNC_RemoveStaticEngineHook(struct UFunction* pFunction);
 ]]
 
 module("engineHook")
@@ -59,7 +59,7 @@ function Add(funcData, hookName, hookFunc)
 	local ptrNum = PtrToNum(funcData.ptr)
 	if RegisteredHooks[ptrNum] == nil then
 		RegisteredHooks[ptrNum] = {}
-		ffi.C.LUAFUNC_AddStaticHook(funcData.ptr, EngineCallback)
+		ffi.C.LUAFUNC_AddStaticEngineHook(funcData.ptr, EngineCallback)
 	end
 
 	RegisteredHooks[ptrNum][hookName] = hookFunc
@@ -77,7 +77,7 @@ function Remove(funcData, hookName)
 
 	RegisteredHooks[ptrNum][hookName] = nil
 	if table.count(RegisteredHooks[ptrNum]) == 0 then
-		ffi.C.LUAFUNC_RemoveStaticHook(funcData.ptr)
+		ffi.C.LUAFUNC_RemoveStaticEngineHook(funcData.ptr)
 		RegisteredHooks[ptrNum] = nil
 	end
 

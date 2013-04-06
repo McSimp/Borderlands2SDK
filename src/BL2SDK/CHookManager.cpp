@@ -78,7 +78,7 @@ bool CHookManager::RemoveFromTable(tHookMap& hookTable, const std::string& funcN
 	return true;
 }
 
-void CHookManager::Register(const std::string& funcName, const std::string& hookName, tProcessEventHook& funcHook)
+void CHookManager::Register(const std::string& funcName, const std::string& hookName, tProcessEventHook* funcHook)
 {
 	// Create pair to insert
 	tFuncNameHookPair hookPair = std::make_pair(hookName, funcHook);

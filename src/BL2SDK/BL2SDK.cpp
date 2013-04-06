@@ -234,7 +234,7 @@ namespace BL2SDK
 
 		GameHooks::EngineHookManager->RemoveStaticHook(pFunction, "StartupSDK");
 
-		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient.PostRender", "GetCanvas", GetCanvasPostRender);
+		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient.PostRender", "GetCanvas", &GetCanvasPostRender);
 		return true;
 	}
 
@@ -255,12 +255,14 @@ namespace BL2SDK
 			HookAntiDebug();
 		}
 
+		GameHooks::Initialize();
+
 		HookGame();
 		LogAllEvents(args->LogAllEvents);
 
 		D3D9Hook::Initialize();
 
-		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameInfo.InitGame", "StartupSDK", GameReady);	
+		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameInfo.InitGame", "StartupSDK", &GameReady);	
 	}
 
 	// This is called when the process is closing

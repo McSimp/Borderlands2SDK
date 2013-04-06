@@ -3,9 +3,18 @@
 
 namespace GameHooks
 {
-	CHookManager* EngineHookManager = new CHookManager();
-	CHookManager* UnrealScriptHookManager = new CHookManager();
+	CHookManager* EngineHookManager;
+	CHookManager* UnrealScriptHookManager;
 	
+	void Initialize()
+	{
+		EngineHookManager = new CHookManager();
+		Logging::LogF("[GameHooks] EngineHookManager = 0x%X\n", EngineHookManager);
+
+		UnrealScriptHookManager = new CHookManager();
+		Logging::LogF("[GameHooks] UnrealScriptHookManager = 0x%X\n", UnrealScriptHookManager);
+	}
+
 	bool ProcessEngineHooks(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
 	{
 		// Resolve any virtual hooks into static hooks
@@ -54,27 +63,15 @@ namespace GameHooks
 		return true;
 	}
 
-	/*
-	extern "C" __declspec(dllexport) void LUAFUNC_AddHook(const char* funcName, tProcessEventHook* funcHook)
-	{
-		Register(funcName, "LuaHook", funcHook);
-	}
-
-	extern "C" __declspec(dllexport) void LUAFUNC_RemoveHook(const char* funcName)
-	{
-		Remove(funcName, "LuaHook");
-	}
-
-	extern "C" __declspec(dllexport) void LUAFUNC_AddStaticHook(UFunction* pFunction, tProcessEventHook* funcHook)
+	extern "C" __declspec(dllexport) void LUAFUNC_AddStaticEngineHook(UFunction* pFunction, tProcessEventHook* funcHook)
 	{
 		tFuncNameHookPair hookPair = std::make_pair("LuaHook", funcHook);
-		AddStaticHook(pFunction, hookPair);
+		EngineHookManager->AddStaticHook(pFunction, hookPair);
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_RemoveStaticHook(UFunction* pFunction)
+	extern "C" __declspec(dllexport) void LUAFUNC_RemoveStaticEngineHook(UFunction* pFunction)
 	{
-		RemoveStaticHook(pFunction, "LuaHook");
+		EngineHookManager->RemoveStaticHook(pFunction, "LuaHook");
 	}
-	*/
 }
 
