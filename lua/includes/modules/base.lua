@@ -75,6 +75,17 @@ function table.find(table, value)
 	return nil
 end
 
+-- Returns the first index of value in the specified table (with string indexs) or nil
+function table.sfind(table, value)
+	for k,v in pairs(table) do
+		if v == value then
+			return k
+		end
+	end
+
+	return nil
+end
+
 -- Returns the number of elements in a table with any type of key
 function table.count(table)
 	local count = 0

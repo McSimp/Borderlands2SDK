@@ -331,3 +331,11 @@ function Initialize()
 
 	profiling.StopTimer("engineinit")
 end
+
+ffi.cdef[[
+void LUAFUNC_LogAllEvents(bool enabled);
+]]
+
+function LogAllEvents(enabled)
+	ffi.C.LUAFUNC_LogAllEvents(enabled)
+end

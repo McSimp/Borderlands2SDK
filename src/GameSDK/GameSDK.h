@@ -16,12 +16,16 @@
 #define GObjHash_Pattern		"\x00\x00\x00\x00\x8B\x4E\x30\x8B\x46\x2C\x8B\x7E\x28"
 #define GObjHash_Mask			"????xxxxxxxxx"
 
+#define CallFunction_Pattern	"\x55\x8B\xEC\x6A\xFF\x68\x00\x00\x00\x00\x64\xA1\x00\x00\x00\x00\x50\x81\xEC\x00\x00\x00\x00\xA1\x00\x00\x00\x00\x33\xC5\x89\x45\xF0\x53\x56\x57\x50\x8D\x45\xF4\x64\xA3\x00\x00\x00\x00\x8B\x7D\x10\x8B\x45\x0C"
+#define CallFunction_Mask		"xxxxxx????xx????xxx????x????xxxxxxxxxxxxxx????xxxxxx"
+
 namespace BL2SDK
 {
 	unsigned long GNames();
 	unsigned long GObjects();
 	unsigned long addrProcessEvent();
 	unsigned long GObjHash();
+	unsigned long addrCallFunction();
 }
 
 #include "GameSDK/GameDefines.h"

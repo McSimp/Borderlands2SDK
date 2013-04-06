@@ -73,7 +73,7 @@ function Remove(funcData, hookName)
 	if type(hookName) ~= "string" then error("Hook name must be a string") end
 
 	local ptrNum = PtrToNum(funcData.ptr)
-	if RegisteredHooks[ptrNum] == nil then error("Hook table for function does not exist") end
+	if RegisteredHooks[ptrNum] == nil then print("Hook table for function does not exist") return end
 
 	RegisteredHooks[ptrNum][hookName] = nil
 	if table.count(RegisteredHooks[ptrNum]) == 0 then

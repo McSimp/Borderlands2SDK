@@ -206,7 +206,7 @@ function RemoveHook()
 end
 
 function KeyHook(ControllerId, Key, Event, AmountDepressed, bGamePad)
-	print(Key:GetName())
+	print(Key:GetName(), Event, table.sfind(enums.EInputEvent, Event))
 end
 
 function AddKeyHook()
@@ -216,3 +216,4 @@ end
 function RemoveKeyHook()
 	engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.InputKey, "KeyHook")
 end
+

@@ -162,7 +162,26 @@ struct FString : public TArray< wchar_t >
 struct FScriptDelegate 
 { 
 	unsigned char UnknownData00[ 0xC ]; 
-}; 
+};
+
+struct FOutputDevice
+{
+	void* VfTable;
+	unsigned long bAllowSuppression;
+	unsigned long bSuppressEventTag;
+	unsigned long bAutoEmitLineTerminator;
+};
+
+struct FFrame : public FOutputDevice
+{
+	class UStruct* Node;
+	class UObject* Object;
+	unsigned char* Code;
+	unsigned char* Locals;
+
+	struct FFrame* PreviousFrame;
+	struct FOutParmRec* OutParms;
+};
 
 /*
 # ========================================================================================= #

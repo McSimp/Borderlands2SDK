@@ -22,6 +22,7 @@ namespace BL2SDK
 	unsigned long								pGNames;
 	unsigned long								pGObjHash;
 	tProcessEvent								pProcessEvent;
+	tCallFunction								pCallFunction;
 
 	void __stdcall hkProcessEvent(UFunction* pFunction, void* pParms, void* pResult)
 	{
@@ -55,6 +56,20 @@ namespace BL2SDK
 		pProcessEvent(pCaller, pFunction, pParms, pResult);
 	}
 
+	void __stdcall hkCallFunction(FFrame& Stack, void* const Result, UFunction* Function)
+	{
+		// Get "this"
+		UObject* pCaller;
+		_asm mov pCaller, ecx;
+
+		if((UObject*)Function == UObject::GObjObjects()->Data[68500])
+		{
+			_asm nop;
+		}
+
+		pCallFunction(pCaller, Stack, Result, Function);
+	}
+
 	void InjectedCallNext()
 	{
 		bInjectedCallNext = true;
@@ -83,6 +98,11 @@ namespace BL2SDK
 	unsigned long GObjHash()
 	{
 		return pGObjHash;
+	}
+
+	unsigned long addrCallFunction()
+	{
+		return (unsigned long)pCallFunction;
 	}
 
 	int UnrealExceptionHandler(unsigned int code, struct _EXCEPTION_POINTERS *ep)
@@ -170,6 +190,10 @@ namespace BL2SDK
 		void* addrUnrealEH = sigscan.Scan((unsigned char*)CrashHandler_Pattern, CrashHandler_Mask);
 		Logging::LogF("[Internal] Unreal Crash handler = 0x%X\n", addrUnrealEH);
 
+		// Sigscan for UObject::CallFunction
+		pCallFunction = reinterpret_cast<tCallFunction>(sigscan.Scan((unsigned char*)CallFunction_Pattern, CallFunction_Mask));
+		Logging::LogF("[Internal] UObject::CallFunction() = 0x%X\n", pCallFunction);
+
 		// Detour UObject::ProcessEvent()
 		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkProcessEvent);
 		detProcessEvent.Attach();
@@ -177,6 +201,10 @@ namespace BL2SDK
 		// Detour Unreal exception handler
 		SETUP_SIMPLE_DETOUR(detUnrealEH, addrUnrealEH, UnrealExceptionHandler);
 		detUnrealEH.Attach();
+
+		// Detour UObject::CallFunction()
+		SETUP_SIMPLE_DETOUR(detCallFunction, pCallFunction, hkCallFunction);
+		detCallFunction.Attach();
 	}
 
 	// This function is used to get the dimensions of the game window for Gwen's renderer
