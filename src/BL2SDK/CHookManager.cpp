@@ -39,7 +39,7 @@ void CHookManager::AddVirtualHook(const std::string& funcName, const tFuncNameHo
 		vHookMap->insert(hookPair); // TODO: Dereference pointer?
 	}
 
-	Logging::LogF("[CHookManager] (0x%X) Hook \"%s\" added as virtual hook for \"%s\"\n", this, hookPair.first.c_str(), funcName.c_str());
+	Logging::LogF("[CHookManager] (%s) Hook \"%s\" added as virtual hook for \"%s\"\n", this->DebugName.c_str(), hookPair.first.c_str(), funcName.c_str());
 }
 
 void CHookManager::AddStaticHook(UFunction* pFunction, const tFuncNameHookPair& hookPair)
@@ -58,7 +58,7 @@ void CHookManager::AddStaticHook(UFunction* pFunction, const tFuncNameHookPair& 
 		hookMap->insert(hookPair); // TODO: Dereference pointer?
 	}
 
-	Logging::LogF("[CHookManager] (0x%X) Hook \"%s\" added as static hook for \"%s\"\n", this, hookPair.first.c_str(), pFunction->GetName());
+	Logging::LogF("[CHookManager] (%s) Hook \"%s\" added as static hook for \"%s\"\n", this->DebugName.c_str(), hookPair.first.c_str(), pFunction->GetName());
 }
 
 bool CHookManager::RemoveFromTable(tHookMap& hookTable, const std::string& funcName, const std::string& hookName)
@@ -70,11 +70,11 @@ bool CHookManager::RemoveFromTable(tHookMap& hookTable, const std::string& funcN
 
 	if(sizeDiff == 0)
 	{
-		Logging::LogF("[CHookManager] (0x%X) Failed to remove hook \"%s\" for function \"%s\"\n", this, hookName.c_str(), funcName.c_str());
+		Logging::LogF("[CHookManager] (%s) Failed to remove hook \"%s\" for function \"%s\"\n", this->DebugName.c_str(), hookName.c_str(), funcName.c_str());
 		return false;
 	}
 
-	Logging::LogF("[CHookManager] (0x%X) Hook \"%s\" removed for function \"%s\" successfully\n", this, hookName.c_str(), funcName.c_str());
+	Logging::LogF("[CHookManager] (%s) Hook \"%s\" removed for function \"%s\" successfully\n", this->DebugName.c_str(), hookName.c_str(), funcName.c_str());
 	return true;
 }
 
@@ -121,7 +121,7 @@ bool CHookManager::RemoveVirtualHook(const std::string& funcName, const std::str
 	tHookMap* hookTable = GetVirtualHookTable(funcName);
 	if(hookTable == NULL)
 	{
-		Logging::LogF("[CHookManager] (0x%X) ERROR: Failed to remove virtual hook \"%s\" for \"%s\"\n", this, hookName.c_str(), funcName);
+		Logging::LogF("[CHookManager] (%s) ERROR: Failed to remove virtual hook \"%s\" for \"%s\"\n", this->DebugName.c_str(), hookName.c_str(), funcName);
 		return false;
 	}
 
@@ -134,7 +134,7 @@ bool CHookManager::RemoveStaticHook(UFunction* pFunction, const std::string& hoo
 	tHookMap* hookTable = GetStaticHookTable(pFunction);
 	if(hookTable == NULL)
 	{
-		Logging::LogF("[CHookManager] (0x%X) ERROR: Failed to remove static hook \"%s\" for \"%s\"\n", this, hookName.c_str(), pFunction->GetFullName());
+		Logging::LogF("[CHookManager] (%s) ERROR: Failed to remove static hook \"%s\" for \"%s\"\n", this->DebugName.c_str(), hookName.c_str(), pFunction->GetFullName());
 		return false;
 	}
 
@@ -156,7 +156,7 @@ void CHookManager::ResolveVirtualHooks(UFunction* pFunction)
 			int size = iVHooks->second.size();
 			StaticHooks.insert(std::make_pair(pFunction, iVHooks->second));
 			VirtualHooks.erase(iVHooks);
-			Logging::LogF("[CHookManager] (0x%X) Function pointer found for \"%s\", added map with %i elements to static hooks map\n", this, funcName.c_str(), size);
+			Logging::LogF("[CHookManager] (%s) Function pointer found for \"%s\", added map with %i elements to static hooks map\n", this->DebugName.c_str(), funcName.c_str(), size);
 		}
 	}
 }

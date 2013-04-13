@@ -8,10 +8,10 @@ namespace GameHooks
 	
 	void Initialize()
 	{
-		EngineHookManager = new CHookManager();
+		EngineHookManager = new CHookManager("EngineHooks");
 		Logging::LogF("[GameHooks] EngineHookManager = 0x%X\n", EngineHookManager);
 
-		UnrealScriptHookManager = new CHookManager();
+		UnrealScriptHookManager = new CHookManager("UnrealScriptHooks");
 		Logging::LogF("[GameHooks] UnrealScriptHookManager = 0x%X\n", UnrealScriptHookManager);
 	}
 

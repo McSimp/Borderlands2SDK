@@ -22,6 +22,10 @@ private:
 public:
 	std::map<std::string, tHookMap> VirtualHooks;
 	std::map<UFunction*, tHookMap> StaticHooks;
+	std::string DebugName;
+
+	CHookManager() : DebugName("Unknown") {}
+	CHookManager(std::string debugName) : DebugName(debugName) {}
 
 	void Register(const std::string& funcName, const std::string& hookName, void* funcHook);
 	bool Remove(const std::string& funcName, const std::string& hookName);
