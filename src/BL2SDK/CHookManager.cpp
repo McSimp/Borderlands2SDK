@@ -1,7 +1,7 @@
 #include "BL2SDK/CHookManager.h"
 #include "BL2SDK/Logging.h"
 
-tHookMap* CHookManager::GetVirtualHookTable(const std::string& funcName)
+CHookManager::tHookMap* CHookManager::GetVirtualHookTable(const std::string& funcName)
 {
 	tiVirtualHooks iHooks = VirtualHooks.find(funcName);
 	if(iHooks != VirtualHooks.end())
@@ -12,7 +12,7 @@ tHookMap* CHookManager::GetVirtualHookTable(const std::string& funcName)
 	return NULL;
 }
 
-tHookMap* CHookManager::GetStaticHookTable(UFunction* pFunction)
+CHookManager::tHookMap* CHookManager::GetStaticHookTable(UFunction* pFunction)
 {
 	tiStaticHooks iHooks = StaticHooks.find(pFunction);
 	if(iHooks != StaticHooks.end())
@@ -23,7 +23,7 @@ tHookMap* CHookManager::GetStaticHookTable(UFunction* pFunction)
 	return NULL;
 }
 
-void CHookManager::AddVirtualHook(const std::string& funcName, tFuncNameHookPair& hookPair)
+void CHookManager::AddVirtualHook(const std::string& funcName, const tFuncNameHookPair& hookPair)
 {
 	tHookMap* vHookMap = GetVirtualHookTable(funcName);
 	if(vHookMap == NULL)
@@ -42,7 +42,7 @@ void CHookManager::AddVirtualHook(const std::string& funcName, tFuncNameHookPair
 	Logging::LogF("[CHookManager] (0x%X) Hook \"%s\" added as virtual hook for \"%s\"\n", this, hookPair.first.c_str(), funcName.c_str());
 }
 
-void CHookManager::AddStaticHook(UFunction* pFunction, tFuncNameHookPair& hookPair)
+void CHookManager::AddStaticHook(UFunction* pFunction, const tFuncNameHookPair& hookPair)
 {
 	tHookMap* hookMap = GetStaticHookTable(pFunction);
 	if(hookMap == NULL)
@@ -78,7 +78,7 @@ bool CHookManager::RemoveFromTable(tHookMap& hookTable, const std::string& funcN
 	return true;
 }
 
-void CHookManager::Register(const std::string& funcName, const std::string& hookName, tProcessEventHook* funcHook)
+void CHookManager::Register(const std::string& funcName, const std::string& hookName, void* funcHook)
 {
 	// Create pair to insert
 	tFuncNameHookPair hookPair = std::make_pair(hookName, funcHook);
@@ -139,4 +139,24 @@ bool CHookManager::RemoveStaticHook(UFunction* pFunction, const std::string& hoo
 	}
 
 	return RemoveFromTable(*hookTable, pFunction->GetFullName(), hookName);
+}
+
+void CHookManager::ResolveVirtualHooks(UFunction* pFunction)
+{
+	// Resolve any virtual hooks into static hooks
+	if(VirtualHooks.size() > 0)
+	{
+		//std::string funcName = GetFuncName(pFunction); TODO: Use this instead of the ugly other thing
+		std::string funcName = pFunction->GetFullName();
+
+		tiVirtualHooks iVHooks = VirtualHooks.find(funcName);
+		if(iVHooks != VirtualHooks.end())
+		{
+			// Insert this map into the static hooks map
+			int size = iVHooks->second.size();
+			StaticHooks.insert(std::make_pair(pFunction, iVHooks->second));
+			VirtualHooks.erase(iVHooks);
+			Logging::LogF("[CHookManager] (0x%X) Function pointer found for \"%s\", added map with %i elements to static hooks map\n", this, funcName.c_str(), size);
+		}
+	}
 }

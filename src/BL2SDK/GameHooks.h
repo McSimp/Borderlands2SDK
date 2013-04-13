@@ -3,6 +3,8 @@
 
 #include "BL2SDK/CHookManager.h"
 
+typedef bool (tProcessEventHook) (UObject*, UFunction*, void*, void*);
+
 namespace GameHooks
 {
 	extern CHookManager* EngineHookManager;

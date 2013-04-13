@@ -18,35 +18,21 @@ namespace GameHooks
 	bool ProcessEngineHooks(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
 	{
 		// Resolve any virtual hooks into static hooks
-		if(EngineHookManager->VirtualHooks.size() > 0)
-		{
-			//std::string funcName = GetFuncName(pFunction); TODO: Use this instead of the ugly other thing
-			std::string funcName = pFunction->GetFullName();
-
-			tiVirtualHooks iVHooks = EngineHookManager->VirtualHooks.find(funcName);
-			if(iVHooks != EngineHookManager->VirtualHooks.end())
-			{
-				// Insert this map into the static hooks map
-				int size = iVHooks->second.size();
-				EngineHookManager->StaticHooks.insert(std::make_pair(pFunction, iVHooks->second));
-				EngineHookManager->VirtualHooks.erase(iVHooks);
-				Logging::LogF("[Engine Hooks] Function pointer found for \"%s\", added map with %i elements to static hooks map\n", funcName.c_str(), size);
-			}
-		}
+		EngineHookManager->ResolveVirtualHooks(pFunction);
 
 		// Call any static hooks that may exist
-		tiStaticHooks iHooks = EngineHookManager->StaticHooks.find(pFunction);
+		CHookManager::tiStaticHooks iHooks = EngineHookManager->StaticHooks.find(pFunction);
 		if(iHooks != EngineHookManager->StaticHooks.end())
 		{
-			tHookMap hooks = iHooks->second;
+			CHookManager::tHookMap hooks = iHooks->second;
 
 			// TODO: Still not sure on best implementation here. Would it be better
 			// just to stop every single next hook if one returns false?
 			bool engineShouldRun = true;
-			for(tiHookMap iterator = hooks.begin(); iterator != hooks.end(); iterator++)
+			for(CHookManager::tiHookMap iterator = hooks.begin(); iterator != hooks.end(); iterator++)
 			{
-				// maps to std::string, tProcessEventHook*
-				if(!iterator->second(pCaller, pFunction, pParms, pResult))
+				// maps to std::string, void*, but we want to call a tProcessEventHook* instead
+				if(!((tProcessEventHook*)iterator->second)(pCaller, pFunction, pParms, pResult))
 				{
 					engineShouldRun = false; // Can't just do engineShouldRun = iterator->.. 
 				}
@@ -65,7 +51,7 @@ namespace GameHooks
 
 	extern "C" __declspec(dllexport) void LUAFUNC_AddStaticEngineHook(UFunction* pFunction, tProcessEventHook* funcHook)
 	{
-		tFuncNameHookPair hookPair = std::make_pair("LuaHook", funcHook);
+		CHookManager::tFuncNameHookPair hookPair = std::make_pair("LuaHook", funcHook);
 		EngineHookManager->AddStaticHook(pFunction, hookPair);
 	}
 
