@@ -16,7 +16,8 @@
 namespace BL2SDK
 {
 	bool										bInjectedCallNext = false;
-	bool										bLogAllEvents = false;
+	bool										bLogAllProcessEvent = false;
+	bool										bLogAllUnrealScriptCalls = false;
 
 	unsigned long								pGObjects;
 	unsigned long								pGNames;
@@ -37,14 +38,9 @@ namespace BL2SDK
 			return;
 		}
 
-		if(bLogAllEvents)
+		if(bLogAllProcessEvent)
 		{
-			std::string CallerName = pCaller->GetFullName();
-			std::string FunctionName = pFunction->GetFullName();
-
-			Logging::Log("===== ProcessEvent called =====\n");
-			Logging::LogF("pCaller Name = %s\n", CallerName.c_str());
-			Logging::LogF("pFunction Name = %s\n", FunctionName.c_str());
+			Logging::LogF("===== ProcessEvent called =====\npCaller Name = %s\npFunction Name = %s\n", pCaller->GetFullName(), pFunction->GetFullName());
 		}
 		
 		if(!GameHooks::ProcessEngineHooks(pCaller, pFunction, pParms, pResult))
@@ -62,9 +58,15 @@ namespace BL2SDK
 		UObject* pCaller;
 		_asm mov pCaller, ecx;
 
-		if((UObject*)Function == UObject::GObjObjects()->Data[68500])
+		if(bLogAllUnrealScriptCalls)
 		{
-			_asm nop;
+			Logging::LogF("===== CallFunction called =====\npCaller Name = %s\npFunction Name = %s\n", pCaller->GetFullName(), Function->GetFullName());
+		}
+
+		if(!GameHooks::ProcessUnrealScriptHooks(pCaller, Stack, Result, Function))
+		{
+			// UnrealScript hook manager already took care of it
+			return;
 		}
 
 		pCallFunction(pCaller, Stack, Result, Function);
@@ -75,9 +77,14 @@ namespace BL2SDK
 		bInjectedCallNext = true;
 	}
 
-	void LogAllEvents(bool enabled)
+	void LogAllProcessEventCalls(bool enabled)
 	{
-		bLogAllEvents = enabled;
+		bLogAllProcessEvent = enabled;
+	}
+
+	void LogAllUnrealScriptCalls(bool enabled)
+	{
+		bLogAllUnrealScriptCalls = enabled;
 	}
 
 	unsigned long GObjects()
@@ -258,7 +265,7 @@ namespace BL2SDK
 		GameHooks::Initialize();
 
 		HookGame();
-		LogAllEvents(args->LogAllEvents);
+		LogAllProcessEventCalls(args->LogAllProcessEventCalls);
 
 		D3D9Hook::Initialize();
 
@@ -272,8 +279,8 @@ namespace BL2SDK
 		Logging::Cleanup();
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_LogAllEvents(bool enabled)
+	extern "C" __declspec(dllexport) void LUAFUNC_LogAllProcessEventCalls(bool enabled)
 	{
-		bLogAllEvents = enabled;
+		LogAllProcessEventCalls(enabled);
 	}
 }

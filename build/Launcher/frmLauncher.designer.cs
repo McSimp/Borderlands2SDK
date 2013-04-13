@@ -36,9 +36,9 @@
             this.msMenu = new System.Windows.Forms.MenuStrip();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.disableAntiDebugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.logAllEventsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.logAllProcessEventCallsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.disableCrashReportingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gbGamePath.SuspendLayout();
             this.msMenu.SuspendLayout();
             this.SuspendLayout();
@@ -102,7 +102,7 @@
             // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.disableAntiDebugToolStripMenuItem,
-            this.logAllEventsToolStripMenuItem,
+            this.logAllProcessEventCallsToolStripMenuItem,
             this.disableCrashReportingToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
@@ -112,17 +112,25 @@
             // 
             this.disableAntiDebugToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("disableAntiDebugToolStripMenuItem.Image")));
             this.disableAntiDebugToolStripMenuItem.Name = "disableAntiDebugToolStripMenuItem";
-            this.disableAntiDebugToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.disableAntiDebugToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
             this.disableAntiDebugToolStripMenuItem.Text = "Disable Anti-Debug";
             this.disableAntiDebugToolStripMenuItem.Click += new System.EventHandler(this.disableAntiDebugToolStripMenuItem_Click);
             // 
-            // logAllEventsToolStripMenuItem
+            // logAllProcessEventCallsToolStripMenuItem
             // 
-            this.logAllEventsToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("logAllEventsToolStripMenuItem.Image")));
-            this.logAllEventsToolStripMenuItem.Name = "logAllEventsToolStripMenuItem";
-            this.logAllEventsToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
-            this.logAllEventsToolStripMenuItem.Text = "Log all events";
-            this.logAllEventsToolStripMenuItem.Click += new System.EventHandler(this.logAllEventsToolStripMenuItem_Click);
+            this.logAllProcessEventCallsToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("logAllProcessEventCallsToolStripMenuItem.Image")));
+            this.logAllProcessEventCallsToolStripMenuItem.Name = "logAllProcessEventCallsToolStripMenuItem";
+            this.logAllProcessEventCallsToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.logAllProcessEventCallsToolStripMenuItem.Text = "Log all ProcessEvent calls";
+            this.logAllProcessEventCallsToolStripMenuItem.Click += new System.EventHandler(this.logAllProcessEventCallsToolStripMenuItem_Click);
+            // 
+            // disableCrashReportingToolStripMenuItem
+            // 
+            this.disableCrashReportingToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("disableCrashReportingToolStripMenuItem.Image")));
+            this.disableCrashReportingToolStripMenuItem.Name = "disableCrashReportingToolStripMenuItem";
+            this.disableCrashReportingToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.disableCrashReportingToolStripMenuItem.Text = "Disable crash reporting";
+            this.disableCrashReportingToolStripMenuItem.Click += new System.EventHandler(this.disableCrashReportingToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
@@ -130,14 +138,6 @@
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-            // 
-            // disableCrashReportingToolStripMenuItem
-            // 
-            this.disableCrashReportingToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("disableCrashReportingToolStripMenuItem.Image")));
-            this.disableCrashReportingToolStripMenuItem.Name = "disableCrashReportingToolStripMenuItem";
-            this.disableCrashReportingToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
-            this.disableCrashReportingToolStripMenuItem.Text = "Disable crash reporting";
-            this.disableCrashReportingToolStripMenuItem.Click += new System.EventHandler(this.disableCrashReportingToolStripMenuItem_Click);
             // 
             // frmLauncher
             // 
@@ -174,7 +174,7 @@
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem disableAntiDebugToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem logAllEventsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem logAllProcessEventCallsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem disableCrashReportingToolStripMenuItem;
     }
 }

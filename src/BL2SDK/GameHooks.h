@@ -4,6 +4,7 @@
 #include "BL2SDK/CHookManager.h"
 
 typedef bool (tProcessEventHook) (UObject*, UFunction*, void*, void*);
+typedef bool (tCallFunctionHook) (UObject*, FFrame&, void* const, UFunction*);
 
 namespace GameHooks
 {
@@ -12,6 +13,7 @@ namespace GameHooks
 
 	void Initialize();
 	bool ProcessEngineHooks(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult);
+	bool ProcessUnrealScriptHooks(UObject* pCaller, FFrame& Stack, void* const Result, UFunction* Function);
 }
 
 #endif

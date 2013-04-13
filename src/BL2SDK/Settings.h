@@ -6,7 +6,7 @@
 
 struct LauncherStruct {
 	bool DisableAntiDebug;
-	bool LogAllEvents;
+	bool LogAllProcessEventCalls;
 	bool DisableCrashRpt;
 	const LPWSTR BinPath;
 };

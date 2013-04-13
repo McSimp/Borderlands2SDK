@@ -49,6 +49,11 @@ namespace GameHooks
 		return true;
 	}
 
+	bool ProcessUnrealScriptHooks(UObject* pCaller, FFrame& Stack, void* const Result, UFunction* Function)
+	{
+		return true;
+	}
+
 	extern "C" __declspec(dllexport) void LUAFUNC_AddStaticEngineHook(UFunction* pFunction, tProcessEventHook* funcHook)
 	{
 		CHookManager::tFuncNameHookPair hookPair = std::make_pair("LuaHook", funcHook);

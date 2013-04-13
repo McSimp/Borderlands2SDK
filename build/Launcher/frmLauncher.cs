@@ -114,7 +114,7 @@ namespace Launcher
             [MarshalAs(UnmanagedType.I1)]
             public bool DisableAntiDebug;
             [MarshalAs(UnmanagedType.I1)]
-            public bool LogAllEvents;
+            public bool LogAllProcessEventCalls;
             [MarshalAs(UnmanagedType.I1)]
             public bool DisableCrashRpt;
             [CustomMarshalAs(CustomUnmanagedType.LPWStr)]
@@ -150,7 +150,7 @@ namespace Launcher
                     SettingsStruct arg = new SettingsStruct() 
                     {
                         DisableAntiDebug = disableAntiDebugToolStripMenuItem.Checked,
-                        LogAllEvents = logAllEventsToolStripMenuItem.Checked,
+                        LogAllProcessEventCalls = logAllProcessEventCallsToolStripMenuItem.Checked,
                         DisableCrashRpt = disableCrashReportingToolStripMenuItem.Checked,
                         BinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\"
                     };
@@ -260,9 +260,9 @@ namespace Launcher
             disableAntiDebugToolStripMenuItem.Checked = !disableAntiDebugToolStripMenuItem.Checked;
         }
 
-        private void logAllEventsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void logAllProcessEventCallsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            logAllEventsToolStripMenuItem.Checked = !logAllEventsToolStripMenuItem.Checked;
+            logAllProcessEventCallsToolStripMenuItem.Checked = !logAllProcessEventCallsToolStripMenuItem.Checked;
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)

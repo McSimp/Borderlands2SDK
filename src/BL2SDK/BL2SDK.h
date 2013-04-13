@@ -12,7 +12,8 @@ namespace BL2SDK
 	//typedef int (tUnrealEH) (unsigned int, struct _EXCEPTION_POINTERS*);
 	typedef void (__thiscall *tCallFunction) (UObject*, FFrame&, void* const, UFunction*);
 
-	void LogAllEvents(bool enabled);
+	void LogAllProcessEventCalls(bool enabled);
+	void LogAllUnrealScriptCalls(bool enabled);
 	bool GetGameVersion(std::wstring& appVersion);
 	void InjectedCallNext();
 	void Initialize(LauncherStruct* args);
