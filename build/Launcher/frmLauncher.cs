@@ -116,6 +116,8 @@ namespace Launcher
             [MarshalAs(UnmanagedType.I1)]
             public bool LogAllProcessEventCalls;
             [MarshalAs(UnmanagedType.I1)]
+            public bool LogAllUnrealScriptCalls;
+            [MarshalAs(UnmanagedType.I1)]
             public bool DisableCrashRpt;
             [CustomMarshalAs(CustomUnmanagedType.LPWStr)]
             public string BinPath;
@@ -151,6 +153,7 @@ namespace Launcher
                     {
                         DisableAntiDebug = disableAntiDebugToolStripMenuItem.Checked,
                         LogAllProcessEventCalls = logAllProcessEventCallsToolStripMenuItem.Checked,
+                        LogAllUnrealScriptCalls = logAllUnrealScriptCallsToolStripMenuItem.Checked,
                         DisableCrashRpt = disableCrashReportingToolStripMenuItem.Checked,
                         BinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\"
                     };
@@ -273,6 +276,11 @@ namespace Launcher
         private void disableCrashReportingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             disableCrashReportingToolStripMenuItem.Checked = !disableCrashReportingToolStripMenuItem.Checked;
+        }
+
+        private void logAllUnrealScriptCallsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            logAllUnrealScriptCallsToolStripMenuItem.Checked = !logAllUnrealScriptCallsToolStripMenuItem.Checked;
         }
     }
 }

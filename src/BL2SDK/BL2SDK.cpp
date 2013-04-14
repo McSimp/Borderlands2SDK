@@ -40,7 +40,10 @@ namespace BL2SDK
 
 		if(bLogAllProcessEvent)
 		{
-			Logging::LogF("===== ProcessEvent called =====\npCaller Name = %s\npFunction Name = %s\n", pCaller->GetFullName(), pFunction->GetFullName());
+			std::string callerName = pCaller->GetFullName();
+			std::string functionName = pFunction->GetFullName();
+
+			Logging::LogF("===== ProcessEvent called =====\npCaller Name = %s\npFunction Name = %s\n", callerName.c_str(), functionName.c_str());
 		}
 		
 		if(!GameHooks::ProcessEngineHooks(pCaller, pFunction, pParms, pResult))
@@ -60,7 +63,10 @@ namespace BL2SDK
 
 		if(bLogAllUnrealScriptCalls)
 		{
-			Logging::LogF("===== CallFunction called =====\npCaller Name = %s\npFunction Name = %s\n", pCaller->GetFullName(), Function->GetFullName());
+			std::string callerName = pCaller->GetFullName();
+			std::string functionName = Function->GetFullName();
+
+			Logging::LogF("===== CallFunction called =====\npCaller Name = %s\npFunction Name = %s\n", callerName.c_str(), functionName.c_str());
 		}
 
 		if(!GameHooks::ProcessUnrealScriptHooks(pCaller, Stack, Result, Function))
@@ -85,31 +91,6 @@ namespace BL2SDK
 	void LogAllUnrealScriptCalls(bool enabled)
 	{
 		bLogAllUnrealScriptCalls = enabled;
-	}
-
-	unsigned long GObjects()
-	{
-		return pGObjects;
-	}
-
-	unsigned long GNames()
-	{
-		return pGNames;
-	}
-
-	unsigned long addrProcessEvent()
-	{
-		return (unsigned long)pProcessEvent;
-	}
-
-	unsigned long GObjHash()
-	{
-		return pGObjHash;
-	}
-
-	unsigned long addrCallFunction()
-	{
-		return (unsigned long)pCallFunction;
 	}
 
 	int UnrealExceptionHandler(unsigned int code, struct _EXCEPTION_POINTERS *ep)
@@ -265,7 +246,9 @@ namespace BL2SDK
 		GameHooks::Initialize();
 
 		HookGame();
+
 		LogAllProcessEventCalls(args->LogAllProcessEventCalls);
+		LogAllUnrealScriptCalls(args->LogAllUnrealScriptCalls);
 
 		D3D9Hook::Initialize();
 

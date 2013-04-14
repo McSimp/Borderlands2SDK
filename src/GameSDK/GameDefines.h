@@ -114,7 +114,7 @@ struct FName
 
 	static TArray< FNameEntry* >* Names() 
 	{ 
-		return (TArray< FNameEntry* >*) BL2SDK::GNames(); 
+		return (TArray< FNameEntry* >*) BL2SDK::pGNames; 
 	}; 
 
 	char* GetName() 

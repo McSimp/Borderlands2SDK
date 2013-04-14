@@ -48,4 +48,35 @@ ffi.cdef[[
 		struct UObject* ObjectPointer; 
 		void* InterfacePointer; 
 	};
+
+	struct FOutputDevice
+	{
+		void* VfTable;
+		unsigned long bAllowSuppression;
+		unsigned long bSuppressEventTag;
+		unsigned long bAutoEmitLineTerminator;
+	};
+
+	struct FOutParmRec
+	{
+		struct UProperty* Property;
+		unsigned char* PropAddr;
+		struct FOutParmRec* NextOutParm;
+	};
+	
+	struct FFrame
+	{
+		void* VfTable;
+		unsigned long bAllowSuppression;
+		unsigned long bSuppressEventTag;
+		unsigned long bAutoEmitLineTerminator;
+
+		struct UStruct* Node;
+		struct UObject* Object;
+		unsigned char* Code;
+		unsigned char* Locals;
+
+		struct FFrame* PreviousFrame;
+		struct FOutParmRec* OutParms;
+	};
 ]]

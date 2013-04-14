@@ -21,11 +21,9 @@
 
 namespace BL2SDK
 {
-	unsigned long GNames();
-	unsigned long GObjects();
-	unsigned long addrProcessEvent();
-	unsigned long GObjHash();
-	unsigned long addrCallFunction();
+	extern unsigned long pGObjects;
+	extern unsigned long pGNames;
+	extern unsigned long pGObjHash;
 }
 
 #include "GameSDK/GameDefines.h"

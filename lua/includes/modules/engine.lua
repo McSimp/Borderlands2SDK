@@ -336,6 +336,6 @@ ffi.cdef[[
 void LUAFUNC_LogAllEvents(bool enabled);
 ]]
 
-function LogAllEvents(enabled)
-	ffi.C.LUAFUNC_LogAllEvents(enabled)
+function LogAllProcessEventCalls(enabled)
+	ffi.C.LUAFUNC_LogAllProcessEventCalls(enabled)
 end
