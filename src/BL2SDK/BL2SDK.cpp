@@ -266,4 +266,9 @@ namespace BL2SDK
 	{
 		LogAllProcessEventCalls(enabled);
 	}
+
+	extern "C" __declspec(dllexport) void LUAFUNC_LogAllUnrealScriptCalls(bool enabled)
+	{
+		LogAllUnrealScriptCalls(enabled);
+	}
 }

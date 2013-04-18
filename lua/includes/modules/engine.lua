@@ -333,9 +333,14 @@ function Initialize()
 end
 
 ffi.cdef[[
-void LUAFUNC_LogAllEvents(bool enabled);
+void LUAFUNC_LogAllProcessEventCalls(bool enabled);
+void LUAFUNC_LogAllUnrealScriptCalls(bool enabled);
 ]]
 
 function LogAllProcessEventCalls(enabled)
 	ffi.C.LUAFUNC_LogAllProcessEventCalls(enabled)
+end
+
+function LogAllUnrealScriptCalls(enabled)
+	ffi.C.LUAFUNC_LogAllUnrealScriptCalls(enabled)
 end

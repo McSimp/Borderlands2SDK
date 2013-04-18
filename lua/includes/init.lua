@@ -16,6 +16,7 @@ require("FName")
 require("TArray")
 require("FString")
 require("UObject")
+require("FFrame")
 
 -- Load engine functions
 require("engine")
@@ -35,6 +36,7 @@ else
 	engine.Initialize()
 
 	require("engineHook")
+	require("scriptHook")
 end
 
 jit.v.off()

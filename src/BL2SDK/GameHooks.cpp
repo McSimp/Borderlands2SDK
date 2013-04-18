@@ -51,6 +51,35 @@ namespace GameHooks
 
 	bool ProcessUnrealScriptHooks(UObject* pCaller, FFrame& Stack, void* const Result, UFunction* Function)
 	{
+		// Resolve any virtual hooks into static hooks
+		UnrealScriptHookManager->ResolveVirtualHooks(Function);
+
+		// Call any static hooks that may exist
+		CHookManager::tiStaticHooks iHooks = UnrealScriptHookManager->StaticHooks.find(Function);
+		if(iHooks != UnrealScriptHookManager->StaticHooks.end())
+		{
+			CHookManager::tHookMap hooks = iHooks->second;
+
+			// TODO: Still not sure on best implementation here. Would it be better
+			// just to stop every single next hook if one returns false?
+			bool engineShouldRun = true;
+			for(CHookManager::tiHookMap iterator = hooks.begin(); iterator != hooks.end(); iterator++)
+			{
+				// maps to std::string, void*, but we want to call a tCallFunctionHook* instead
+				if(!((tCallFunctionHook*)iterator->second)(pCaller, Stack, Result, Function))
+				{
+					engineShouldRun = false;
+				}
+			}
+
+			if(!engineShouldRun)
+			{
+				// Tell the SDK not to run this function through the engine
+				return false;
+			}
+		}
+
+		// Run the function in the engine as normal
 		return true;
 	}
 
@@ -63,6 +92,17 @@ namespace GameHooks
 	extern "C" __declspec(dllexport) void LUAFUNC_RemoveStaticEngineHook(UFunction* pFunction)
 	{
 		EngineHookManager->RemoveStaticHook(pFunction, "LuaHook");
+	}
+
+	extern "C" __declspec(dllexport) void LUAFUNC_AddStaticScriptHook(UFunction* pFunction, tCallFunctionHook* funcHook)
+	{
+		CHookManager::tFuncNameHookPair hookPair = std::make_pair("LuaHook", funcHook);
+		UnrealScriptHookManager->AddStaticHook(pFunction, hookPair);
+	}
+
+	extern "C" __declspec(dllexport) void LUAFUNC_RemoveStaticScriptHook(UFunction* pFunction)
+	{
+		UnrealScriptHookManager->RemoveStaticHook(pFunction, "LuaHook");
 	}
 }
 

@@ -28,7 +28,7 @@ function ProcessHooks(pObject, pFunction, pParms, pResult)
 	local hookTable = RegisteredHooks[ptrNum]
 
 	if hookTable == nil then
-		print(string.format("[Lua] Warning: ProcessHooks called for %s (0x%X) with no hook table",
+		print(string.format("[Lua] Warning: engineHook.ProcessHooks called for %s (0x%X) with no hook table",
 			pFunction:GetName(),
 			ptrNum))
 		return true
