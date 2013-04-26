@@ -402,7 +402,7 @@ const char* CLuaInterface::GetStringOrError(int i)
 	return this->GetString(i);
 }
 
-// VIRT DONE
+// VIRT DONE (Might be leaking memory)
 CUtlLuaVector* CLuaInterface::GetAllTableMembers(int i)
 {
 	if(i != 0)
@@ -795,6 +795,8 @@ void CLuaInterface::SetSDKValues()
 	sdkTable->SetMember("addrGObjects", (double)BL2SDK::pGObjects);
 	sdkTable->SetMember("addrProcessEvent", (double)(unsigned long)BL2SDK::pProcessEvent);
 	sdkTable->SetMember("addrGObjHash", (double)BL2SDK::pGObjHash);
+	sdkTable->SetMember("addrFrameStep", (double)(unsigned long)BL2SDK::pFrameStep);
+	sdkTable->SetMember("addrCallFunction", (double)(unsigned long)BL2SDK::pCallFunction);
 
 	this->Global()->SetMember("bl2sdk", sdkTable);
 

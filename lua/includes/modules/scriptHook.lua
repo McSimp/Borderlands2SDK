@@ -1,8 +1,16 @@
 local ffi = require("ffi")
+local engine = engine
+local PtrToNum = PtrToNum
+local table = table
+local type = type
+local print = print
+local error = error
+local pairs = pairs
+local string = string
 
 ffi.cdef[[
 typedef bool (*tCallFunctionHook) (struct UObject*, struct FFrame&, void* const Result, struct UFunction*);
-void LUAFUNC_AddStaticScriptHook(struct UFunction* pFunction, tCallFunctionHook* funcHook);
+void LUAFUNC_AddStaticScriptHook(struct UFunction* pFunction, tCallFunctionHook funcHook);
 void LUAFUNC_RemoveStaticScriptHook(struct UFunction* pFunction);
 ]]
 
@@ -10,7 +18,7 @@ module("scriptHook")
 
 RegisteredHooks = {}
 
-function ProcessHooks(pObject, Stack, Result, Function)
+function ProcessHooks(Object, Stack, Result, Function)
 	local ptrNum = PtrToNum(Function)
 	local hookTable = RegisteredHooks[ptrNum]
 
@@ -19,6 +27,10 @@ function ProcessHooks(pObject, Stack, Result, Function)
 			Function:GetName(),
 			ptrNum))
 		return true
+	end
+
+	for _,v in pairs(hookTable) do
+		v(pObject, Stack, Result, Function)
 	end
 
 	return true

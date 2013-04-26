@@ -11,9 +11,11 @@ namespace BL2SDK
 	typedef void (__thiscall *tProcessEvent) (UObject*, UFunction*, void*, void*);
 	//typedef int (tUnrealEH) (unsigned int, struct _EXCEPTION_POINTERS*);
 	typedef void (__thiscall *tCallFunction) (UObject*, FFrame&, void* const, UFunction*);
+	typedef void (__thiscall *tFrameStep) (FFrame*, UObject*, void* const);
 
 	extern tProcessEvent pProcessEvent;
 	extern tCallFunction pCallFunction;
+	extern tFrameStep pFrameStep;
 
 	void LogAllProcessEventCalls(bool enabled);
 	void LogAllUnrealScriptCalls(bool enabled);

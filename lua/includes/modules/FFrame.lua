@@ -1,39 +1,38 @@
 local ffi = require("ffi")
 
+ffi.cdef[[
+typedef void (__thiscall *tFrameStep) (struct FFrame*, struct UObject*, void* const);
+]]
+local pFrameStep = ffi.cast("tFrameStep", bl2sdk.addrFrameStep)
+
 local FFrameMT = {}
-local NativeFunctions = {}
 
-
+function FFrameMT.ReadType(self, ptrType, size)
+	local result = ffi.cast(ptrType, self.Code)[0]
+	self.Code = self.Code + size
+	return result
+end
 
 function FFrameMT.ReadInt(self)
-	local result = ffi.cast("int*", self.Code)[0]
-	self.Code = self.Code + 4
-	return result
+	return self:ReadType(ffi.typeof("int*"), 4)
 end
 
 function FFrameMT.ReadFloat(self)
-	local result = ffi.cast("float*", self.Code)[0]
-	self.Code = self.Code + 4
-	return result
+	return self:ReadType(ffi.typeof("float*"), 4)
 end
 
 function FFrameMT.ReadName(self)
-	local result = ffi.cast("struct FName*", self.Code)[0]
-	self.Code = self.Code + ffi.sizeof("struct FName")
-	return result
+	return self:ReadType(ffi.typeof("struct FName*"), ffi.sizeof("struct FName"))
 end
 
 function FFrameMT.ReadObject(self)
-	local result = ffi.cast("struct UObject*", self.Code)[0]
-	self.Code = self.Code + ffi.sizeof("unsigned long long")
-	return result
+	return self:ReadType(ffi.typeof("struct UObject**"), 8) -- In C++, size = sizeof(ScriptPointerType) = sizeof(QWORD) = 8
 end
 
 function FFrameMT.ReadWord(self)
-	local result = ffi.cast("unsigned short*", self.Code)[0]
-	self.Code = self.Code + 2
-	return result
+	return self:ReaadType(ffi.typeof("unsigned short*"), 2)
 end
 
+FFrameMT.Step = pFrameStep
 
 ffi.metatype("struct FFrame", { __index = FFrameMT })

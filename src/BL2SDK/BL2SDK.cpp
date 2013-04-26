@@ -24,6 +24,7 @@ namespace BL2SDK
 	unsigned long								pGObjHash;
 	tProcessEvent								pProcessEvent;
 	tCallFunction								pCallFunction;
+	tFrameStep									pFrameStep;
 
 	void __stdcall hkProcessEvent(UFunction* pFunction, void* pParms, void* pResult)
 	{
@@ -182,6 +183,10 @@ namespace BL2SDK
 		pCallFunction = reinterpret_cast<tCallFunction>(sigscan.Scan((unsigned char*)CallFunction_Pattern, CallFunction_Mask));
 		Logging::LogF("[Internal] UObject::CallFunction() = 0x%X\n", pCallFunction);
 
+		// Sigscan for FFrame::Step
+		pFrameStep = reinterpret_cast<tFrameStep>(sigscan.Scan((unsigned char*)FrameStep_Pattern, FrameStep_Mask));
+		Logging::LogF("[Internal] FFrame::Step() = 0x%X\n", pFrameStep);
+
 		// Detour UObject::ProcessEvent()
 		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkProcessEvent);
 		detProcessEvent.Attach();
@@ -260,6 +265,7 @@ namespace BL2SDK
 	void Cleanup()
 	{
 		Logging::Cleanup();
+		GameHooks::Cleanup();
 	}
 
 	extern "C" __declspec(dllexport) void LUAFUNC_LogAllProcessEventCalls(bool enabled)

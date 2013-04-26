@@ -15,6 +15,17 @@ namespace GameHooks
 		Logging::LogF("[GameHooks] UnrealScriptHookManager = 0x%X\n", UnrealScriptHookManager);
 	}
 
+	void Cleanup()
+	{
+		delete EngineHookManager;
+		EngineHookManager = NULL;
+
+		delete UnrealScriptHookManager;
+		UnrealScriptHookManager = NULL;
+
+		// TODO: Would it be best to do the detours in this?
+	}
+
 	bool ProcessEngineHooks(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
 	{
 		// Resolve any virtual hooks into static hooks
