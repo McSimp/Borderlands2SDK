@@ -1,7 +1,7 @@
 local ffi = require("ffi")
 
 ffi.cdef[[
-typedef void (__thiscall *tFrameStep) (struct FFrame*, struct UObject*, void* const);
+typedef void (__thiscall *tFrameStep) (struct FFrame*, struct UObject*, void*);
 ]]
 local pFrameStep = ffi.cast("tFrameStep", bl2sdk.addrFrameStep)
 
@@ -34,5 +34,38 @@ function FFrameMT.ReadWord(self)
 end
 
 FFrameMT.Step = pFrameStep
+
+local function GetGenericNumber(Stack)
+	local var = ffi.new("int[1]", 0)
+	pFrameStep(Stack, Stack.Object, var)
+	return var[0]
+end
+
+local function GetCastedType(Stack, toCast)
+	local var = ffi.new(toCast .. "[1]")
+	pFrameStep(Stack, Stack.Object, var)
+	return var[0]
+end
+
+FFrameMT.GetBool = GetGenericNumber
+FFrameMT.GetStruct = GetCastedType
+FFrameMT.GetInt = GetGenericNumber
+FFrameMT.GetFloat = GetGenericNumber
+FFrameMT.GetByte = GetGenericNumber
+
+function FFrameMT.GetName(self)
+	return GetCastedType(self, "struct FName")
+end
+
+function FFrameMT.GetString(self)
+	return GetCastedType(self, "struct FString")
+end
+
+-- TODO: TArray inner type
+function FFrameMT.GetTArray(self)
+	return GetCastedType(self, "struct TArray")
+end
+
+FFrameMT.GetObject = GetCastedType -- Have to use a pointer type (like struct UObject*)
 
 ffi.metatype("struct FFrame", { __index = FFrameMT })

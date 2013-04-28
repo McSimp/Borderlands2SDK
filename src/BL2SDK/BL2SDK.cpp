@@ -25,6 +25,7 @@ namespace BL2SDK
 	tProcessEvent								pProcessEvent;
 	tCallFunction								pCallFunction;
 	tFrameStep									pFrameStep;
+	tExit										pExit;
 
 	void __stdcall hkProcessEvent(UFunction* pFunction, void* pParms, void* pResult)
 	{
@@ -77,6 +78,12 @@ namespace BL2SDK
 		}
 
 		pCallFunction(pCaller, Stack, Result, Function);
+	}
+
+	void __cdecl hkExit(int Code)
+	{
+		_asm nop;
+		pExit(Code);
 	}
 
 	void InjectedCallNext()
@@ -198,6 +205,10 @@ namespace BL2SDK
 		// Detour UObject::CallFunction()
 		SETUP_SIMPLE_DETOUR(detCallFunction, pCallFunction, hkCallFunction);
 		detCallFunction.Attach();
+
+		pExit = &exit;
+		SETUP_SIMPLE_DETOUR(detExit, pExit, hkExit);
+		detExit.Attach();
 	}
 
 	// This function is used to get the dimensions of the game window for Gwen's renderer

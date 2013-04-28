@@ -787,6 +787,16 @@ void CLuaInterface::SetPaths()
 	pkg->UnReference();
 }
 
+void __stdcall LuaFrameHook(UObject* Object, void* const Result)
+{
+	FFrame* Stack;
+	_asm mov Stack, ecx;
+
+	Logging::LogF("FrameHook called 0x%X, 0x%X, 0x%X\n", Stack, Object, Result);
+
+	BL2SDK::pFrameStep(Stack, Object, Result);
+}
+
 void CLuaInterface::SetSDKValues()
 {
 	CLuaObject* sdkTable = this->GetNewTable();
@@ -795,7 +805,9 @@ void CLuaInterface::SetSDKValues()
 	sdkTable->SetMember("addrGObjects", (double)BL2SDK::pGObjects);
 	sdkTable->SetMember("addrProcessEvent", (double)(unsigned long)BL2SDK::pProcessEvent);
 	sdkTable->SetMember("addrGObjHash", (double)BL2SDK::pGObjHash);
-	sdkTable->SetMember("addrFrameStep", (double)(unsigned long)BL2SDK::pFrameStep);
+	//sdkTable->SetMember("addrFrameStep", (double)(unsigned long)BL2SDK::pFrameStep);
+	sdkTable->SetMember("addrFrameStep", (double)(unsigned long)&LuaFrameHook);
+	Logging::LogF("LuaFrameHook = 0x%X\n", &LuaFrameHook);
 	sdkTable->SetMember("addrCallFunction", (double)(unsigned long)BL2SDK::pCallFunction);
 
 	this->Global()->SetMember("bl2sdk", sdkTable);
