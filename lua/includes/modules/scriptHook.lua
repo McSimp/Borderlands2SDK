@@ -7,14 +7,18 @@ local print = print
 local error = error
 local pairs = pairs
 local string = string
+local bl2sdk = bl2sdk
 
 ffi.cdef[[
 typedef bool (*tCallFunctionHook) (struct UObject*, struct FFrame&, void* const Result, struct UFunction*);
 void LUAFUNC_AddStaticScriptHook(struct UFunction* pFunction, tCallFunctionHook funcHook);
 void LUAFUNC_RemoveStaticScriptHook(struct UFunction* pFunction);
+typedef void (__thiscall *tCallFunction) (struct UObject*, struct FFrame*, void* const, struct UFunction*);
 ]]
 
 module("scriptHook")
+
+CallFunction = ffi.cast("tCallFunction", bl2sdk.addrCallFunction)
 
 RegisteredHooks = {}
 
@@ -30,7 +34,15 @@ function ProcessHooks(Object, Stack, Result, Function)
 	end
 
 	for _,v in pairs(hookTable) do
-		v(pObject, Stack, Result, Function)
+		local codePtr = Stack.Code
+		local ret = v(Object, Stack, Result, Function)
+		-- A non-nil/false value means that we probably created a new stack and executed
+		-- the function with it, so we don't want the original call to go through.
+		if not ret then
+			Stack.Code = codePtr -- Restore the code pointer to what it was originally
+		else
+			return false
+		end
 	end
 
 	return true

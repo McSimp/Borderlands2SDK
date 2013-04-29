@@ -79,14 +79,8 @@ namespace GameHooks
 				// maps to std::string, void*, but we want to call a tCallFunctionHook* instead
 				if(!((tCallFunctionHook*)iterator->second)(pCaller, Stack, Result, Function))
 				{
-					engineShouldRun = false;
+					return false;
 				}
-			}
-
-			if(!engineShouldRun)
-			{
-				// Tell the SDK not to run this function through the engine
-				return false;
 			}
 		}
 

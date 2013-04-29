@@ -1,56 +1,99 @@
 local ffi = require("ffi")
 local bit = require("bit")
 
+--[[
 scriptHook.Remove(engine.Classes.UCustomizationDefinition.funcs.GetAvailableCustomizationsForPlayer, "LolDev")
 scriptHook.Add(engine.Classes.UCustomizationDefinition.funcs.GetAvailableCustomizationsForPlayer, "LolDev", function(Object, Stack, Result, Function)
 	print("GetAvailableCustomizationsForPlayer called")
 
-	local originalCode = Stack.Code
-	print(originalCode)
-	local out = ""
+	--local a,b = pcall(function(Object, Stack, Result, Function)
+		local originalCode = Stack.Code
 
-	while true do
-		local opcode = Stack.Code[0]
-		out = out .. bit.tohex(opcode, 2) .. " "
-		if opcode == 0x16 then break end
-		Stack.Code = Stack.Code + 1
-	end
+		print(Stack:GetFuncArgsHex())
 
-	print(out)
+		local PC = Stack:GetObject("struct AWillowPlayerController*")
+		Stack:GetTArray()
+		Stack:GetTArray()
+		Stack:GetInt()
+		local RequiredType = Stack:GetObject("struct UObject*")
+		local bDebugAllowLocked = Stack:GetBool()
+		local CharacterClassOverride = Stack:GetObject("struct UWillowCharacterClassDefinition*")
 
-	Stack.Code = originalCode
-	print(Stack.Code)
+		print(PC, RequiredType, bDebugAllowLocked, CharacterClassOverride)
+		print(PC:GetFullName())
+		print(RequiredType:GetFullName())
 
-	local PC = Stack:GetObject("struct AWillowPlayerController*")
-	Stack:GetTArray()
-	Stack:GetTArray()
-	Stack:GetInt()
-	local RequiredType = Stack:GetObject("struct UObject*")
-	local bDebugAllowLocked = Stack:GetBool()
-	local CharacterClassOverride = Stack:GetObject("struct UWillowCharacterClassDefinition*")
+		Stack.Code = originalCode
 
-	print(PC, RequiredType, bDebugAllowLocked, CharacterClassOverride)
-	print(PC:GetFullName())
-	print(RequiredType:GetFullName())
-	
+		Stack:PrintStackInfo()
 
-	Stack.Code = originalCode
+		local newStack = FFrame.NewStack(Stack)
+		local startCode = newStack.Code
+
+		Stack:CopyStep(newStack)
+		Stack:CopyStep(newStack)
+		Stack:CopyStep(newStack)
+		Stack:CopyStep(newStack)
+		Stack:CopyStep(newStack)
+		newStack:WriteOpToCode(0x27)
+		newStack:WriteOpToCode(0x4A)
+		newStack:WriteOpToCode(0x16)
+		newStack:WriteOpToCode(0x0F)
+
+		newStack.Code = startCode
+		Stack.Code = originalCode
+
+		print(newStack:GetFuncArgsHex())
+
+		newStack:PrintStackInfo()
+
+		scriptHook.CallFunction(Object, newStack, Result, Function)
+
+		newStack:PrintStackInfo()
+
+		Stack:SkipFunction()
+	--end, Object, Stack, Result, Function)
+
+	--print(a,b)
+
+	return true
 end)
-
---[[
-for i=0,(engine.Objects.Count-1) do
-
-	local obj = engine.Objects:Get(i)
-	if IsNull(obj) then goto continue end
-	if not obj:IsA(engine.Classes.UGearboxAccountData) then goto continue end
-
-	obj = ffi.cast("struct UGearboxAccountData*", obj)
-
-	print(obj:GetFullName() .. " => " .. obj.Index)
-
-	::continue::
-end
 ]]
+
+scriptHook.Remove(engine.Classes.UCustomizationDefinition.funcs.GetAvailableCustomizationsForPlayer, "LolDev2")
+scriptHook.Add(engine.Classes.UCustomizationDefinition.funcs.GetAvailableCustomizationsForPlayer, "LolDev2", function(Object, Stack, Result, Function)
+	print("GetAvailableCustomizationsForPlayer called")
+
+	local originalCode = Stack.Code
+	print(Stack:GetFuncArgsHex())
+	Stack:PrintStackInfo()
+
+	local newStack = FFrame.NewStack(Stack)
+	local startCode = newStack.Code
+
+	Stack:CopyStep(newStack)
+	Stack:CopyStep(newStack)
+	Stack:CopyStep(newStack)
+	Stack:CopyStep(newStack)
+	Stack:CopyStep(newStack)
+	newStack:WriteOpToCode(0x27)
+	newStack:WriteOpToCode(0x4A)
+	newStack:WriteOpToCode(0x16)
+
+	newStack.Code = startCode
+	Stack.Code = originalCode
+
+	print(newStack:GetFuncArgsHex())
+	newStack:PrintStackInfo()
+
+	scriptHook.CallFunction(Object, newStack, Result, Function)
+
+	newStack:PrintStackInfo()
+
+	Stack:SkipFunction()
+
+	return true
+end)
 
 --[[
 args = {
