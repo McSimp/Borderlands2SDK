@@ -12,6 +12,7 @@ function FFrameMT.GetFuncArgsHex(self)
 	local originalCode = self.Code
 	local out = ""
 
+	-- TODO: Limit
 	while true do
 		local opcode = self.Code[0]
 		out = out .. bit.tohex(opcode, 2) .. " "
@@ -147,6 +148,7 @@ function FFrameMT.PrintStackInfo(self)
 end
 
 function FFrameMT.SkipFunction(self)
+	-- TODO: Limit
 	while true do
 		local opcode = self.Code[0]
 		self.Code = self.Code + 1

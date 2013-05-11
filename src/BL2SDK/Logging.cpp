@@ -9,27 +9,27 @@
 
 namespace Logging
 {
-	HANDLE				hLogFile				= NULL;
-	bool				bLogToExternalConsole	= false;
-	bool				bLogToFile				= false;
-	bool				bLogToGameConsole		= false;
-	UConsole*			pGameConsole			= NULL;
+	HANDLE logFile = NULL;
+	bool logToExternalConsole = false;
+	bool logToFile = false;
+	bool logToGameConsole = false;
+	UConsole* gameConsole = NULL;
 
-	void LogToFile(const char* szBuff, int len)
+	void LogToFile(const char* buff, int len)
 	{
-		if(hLogFile != INVALID_HANDLE_VALUE)
+		if(logFile != INVALID_HANDLE_VALUE)
 		{
 			// Write to the log file. 0 fucks given if it fails.
-			DWORD dwBytesWritten = 0;
-			WriteFile(hLogFile, szBuff, len, &dwBytesWritten, NULL);
+			DWORD bytesWritten = 0;
+			WriteFile(logFile, buff, len, &bytesWritten, NULL);
 		}
 	}
 
-	void LogWinConsole(const char* szBuff, int len)
+	void LogWinConsole(const char* buff, int len)
 	{
-		HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-		DWORD dwBytesWritten = 0;
-		WriteFile(hOutput, szBuff, len, &dwBytesWritten, NULL);
+		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+		DWORD bytesWritten = 0;
+		WriteFile(output, buff, len, &bytesWritten, NULL);
 	}
 
 	void Log(const char* formatted, int length)
@@ -37,28 +37,28 @@ namespace Logging
 		if(length == 0)
 			length = strlen(formatted);
 
-		if(bLogToExternalConsole)
+		if(logToExternalConsole)
 			LogWinConsole(formatted, length);
 
-		if(bLogToFile)
+		if(logToFile)
 			LogToFile(formatted, length);
 		
-		if(bLogToGameConsole)
+		if(logToGameConsole)
 		{
-			if(pGameConsole != NULL)
+			if(gameConsole != NULL)
 			{
 				std::wstring wfmt = Util::Widen(formatted);
 				BL2SDK::InjectedCallNext();
-				pGameConsole->eventOutputText(FString((wchar_t*)wfmt.c_str()));
+				gameConsole->eventOutputText(FString((wchar_t*)wfmt.c_str()));
 			}
 		}
 	}
 
-	void LogF(const char* szFmt, ...)
+	void LogF(const char* fmt, ...)
 	{
 		va_list args;
-		va_start(args, szFmt);
-		std::string formatted = Util::FormatInternal(szFmt, args); 
+		va_start(args, fmt);
+		std::string formatted = Util::FormatInternal(fmt, args); 
 		va_end(args);
 
 		Log(formatted.c_str(), formatted.length());
@@ -69,20 +69,20 @@ namespace Logging
 		BOOL result = AllocConsole();
 		if(result)
 		{
-			bLogToExternalConsole = true;
+			logToExternalConsole = true;
 		}
 	}
 
 	// Everything else can fail, but InitializeFile must work.
 	void InitializeFile(const std::wstring& fileName)
 	{
-		hLogFile = CreateFile(fileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if(hLogFile == INVALID_HANDLE_VALUE)
+		logFile = CreateFile(fileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if(logFile == INVALID_HANDLE_VALUE)
 		{
 			throw FatalSDKException(1000, "Failed to initialize log file (INVALID_HANDLE_VALUE)");
 		}
 		
-		bLogToFile = true;
+		logToFile = true;
 	}
 
 	// TODO: Cleanup
@@ -93,8 +93,8 @@ namespace Logging
 
 		if(console != NULL)
 		{
-			pGameConsole = console;
-			bLogToGameConsole = true;
+			gameConsole = console;
+			logToGameConsole = true;
 		}
 		else
 		{
@@ -109,10 +109,10 @@ namespace Logging
 
 	void Cleanup()
 	{
-		if(hLogFile != INVALID_HANDLE_VALUE)
+		if(logFile != INVALID_HANDLE_VALUE)
 		{
-			FlushFileBuffers(hLogFile);
-			CloseHandle(hLogFile);
+			FlushFileBuffers(logFile);
+			CloseHandle(logFile);
 		}
 	}
 }

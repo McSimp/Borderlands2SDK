@@ -15,93 +15,93 @@
 
 namespace BL2SDK
 {
-	bool										bInjectedCallNext = false;
-	bool										bLogAllProcessEvent = false;
-	bool										bLogAllUnrealScriptCalls = false;
+	bool injectedCallNext = false;
+	bool logAllProcessEvent = false;
+	bool logAllUnrealScriptCalls = false;
 
-	unsigned long								pGObjects;
-	unsigned long								pGNames;
-	unsigned long								pGObjHash;
-	tProcessEvent								pProcessEvent;
-	tCallFunction								pCallFunction;
-	tFrameStep									pFrameStep;
-	tExit										pExit;
+	unsigned long pGObjects;
+	unsigned long pGNames;
+	unsigned long pGObjHash;
+	tProcessEvent pProcessEvent;
+	tCallFunction pCallFunction;
+	tFrameStep pFrameStep;
+	tExit pExit;
 
-	void __stdcall hkProcessEvent(UFunction* pFunction, void* pParms, void* pResult)
+	void __stdcall hkProcessEvent(UFunction* function, void* parms, void* result)
 	{
 		// Get "this"
-		UObject* pCaller;
-		_asm mov pCaller, ecx;
+		UObject* caller;
+		_asm mov caller, ecx;
 
-		if(bInjectedCallNext)
+		if(injectedCallNext)
 		{
-			bInjectedCallNext = false;
-			pProcessEvent(pCaller, pFunction, pParms, pResult);
+			injectedCallNext = false;
+			pProcessEvent(caller, function, parms, result);
 			return;
 		}
 
-		if(bLogAllProcessEvent)
+		if(logAllProcessEvent)
 		{
-			std::string callerName = pCaller->GetFullName();
-			std::string functionName = pFunction->GetFullName();
+			std::string callerName = caller->GetFullName();
+			std::string functionName = function->GetFullName();
 
 			Logging::LogF("===== ProcessEvent called =====\npCaller Name = %s\npFunction Name = %s\n", callerName.c_str(), functionName.c_str());
 		}
 		
-		if(!GameHooks::ProcessEngineHooks(pCaller, pFunction, pParms, pResult))
+		if(!GameHooks::ProcessEngineHooks(caller, function, parms, result))
 		{
 			// The engine hook manager told us not to pass this function to the engine
 			return;
 		}
 		
-		pProcessEvent(pCaller, pFunction, pParms, pResult);
+		pProcessEvent(caller, function, parms, result);
 	}
 
-	void __stdcall hkCallFunction(FFrame& Stack, void* const Result, UFunction* Function)
+	void __stdcall hkCallFunction(FFrame& stack, void* const result, UFunction* function)
 	{
 		// Get "this"
-		UObject* pCaller;
-		_asm mov pCaller, ecx;
+		UObject* caller;
+		_asm mov caller, ecx;
 
-		if(bLogAllUnrealScriptCalls)
+		if(logAllUnrealScriptCalls)
 		{
-			std::string callerName = pCaller->GetFullName();
-			std::string functionName = Function->GetFullName();
+			std::string callerName = caller->GetFullName();
+			std::string functionName = function->GetFullName();
 
 			Logging::LogF("===== CallFunction called =====\npCaller Name = %s\npFunction Name = %s\n", callerName.c_str(), functionName.c_str());
 		}
 
-		if(!GameHooks::ProcessUnrealScriptHooks(pCaller, Stack, Result, Function))
+		if(!GameHooks::ProcessUnrealScriptHooks(caller, stack, result, function))
 		{
 			// UnrealScript hook manager already took care of it
 			return;
 		}
 
-		pCallFunction(pCaller, Stack, Result, Function);
+		pCallFunction(caller, stack, result, function);
 	}
 
-	void __cdecl hkExit(int Code)
+	void __cdecl hkExit(int code)
 	{
 		_asm nop;
-		pExit(Code);
+		pExit(code);
 	}
 
 	void InjectedCallNext()
 	{
-		bInjectedCallNext = true;
+		injectedCallNext = true;
 	}
 
 	void LogAllProcessEventCalls(bool enabled)
 	{
-		bLogAllProcessEvent = enabled;
+		logAllProcessEvent = enabled;
 	}
 
 	void LogAllUnrealScriptCalls(bool enabled)
 	{
-		bLogAllUnrealScriptCalls = enabled;
+		logAllUnrealScriptCalls = enabled;
 	}
 
-	int UnrealExceptionHandler(unsigned int code, struct _EXCEPTION_POINTERS *ep)
+	int UnrealExceptionHandler(unsigned int code, struct _EXCEPTION_POINTERS* ep)
 	{
 		if(CrashRptHelper::GenerateReport(code, ep))
 		{
@@ -117,40 +117,40 @@ namespace BL2SDK
 
 	bool GetGameVersion(std::wstring& appVersion)
 	{
-		wchar_t* szFilename = L"Borderlands2.exe";
+		wchar_t* filename = L"Borderlands2.exe";
 
 		// Allocate a block of memory for the version info
-		DWORD dwDummy;
-		DWORD dwSize = GetFileVersionInfoSize(szFilename, &dwDummy);
-		if(dwSize == 0)
+		DWORD dummy;
+		DWORD size = GetFileVersionInfoSize(filename, &dummy);
+		if(size == 0)
 		{
 			Logging::LogF("[BL2SDK] ERROR: GetFileVersionInfoSize failed with error %d\n", GetLastError());
 			return false;
 		}
 		
-		LPBYTE lpVersionInfo = new BYTE[dwSize];
+		LPBYTE versionInfo = new BYTE[size];
 
 		// Load the version info
-		if(!GetFileVersionInfo(szFilename, NULL, dwSize, &lpVersionInfo[0]))
+		if(!GetFileVersionInfo(filename, NULL, size, &versionInfo[0]))
 		{
 			Logging::LogF("[BL2SDK] ERROR: GetFileVersionInfo failed with error %d\n", GetLastError());
 			return false;
 		}
 
 		// Get the version strings
-		VS_FIXEDFILEINFO* lpFfi;
-		unsigned int iProductVersionLen = 0;
+		VS_FIXEDFILEINFO* ffi;
+		unsigned int productVersionLen = 0;
 
-		if(!VerQueryValue(&lpVersionInfo[0], L"\\", (LPVOID*)&lpFfi, &iProductVersionLen))
+		if(!VerQueryValue(&versionInfo[0], L"\\", (LPVOID*)&ffi, &productVersionLen))
 		{
 			Logging::Log("[BL2SDK] ERROR: Can't obtain FixedFileInfo from resources\n");
 			return false;
 		}
 
-		DWORD fileVersionMS = lpFfi->dwFileVersionMS;
-		DWORD fileVersionLS = lpFfi->dwFileVersionLS;
+		DWORD fileVersionMS = ffi->dwFileVersionMS;
+		DWORD fileVersionLS = ffi->dwFileVersionLS;
 
-		delete[] lpVersionInfo;
+		delete[] versionInfo;
 
 		appVersion = Util::Format(L"%d.%d.%d.%d", 
 			HIWORD(fileVersionMS),
@@ -212,19 +212,19 @@ namespace BL2SDK
 	}
 
 	// This function is used to get the dimensions of the game window for Gwen's renderer
-	bool GetCanvasPostRender(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
+	bool GetCanvasPostRender(UObject* caller, UFunction* function, void* parms, void* result)
 	{
-		UGameViewportClient_eventPostRender_Parms* realParms = reinterpret_cast<UGameViewportClient_eventPostRender_Parms*>(pParms);
-		UCanvas* pCanvas = realParms->Canvas;
+		UGameViewportClient_eventPostRender_Parms* realParms = reinterpret_cast<UGameViewportClient_eventPostRender_Parms*>(parms);
+		UCanvas* canvas = realParms->Canvas;
 
-		GwenManager::CreateCanvas(pCanvas->SizeX, pCanvas->SizeY);
+		GwenManager::CreateCanvas(canvas->SizeX, canvas->SizeY);
 
-		GameHooks::EngineHookManager->RemoveStaticHook(pFunction, "GetCanvas");
+		GameHooks::EngineHookManager->RemoveStaticHook(function, "GetCanvas");
 		return true;
 	}
 
 	// This function is used to ensure that everything gets called in the game thread once the game itself has loaded
-	bool GameReady(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult) 
+	bool GameReady(UObject* caller, UFunction* function, void* parms, void* result) 
 	{
 		Logging::LogF("[GameReady] Thread: %i\n", GetCurrentThreadId());
 
@@ -236,7 +236,7 @@ namespace BL2SDK
 
 		ConCmdManager::Initialize();
 
-		GameHooks::EngineHookManager->RemoveStaticHook(pFunction, "StartupSDK");
+		GameHooks::EngineHookManager->RemoveStaticHook(function, "StartupSDK");
 
 		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient.PostRender", "GetCanvas", &GetCanvasPostRender);
 		return true;

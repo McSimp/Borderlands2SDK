@@ -16,7 +16,7 @@ public:
 
 private:
 	tHookMap* GetVirtualHookTable(const std::string& funcName);
-	tHookMap* GetStaticHookTable(UFunction* pFunction);
+	tHookMap* GetStaticHookTable(UFunction* function);
 	bool RemoveFromTable(tHookMap& hookTable, const std::string& funcName, const std::string& hookName);
 
 public:
@@ -30,10 +30,10 @@ public:
 	void Register(const std::string& funcName, const std::string& hookName, void* funcHook);
 	bool Remove(const std::string& funcName, const std::string& hookName);
 	void AddVirtualHook(const std::string& funcName, const tFuncNameHookPair& hookPair);
-	void AddStaticHook(UFunction* pFunction, const tFuncNameHookPair& hookPair);
-	bool RemoveStaticHook(UFunction* pFunction, const std::string& hookName);
+	void AddStaticHook(UFunction* function, const tFuncNameHookPair& hookPair);
+	bool RemoveStaticHook(UFunction* function, const std::string& hookName);
 	bool RemoveVirtualHook(const std::string& funcName, const std::string& hookName);
-	void ResolveVirtualHooks(UFunction* pFunction);
+	void ResolveVirtualHooks(UFunction* function);
 };
 
 #endif

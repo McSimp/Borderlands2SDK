@@ -26,13 +26,13 @@ namespace GameHooks
 		// TODO: Would it be best to do the detours in this?
 	}
 
-	bool ProcessEngineHooks(UObject* pCaller, UFunction* pFunction, void* pParms, void* pResult)
+	bool ProcessEngineHooks(UObject* caller, UFunction* function, void* parms, void* result)
 	{
 		// Resolve any virtual hooks into static hooks
-		EngineHookManager->ResolveVirtualHooks(pFunction);
+		EngineHookManager->ResolveVirtualHooks(function);
 
 		// Call any static hooks that may exist
-		CHookManager::tiStaticHooks iHooks = EngineHookManager->StaticHooks.find(pFunction);
+		CHookManager::tiStaticHooks iHooks = EngineHookManager->StaticHooks.find(function);
 		if(iHooks != EngineHookManager->StaticHooks.end())
 		{
 			CHookManager::tHookMap hooks = iHooks->second;
@@ -43,7 +43,7 @@ namespace GameHooks
 			for(CHookManager::tiHookMap iterator = hooks.begin(); iterator != hooks.end(); iterator++)
 			{
 				// maps to std::string, void*, but we want to call a tProcessEventHook* instead
-				if(!((tProcessEventHook*)iterator->second)(pCaller, pFunction, pParms, pResult))
+				if(!((tProcessEventHook*)iterator->second)(caller, function, parms, result))
 				{
 					engineShouldRun = false; // Can't just do engineShouldRun = iterator->.. 
 				}
@@ -60,13 +60,13 @@ namespace GameHooks
 		return true;
 	}
 
-	bool ProcessUnrealScriptHooks(UObject* pCaller, FFrame& Stack, void* const Result, UFunction* Function)
+	bool ProcessUnrealScriptHooks(UObject* caller, FFrame& stack, void* const result, UFunction* function)
 	{
 		// Resolve any virtual hooks into static hooks
-		UnrealScriptHookManager->ResolveVirtualHooks(Function);
+		UnrealScriptHookManager->ResolveVirtualHooks(function);
 
 		// Call any static hooks that may exist
-		CHookManager::tiStaticHooks iHooks = UnrealScriptHookManager->StaticHooks.find(Function);
+		CHookManager::tiStaticHooks iHooks = UnrealScriptHookManager->StaticHooks.find(function);
 		if(iHooks != UnrealScriptHookManager->StaticHooks.end())
 		{
 			CHookManager::tHookMap hooks = iHooks->second;
@@ -77,7 +77,7 @@ namespace GameHooks
 			for(CHookManager::tiHookMap iterator = hooks.begin(); iterator != hooks.end(); iterator++)
 			{
 				// maps to std::string, void*, but we want to call a tCallFunctionHook* instead
-				if(!((tCallFunctionHook*)iterator->second)(pCaller, Stack, Result, Function))
+				if(!((tCallFunctionHook*)iterator->second)(caller, stack, result, function))
 				{
 					return false;
 				}
@@ -88,26 +88,26 @@ namespace GameHooks
 		return true;
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_AddStaticEngineHook(UFunction* pFunction, tProcessEventHook* funcHook)
+	extern "C" __declspec(dllexport) void LUAFUNC_AddStaticEngineHook(UFunction* function, tProcessEventHook* funcHook)
 	{
 		CHookManager::tFuncNameHookPair hookPair = std::make_pair("LuaHook", funcHook);
-		EngineHookManager->AddStaticHook(pFunction, hookPair);
+		EngineHookManager->AddStaticHook(function, hookPair);
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_RemoveStaticEngineHook(UFunction* pFunction)
+	extern "C" __declspec(dllexport) void LUAFUNC_RemoveStaticEngineHook(UFunction* function)
 	{
-		EngineHookManager->RemoveStaticHook(pFunction, "LuaHook");
+		EngineHookManager->RemoveStaticHook(function, "LuaHook");
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_AddStaticScriptHook(UFunction* pFunction, tCallFunctionHook* funcHook)
+	extern "C" __declspec(dllexport) void LUAFUNC_AddStaticScriptHook(UFunction* function, tCallFunctionHook* funcHook)
 	{
 		CHookManager::tFuncNameHookPair hookPair = std::make_pair("LuaHook", funcHook);
-		UnrealScriptHookManager->AddStaticHook(pFunction, hookPair);
+		UnrealScriptHookManager->AddStaticHook(function, hookPair);
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_RemoveStaticScriptHook(UFunction* pFunction)
+	extern "C" __declspec(dllexport) void LUAFUNC_RemoveStaticScriptHook(UFunction* function)
 	{
-		UnrealScriptHookManager->RemoveStaticHook(pFunction, "LuaHook");
+		UnrealScriptHookManager->RemoveStaticHook(function, "LuaHook");
 	}
 }
 
