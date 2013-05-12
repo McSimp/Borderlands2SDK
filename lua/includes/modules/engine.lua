@@ -78,6 +78,22 @@ function FindObject(objectName, class)
 	return nil
 end
 
+function FindObjectExactClass(objectName, class)
+	for i=0,(Objects.Count-1) do
+		local obj = Objects:Get(i)
+		if IsNull(obj) then goto continue end
+		if obj.UObject.Class ~= class.static then goto continue end
+
+		if obj:GetFullName() == objectName then
+			return obj
+		end
+
+		::continue::
+	end
+
+	return nil
+end
+
 function FindClass(className)
 	local obj
 	if Classes.UClass ~= nil then

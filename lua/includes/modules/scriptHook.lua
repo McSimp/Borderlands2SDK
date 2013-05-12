@@ -8,6 +8,7 @@ local error = error
 local pairs = pairs
 local string = string
 local bl2sdk = bl2sdk
+local pcall = pcall
 
 ffi.cdef[[
 typedef bool (*tCallFunctionHook) (struct UObject*, struct FFrame&, void* const Result, struct UFunction*);
@@ -35,7 +36,13 @@ function ProcessHooks(Object, Stack, Result, Function)
 
 	for _,v in pairs(hookTable) do
 		local codePtr = Stack.Code
-		local ret = v(Object, Stack, Result, Function)
+		--local ret = v(Object, Stack, Result, Function)
+		local success, ret = pcall(v, Object, Stack, Result, Function)
+		if not success then 
+			print(ret)
+			ret = false
+		end
+
 		-- A non-nil/false value means that we probably created a new stack and executed
 		-- the function with it, so we don't want the original call to go through.
 		if not ret then

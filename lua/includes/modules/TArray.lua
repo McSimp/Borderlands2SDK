@@ -35,6 +35,10 @@ function TArrayMT.__ipairs(self)
 	return TArrayIter, self, -1 -- neg 1 because TArrayIter will increment this to 0
 end
 
+function TArrayMT.__len(self)
+	return self.Count
+end
+
 ffi.metatype("struct TArray", TArrayMT)
 
 module("TArray")

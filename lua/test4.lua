@@ -6,7 +6,9 @@ scriptHook.Add(engine.Classes.UItemInspectionGFxMovie.funcs.InspectItem, "Inspec
 
 	local thing = Stack:GetStruct("struct AWillowInventory*")
 	print(thing:GetFullName())
+	print(thing.Index)
 	
+	--[[
 	print("WillowInventory members")
 
 	print(thing.MonetaryValue)
@@ -35,10 +37,25 @@ scriptHook.Add(engine.Classes.UItemInspectionGFxMovie.funcs.InspectItem, "Inspec
 	print(thing.ReloadTime)
 	print(thing.ReloadTimeBaseValue)
 	print(thing.bUseWeaponMelee)
+	]]
 
 	print(thing:GenerateHumanReadableName():GetLuaString())
 
 end)
+
+scriptHook.Remove(engine.Classes.AWillowWeapon.funcs.InitializeFromDefinitionData, "InitWepHook")
+scriptHook.Add(engine.Classes.AWillowWeapon.funcs.InitializeFromDefinitionData, "InitWepHook", function(Object, Stack, Result, Function)
+	print("InitializeFromDefinitionData called")
+
+	local wepDef = Stack:GetStruct("struct FWeaponDefinitionData")
+	local querySource = Stack:GetObject("struct UObject*")
+	local selectNameParts = Stack:GetBool()
+
+	print(wepDef.WeaponTypeDefinition:GetFullName())
+	print(querySource:GetFullName())
+	print(selectNameParts)
+end)
+
 
 local function GetWeaponTypes()
 	local weaponTypes = {}
@@ -51,7 +68,6 @@ local function GetWeaponTypes()
 		obj = ffi.cast("struct UWeaponTypeDefinition*", obj)
 
 		table.insert(weaponTypes, obj)
-		print(obj:GetFullName())
 
 		::continue::
 	end
@@ -61,234 +77,163 @@ local function GetWeaponTypes()
 	return weaponTypes
 end
 
+local balanceDefs = {}
+local function GetAllBalanceDefs()
+	if #balanceDefs ~= 0 then
+		return balanceDefs
+	end
+
+	for i=0,(engine.Objects.Count-1) do
+		local obj = engine.Objects:Get(i)
+		if IsNull(obj) then goto continue end
+		if obj.UObject.Class ~= engine.Classes.UWeaponBalanceDefinition.static then goto continue end
+
+		obj = ffi.cast("struct UWeaponBalanceDefinition*", obj)
+
+		table.insert(balanceDefs, obj)
+
+		::continue::
+	end
+
+	return balanceDefs
+end
+
+local function GetBalanceDefs(wepType)
+	local allDefs = GetAllBalanceDefs()
+
+	local thisTypeDefs = {}
+
+	-- First insert the very base so we can check the bases of other balance defs
+	for _,v in ipairs(allDefs) do
+		if v.InventoryDefinition == wepType then
+			table.insert(thisTypeDefs, v)
+		end
+	end
+
+	-- Now do it for the rest of them, which could inherit from the base
+	for _,v in ipairs(allDefs) do
+		-- Check if it has a base which we know is a balance def
+		-- for this type, and if it does, add it to the list.
+		
+		local baseDef = v.BaseDefinition
+		while NotNull(baseDef) do
+			if table.contains(thisTypeDefs, baseDef) then
+				table.insert(thisTypeDefs, v)
+				goto continue
+			end
+
+			baseDef = baseDef.BaseDefinition
+		end
+
+		::continue::
+	end
+
+	return thisTypeDefs
+end
+
+local function GetManufacturers(balanceDefs)
+	-- For all the balance defs, insert all the elements of the Manufacturers
+	-- array into a table
+	local manufacturers = {}
+
+	for _,v in ipairs(balanceDefs) do
+		if v.Manufacturers.Count ~= 0 then
+			for _,mf in ipairs(v.Manufacturers) do
+				table.insert(manufacturers, mf.Manufacturer)
+			end
+		end
+	end
+
+	return manufacturers
+end
+
+local function GetParts(partList)
+	local ret = {}
+	local parts = partList.UWeaponPartListDefinition.WeightedParts
+
+	for _,v in ipairs(parts) do
+		table.insert(ret, v)
+	end
+
+	return ret
+end
 
 
+function TestingShit(idx)
+	local types = GetWeaponTypes()
+	local weaponTypeDef = types[idx]
+	local typeBalanceDefs = GetBalanceDefs(weaponTypeDef)
+	print("Doing for: " .. weaponTypeDef:GetFullName())
+
+
+	print("Balance defs")
+	for _,v in ipairs(typeBalanceDefs) do
+		print(v:GetFullName())
+	end
+
+	print("Manufacturers")
+
+	local manufacturers = GetManufacturers(typeBalanceDefs)
+
+	for _,v in ipairs(manufacturers) do
+		print(v:GetFullName())
+	end
+
+	print("Body parts")
+
+	print(weaponTypeDef.BodyParts)
+--[[
+	local bodyParts = GetParts(weaponTypeDef.BodyParts)
+
+	for _,v in ipairs(bodyParts) do
+		print(v:GetFullName())
+	end
+]]
+end
+
+local function CleanupOldInspect(gfx)
+	local mesh = ffi.cast("struct UActorComponent*", gfx.MyInspectionMesh)
+	gfx.WPCOwner.Pawn:DetachComponent(mesh)
+
+	--gfx.MyInspectionMesh = nil
+end
+
+function InspectRandomWeapon()
+	local gfx = engine.FindObjectExactClass("ItemInspectionGFxMovie Transient.ItemInspectionGFxMovie", engine.Classes.UItemInspectionGFxMovie)
+	print("Found Inspect movie: " .. gfx:GetFullName())
+
+	print("Cleaning it up")
+	CleanupOldInspect(gfx)
+
+	print("Generating random weapon data")
+	local types = GetWeaponTypes()
+
+
+	local thing = engine.Objects:Get(index)
+	thing = ffi.cast("struct AWillowInventory*", thing)
+	print("Calling InspectItem on: " .. thing:GetFullName())
+	gfx:InspectItem(thing)
+end
 
 --[[
-struct AWillowWeapon_Data {
-	struct FPointer VfTable_IIInstanceData; // 0x9AC (0x4)
-	struct FPointer VfTable_IIMissionInventory; // 0x9B0 (0x4)
-	struct FPointer VfTable_IIBehaviorConsumer; // 0x9B4 (0x4)
-	struct FPointer VfTable_IIItemCardable; // 0x9B8 (0x4)
-	struct FPointer VfTable_IINounAttributeProvider; // 0x9BC (0x4)
-	int NextFiringPatternIndex; // 0x9C0 (0x4)
-	int StoredAmmo; // 0x9C4 (0x4)
-	struct FResourcePoolReference AmmoPool; // 0x9C8 (0xC)
-	int AmmoNotInClip; // 0x9D4 (0x4)
-	bool bUpdateAmmoNotInClip : 1; // 0x9D8 (0x4)
-	bool bAmmoRefilledDuringReload : 1; // 0x9D8 (0x4)
-	bool bItemNameGenerated : 1; // 0x9D8 (0x4)
-	bool bUseOverheatBehavior : 1; // 0x9D8 (0x4)
-	bool bBurstDelayActive : 1; // 0x9D8 (0x4)
-	bool bDisplayWeaponShotDebug : 1; // 0x9D8 (0x4)
-	bool bDisableFireViewShake : 1; // 0x9D8 (0x4)
-	bool bDisableWeaponSpread : 1; // 0x9D8 (0x4)
-	bool bHoldToZoom : 1; // 0x9D8 (0x4)
-	bool bFadeOnZoomBegin : 1; // 0x9D8 (0x4)
-	bool bFadeOnZoomEnd : 1; // 0x9D8 (0x4)
-	bool bDeRezzed : 1; // 0x9D8 (0x4)
-	bool bReplicateFiringSounds : 1; // 0x9D8 (0x4)
-	bool bSwappingWeaponAfterPutDown : 1; // 0x9D8 (0x4)
-	bool bMuzzleFlashPSCLoops : 1; // 0x9D8 (0x4)
-	bool bSelectRandomPartsOnInitialization : 1; // 0x9D8 (0x4)
-	bool bInitAnimationsOnAttach : 1; // 0x9D8 (0x4)
-	bool bContinuousBeamIsFiring : 1; // 0x9D8 (0x4)
-	bool bCrosshairEnabled : 1; // 0x9D8 (0x4)
-	bool bSuppressCrosshair : 1; // 0x9D8 (0x4)
-	bool bIsBlockedAfterBusy : 1; // 0x9D8 (0x4)
-	bool bUseRealTimeForZoom : 1; // 0x9D8 (0x4)
-	bool bAttachedToInstigator : 1; // 0x9D8 (0x4)
-	bool bHolsteredOnBody : 1; // 0x9D8 (0x4)
-	bool bActivatedDuringVehicleTransition : 1; // 0x9D8 (0x4)
-	bool bOnlyPlayFirstPersonAnimOnNextEquip : 1; // 0x9D8 (0x4)
-	int ShotCost; // 0x9DC (0x4)
-	int ShotCostBaseValue; // 0x9E0 (0x4)
-	struct TArray_UAttributeModifierPtr_ ShotCostModifierStack; // 0x9E4 (0xC)
-	int AdditionalRicochets; // 0x9F0 (0x4)
-	int AdditionalRicochetsBaseValue; // 0x9F4 (0x4)
-	struct TArray_UAttributeModifierPtr_ AdditionalRicochetsModifierStack; // 0x9F8 (0xC)
-	float LastFireTime; // 0xA04 (0x4)
-	int ClipSize; // 0xA08 (0x4)
-	int ClipSizeBaseValue; // 0xA0C (0x4)
-	struct TArray_UAttributeModifierPtr_ ClipSizeModifierStack; // 0xA10 (0xC)
-	int LastReloadCnt; // 0xA1C (0x4)
-	int LastClipSize; // 0xA20 (0x4)
-	int AmmoLeftInClipDuringReload; // 0xA24 (0x4)
-	int ReloadCnt; // 0xA28 (0x4)
-	int CurrentBurstShotCount; // 0xA2C (0x4)
-	float ReloadTime; // 0xA30 (0x4)
-	float ReloadTimeBaseValue; // 0xA34 (0x4)
-	struct TArray_UAttributeModifierPtr_ ReloadTimeModifierStack; // 0xA38 (0xC)
-	unsigned char ReplicatedReloadState; // 0xA44 (0x1)
-	unsigned char bUseWeaponMelee; // 0xA45 (0x1)
-	unsigned char ZoomState; // 0xA46 (0x1)
-	unsigned char BodyVariation; // 0xA47 (0x1)
-	unsigned char PutDownAnimState; // 0xA48 (0x1)
-	unsigned char MagazineSpinState; // 0xA49 (0x1)
-	unsigned char LastProcessedMagazineSpinState; // 0xA4A (0x1)
-	unsigned char BarrelSpinState; // 0xA4B (0x1)
-	unsigned char LastProcessedBarrelSpinState; // 0xA4C (0x1)
-	unsigned char VisibleAmmoState; // 0xA4D (0x1)
-	unsigned char QuickSelectSlot; // 0xA4E (0x1)
-	struct USpecialMoveDefinition* Playing1stPersonReloadSMD; // 0xA50 (0x4)
-	struct USpecialMoveDefinition* Playing3rdPersonReloadSMD; // 0xA54 (0x4)
-	struct FString GeneratedItemName; // 0xA58 (0xC)
-	float OverheatRegenDelay; // 0xA64 (0x4)
-	float OverheatRegenDelayBaseValue; // 0xA68 (0x4)
-	struct TArray_UAttributeModifierPtr_ OverheatRegenDelayModifierStack; // 0xA6C (0xC)
-	float FireRegenDelay; // 0xA78 (0x4)
-	float FireRegenDelayBaseValue; // 0xA7C (0x4)
-	struct TArray_UAttributeModifierPtr_ FireRegenDelayModifierStack; // 0xA80 (0xC)
-	float RegenRate; // 0xA8C (0x4)
-	float RegenRateBaseValue; // 0xA90 (0x4)
-	struct TArray_UAttributeModifierPtr_ RegenRateModifierStack; // 0xA94 (0xC)
-	float RegenAmount; // 0xAA0 (0x4)
-	int OverheatAmmo; // 0xAA4 (0x4)
-	float AmmoRegenStartTime; // 0xAA8 (0x4)
-	float MeleeDamage; // 0xAAC (0x4)
-	float MeleeDamageBaseValue; // 0xAB0 (0x4)
-	struct TArray_UAttributeModifierPtr_ MeleeDamageModifierStack; // 0xAB4 (0xC)
-	float NormalizedInstantHitDamage; // 0xAC0 (0x4)
-	float NormalizedInstantHitDamageBaseValue; // 0xAC4 (0x4)
-	struct TArray_UAttributeModifierPtr_ NormalizedInstantHitDamageModifierStack; // 0xAC8 (0xC)
-	float NormalizedMeleeDamage; // 0xAD4 (0x4)
-	float NormalizedMeleeDamageBaseValue; // 0xAD8 (0x4)
-	struct TArray_UAttributeModifierPtr_ NormalizedMeleeDamageModifierStack; // 0xADC (0xC)
-	float BurstInterval; // 0xAE8 (0x4)
-	float BurstIntervalBaseValue; // 0xAEC (0x4)
-	struct TArray_UAttributeModifierPtr_ BurstIntervalModifierStack; // 0xAF0 (0xC)
-	int AutomaticBurstCount; // 0xAFC (0x4)
-	int AutomaticBurstCountBaseValue; // 0xB00 (0x4)
-	struct TArray_UAttributeModifierPtr_ AutomaticBurstCountModifierStack; // 0xB04 (0xC)
-	float BurstShotAccuracyImpulseScale; // 0xB10 (0x4)
-	float BurstShotAccuracyImpulseScaleBaseValue; // 0xB14 (0x4)
-	struct TArray_UAttributeModifierPtr_ BurstShotAccuracyImpulseScaleModifierStack; // 0xB18 (0xC)
-	float LastAutomaticBurstTime; // 0xB24 (0x4)
-	struct FInstanceDataSet InstanceDataState; // 0xB28 (0xC)
-	struct TArray_AWeaponShotDebugPtr_ WeaponShotDebugHistory; // 0xB34 (0xC)
-	float BaseStatusEffectChanceModifier; // 0xB40 (0x4)
-	float BaseStatusEffectChanceModifierBaseValue; // 0xB44 (0x4)
-	struct TArray_UAttributeModifierPtr_ BaseStatusEffectChanceModifierModifierStack; // 0xB48 (0xC)
-	float StatusEffectChanceModifier; // 0xB54 (0x4)
-	float StatusEffectChanceModifierBaseValue; // 0xB58 (0x4)
-	struct TArray_UAttributeModifierPtr_ StatusEffectChanceModifierModifierStack; // 0xB5C (0xC)
-	float StatusEffectSpreadTimeIntervalModifier; // 0xB68 (0x4)
-	float StatusEffectSpreadTimeIntervalModifierBaseValue; // 0xB6C (0x4)
-	struct TArray_UAttributeModifierPtr_ StatusEffectSpreadTimeIntervalModifierModifierStack; // 0xB70 (0xC)
-	float StatusEffectDamage; // 0xB7C (0x4)
-	float StatusEffectDamageBaseValue; // 0xB80 (0x4)
-	struct TArray_UAttributeModifierPtr_ StatusEffectDamageModifierStack; // 0xB84 (0xC)
-	float ZoomedEndFOV; // 0xB90 (0x4)
-	float ZoomedEndFOVBaseValue; // 0xB94 (0x4)
-	struct TArray_UAttributeModifierPtr_ ZoomedEndFOVModifierStack; // 0xB98 (0xC)
-	float ZoomedFOV; // 0xBA4 (0x4)
-	float ZoomedRate; // 0xBA8 (0x4)
-	float ZoomedRateBaseValue; // 0xBAC (0x4)
-	struct TArray_UAttributeModifierPtr_ ZoomedRateModifierStack; // 0xBB0 (0xC)
-	float ZoomFadeTime; // 0xBBC (0x4)
-	float ZoomStartTime; // 0xBC0 (0x4)
-	struct UMaterialInstance* WeaponMaterial; // 0xBC4 (0x4)
-	struct UMaterialInstance* SightFXCrosshairMaterial; // 0xBC8 (0x4)
-	struct USkeletalMeshComponent* ThirdPersonMesh; // 0xBCC (0x4)
-	int CurrentSlot; // 0xBD0 (0x4)
-	struct TArray_FExtraWeaponSlot_ ExtraSlots; // 0xBD4 (0xC)
-	struct FVector CachedMuzzleLocation; // 0xBE0 (0xC)
-	int CachedMuzzleLocationFrameNumber; // 0xBEC (0x4)
-	struct USkeletalMeshComponent* CachedMuzzleLocationMesh; // 0xBF0 (0x4)
-	struct UWillowAnimNodeSlot* WeaponAnimNodeSlot; // 0xBF4 (0x4)
-	struct UWillowAnimNodeSlot* ArmAnimNodeSlot; // 0xBF8 (0x4)
-	struct UAkEvent* BulletWhipAkEvent; // 0xBFC (0x4)
-	struct FImpactResponseParameters MyWeaponImpactResponseParameters; // 0xC00 (0x4C)
-	float MagazineSpinUpDuration; // 0xC4C (0x4)
-	float MagazineSpinUpDurationBaseValue; // 0xC50 (0x4)
-	struct TArray_UAttributeModifierPtr_ MagazineSpinUpDurationModifierStack; // 0xC54 (0xC)
-	float MagazineSpinDownDuration; // 0xC60 (0x4)
-	float MagazineSpinDownDurationBaseValue; // 0xC64 (0x4)
-	struct TArray_UAttributeModifierPtr_ MagazineSpinDownDurationModifierStack; // 0xC68 (0xC)
-	float MagazineSpinUpPercent; // 0xC74 (0x4)
-	float BodyFlapsExpandDuration; // 0xC78 (0x4)
-	float BodyFlapsExpandDurationBaseValue; // 0xC7C (0x4)
-	struct TArray_UAttributeModifierPtr_ BodyFlapsExpandDurationModifierStack; // 0xC80 (0xC)
-	float BodyFlapsCollapseDuration; // 0xC8C (0x4)
-	float BodyFlapsCollapseDurationBaseValue; // 0xC90 (0x4)
-	struct TArray_UAttributeModifierPtr_ BodyFlapsCollapseDurationModifierStack; // 0xC94 (0xC)
-	float BarrelFlapsExpandDuration; // 0xCA0 (0x4)
-	float BarrelFlapsExpandDurationBaseValue; // 0xCA4 (0x4)
-	struct TArray_UAttributeModifierPtr_ BarrelFlapsExpandDurationModifierStack; // 0xCA8 (0xC)
-	float BarrelFlapsCollapseDuration; // 0xCB4 (0x4)
-	float BarrelFlapsCollapseDurationBaseValue; // 0xCB8 (0x4)
-	struct TArray_UAttributeModifierPtr_ BarrelFlapsCollapseDurationModifierStack; // 0xCBC (0xC)
-	float BaseGlowScale; // 0xCC8 (0x4)
-	float FinalGlowScale; // 0xCCC (0x4)
-	struct UWeaponGlowEffectDefinition* GlowEffect; // 0xCD0 (0x4)
-	float GlowEffectStartTime; // 0xCD4 (0x4)
-	float GlowImpulseScale; // 0xCD8 (0x4)
-	float GlowImpulseDecayStartTime; // 0xCDC (0x4)
-	struct UParticleSystemComponent* FirstPersonMuzzleFlash; // 0xCE0 (0x4)
-	struct TArray_UParticleSystemComponentPtr_ FirstPersonAltMuzzleFlashes; // 0xCE4 (0xC)
-	struct UParticleSystemComponent* ThirdPersonMuzzleFlash; // 0xCF0 (0x4)
-	struct TArray_UParticleSystemComponentPtr_ ThirdPersonAltMuzzleFlashes; // 0xCF4 (0xC)
-	int NumberOfMuzzleFlashes; // 0xD00 (0x4)
-	int CurrentMuzzleFlashIndex; // 0xD04 (0x4)
-	struct UParticleSystemComponent* FirstPersonShellCasing; // 0xD08 (0x4)
-	struct UWillowPointLight* MuzzleFlashLight; // 0xD0C (0x4)
-	struct UWillowPointLight* ThirdPersonMuzzleFlashLight; // 0xD10 (0x4)
-	struct UParticleSystemComponent* TracerParameterTemplate; // 0xD14 (0x4)
-	struct UParticleSystem* MuzzleFlashPSTemplate; // 0xD18 (0x4)
-	float CurrentRating; // 0xD1C (0x4)
-	int OwnerStatsID; // 0xD20 (0x4)
-	int WeaponStatsID; // 0xD24 (0x4)
-	float ExtraShotChance; // 0xD28 (0x4)
-	float ExtraShotChanceBaseValue; // 0xD2C (0x4)
-	struct TArray_UAttributeModifierPtr_ ExtraShotChanceModifierStack; // 0xD30 (0xC)
-	float ExtraShotDelay; // 0xD3C (0x4)
-	float ExtraShotDelayBaseValue; // 0xD40 (0x4)
-	struct TArray_UAttributeModifierPtr_ ExtraShotDelayModifierStack; // 0xD44 (0xC)
-	struct FLockOnTargetStateStruct LockOnTargetState; // 0xD50 (0x10)
-	float BarrelSpinUpDuration; // 0xD60 (0x4)
-	float BarrelSpinUpDurationBaseValue; // 0xD64 (0x4)
-	struct TArray_UAttributeModifierPtr_ BarrelSpinUpDurationModifierStack; // 0xD68 (0xC)
-	float BarrelSpinDownDuration; // 0xD74 (0x4)
-	float BarrelSpinDownDurationBaseValue; // 0xD78 (0x4)
-	struct TArray_UAttributeModifierPtr_ BarrelSpinDownDurationModifierStack; // 0xD7C (0xC)
-	float BarrelSpinUpPercent; // 0xD88 (0x4)
-	struct FColor WeaponColor; // 0xD8C (0x4)
-	float AimError; // 0xD90 (0x4)
-	float AimErrorBaseValue; // 0xD94 (0x4)
-	struct TArray_UAttributeModifierPtr_ AimErrorModifierStack; // 0xD98 (0xC)
-	float PerShotAccuracyImpulse; // 0xDA4 (0x4)
-	float PerShotAccuracyImpulseBaseValue; // 0xDA8 (0x4)
-	struct TArray_UAttributeModifierPtr_ PerShotAccuracyImpulseModifierStack; // 0xDAC (0xC)
-	int ProjectilesPerShot; // 0xDB8 (0x4)
-	int ProjectilesPerShotBaseValue; // 0xDBC (0x4)
-	struct TArray_UAttributeModifierPtr_ ProjectilesPerShotModifierStack; // 0xDC0 (0xC)
-	struct TArray_FAppliedAttributeEffect_ ExternalAttributeModifiers; // 0xDCC (0xC)
-	struct TArray_FAppliedAttributeEffect_ WeaponAttributeModifiers; // 0xDD8 (0xC)
-	struct TArray_FAppliedAttributeEffect_ ZoomExternalAttributeModifiers; // 0xDE4 (0xC)
-	struct TArray_FAppliedAttributeEffect_ ZoomWeaponAttributeModifiers; // 0xDF0 (0xC)
-	struct TArray_FModifierValuePresentationData_ WeaponCardModifierStats; // 0xDFC (0xC)
-	struct FReplicatedInventoryCardData ReplicatedWeaponCardModifierValues[5]; // 0xE08 (0x28)
-	struct FWeaponDefinitionData DefinitionData; // 0xE30 (0x44)
-	struct UWeaponPartListCollectionDefinition* PartListCollection; // 0xE74 (0x4)
-	struct TArray_FWeaponBoneControllerInstance_ WeaponPartBoneControllers; // 0xE78 (0xC)
-	int ReloadCntOnLastVisibleAmmoBoneUpdate; // 0xE84 (0x4)
-	struct TArray_unsigned_char_ VisibleAmmoBoneIndices; // 0xE88 (0xC)
-	struct FName LeftHandGripAnimWeapon; // 0xE94 (0x8)
-	struct AWillowWeapon* LastComparedWeapon; // 0xE9C (0x4)
-	struct FName StoredPreviousStateName; // 0xEA0 (0x8)
-	struct TArray_FShellCasingImpact_ ShellCasingImpacts; // 0xEA8 (0xC)
-	float ProjectileSpeedMultiplier; // 0xEB4 (0x4)
-	float ProjectileSpeedMultiplierBaseValue; // 0xEB8 (0x4)
-	struct TArray_UAttributeModifierPtr_ ProjectileSpeedMultiplierModifierStack; // 0xEBC (0xC)
-	float UpdateMipTimer; // 0xEC8 (0x4)
-	float WantsMissedShotNotifications; // 0xECC (0x4)
-	float WantsMissedShotNotificationsBaseValue; // 0xED0 (0x4)
-	struct TArray_UAttributeModifierPtr_ WantsMissedShotNotificationsModifierStack; // 0xED4 (0xC)
-	struct FBehaviorConsumerHandle ConsumerHandle; // 0xEE0 (0x4)
-	struct TArray_FNounAttributeState_ NounState; // 0xEE4 (0xC)
-	float TotalAutomaticFiringTime; // 0xEF0 (0x4)
-	struct FImpactInfo LastLocalHitTraceInfo; // 0xEF4 (0x5C)
-	struct FString CrosshairFrameOverride; // 0xF50 (0xC)
+struct FWeaponDefinitionData {
+	struct UWeaponTypeDefinition* WeaponTypeDefinition; // 0x0 (0x4)
+	struct UInventoryBalanceDefinition* BalanceDefinition; // 0x4 (0x4)
+	struct UManufacturerDefinition* ManufacturerDefinition; // 0x8 (0x4)
+	int ManufacturerGradeIndex; // 0xC (0x4)
+	struct UWeaponPartDefinition* BodyPartDefinition; // 0x10 (0x4)
+	struct UWeaponPartDefinition* GripPartDefinition; // 0x14 (0x4)
+	struct UWeaponPartDefinition* BarrelPartDefinition; // 0x18 (0x4)
+	struct UWeaponPartDefinition* SightPartDefinition; // 0x1C (0x4)
+	struct UWeaponPartDefinition* StockPartDefinition; // 0x20 (0x4)
+	struct UWeaponPartDefinition* ElementalPartDefinition; // 0x24 (0x4)
+	struct UWeaponPartDefinition* Accessory1PartDefinition; // 0x28 (0x4)
+	struct UWeaponPartDefinition* Accessory2PartDefinition; // 0x2C (0x4)
+	struct UWeaponPartDefinition* MaterialPartDefinition; // 0x30 (0x4)
+	struct UWeaponNamePartDefinition* PrefixPartDefinition; // 0x34 (0x4)
+	struct UWeaponNamePartDefinition* TitlePartDefinition; // 0x38 (0x4)
+	int GameStage; // 0x3C (0x4)
+	int UniqueId; // 0x40 (0x4)
 };
 
 struct AInventory_Data {
