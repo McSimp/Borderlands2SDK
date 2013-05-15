@@ -47,9 +47,16 @@ namespace Logging
 		{
 			if(gameConsole != NULL)
 			{
-				std::wstring wfmt = Util::Widen(formatted);
-				BL2SDK::InjectedCallNext();
-				gameConsole->eventOutputText(FString((wchar_t*)wfmt.c_str()));
+				// It seems that Unreal will automatically put a newline on the end of a 
+				// console output, but if there's already a \n at the end, then it won't
+				// add this \n onto the end. So if we're printing just a \n by itself, 
+				// just don't do anything.
+				if(!(length == 1 && formatted[0] == '\n'))
+				{
+					std::wstring wfmt = Util::Widen(formatted);
+					BL2SDK::InjectedCallNext();
+					gameConsole->eventOutputText(FString((wchar_t*)wfmt.c_str()));
+				}
 			}
 		}
 	}
