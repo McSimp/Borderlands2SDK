@@ -8,11 +8,13 @@
 #include "Gwen/Renderers/DirectX9.h"
 #include "BL2SDK/Settings.h"
 
+using namespace Gwen;
+
 namespace GwenManager
 {
-	Gwen::Renderer::DirectX9* pRenderer = NULL;
-	Gwen::Skin::TexturedBase* pSkin = NULL;
-	Gwen::Controls::Canvas* pCanvas = NULL;
+	Renderer::DirectX9* pRenderer = NULL;
+	Skin::TexturedBase* pSkin = NULL;
+	Controls::Canvas* pCanvas = NULL;
 
 	void InitializeRenderer(IDirect3DDevice9* pD3DDev)
 	{
@@ -20,9 +22,9 @@ namespace GwenManager
 		if(pSkin) delete pSkin;
 
 		Logging::Log("[Gwen] Initializing Renderer\n");
-		pRenderer = new Gwen::Renderer::DirectX9(pD3DDev);
+		pRenderer = new Renderer::DirectX9(pD3DDev);
 
-		pSkin = new Gwen::Skin::TexturedBase(pRenderer);
+		pSkin = new Skin::TexturedBase(pRenderer);
 		pSkin->Init(Settings::GetBinFile(L"DefaultSkin.png"));
 	}
 
@@ -31,11 +33,11 @@ namespace GwenManager
 		if(pCanvas) delete pCanvas;
 
 		Logging::LogF("[Gwen] Creating canvas (%dx%d)\n", x, y);
-		pCanvas = new Gwen::Controls::Canvas(pSkin);
+		pCanvas = new Controls::Canvas(pSkin);
 		pCanvas->SetSize(x, y);
 
-		//pCanvas->SetDrawBackground(true);
-		//pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 100));
+		pCanvas->SetDrawBackground(true);
+		pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 100));
 	}
 
 	void OnEndScene()
@@ -44,5 +46,28 @@ namespace GwenManager
 		{
 			pCanvas->RenderCanvas();
 		}
+	}
+
+	enum GwenControls
+	{
+		GWEN_BUTTON,
+		GWEN_WINDOW
+	};
+
+	extern "C" __declspec(dllexport) Controls::Base* CreateNewControl(GwenControls controlNum)
+	{
+		Controls::Base* parent = pCanvas;
+		Controls::Base* control = NULL;
+
+		if(controlNum == GWEN_BUTTON)
+		{
+			control = new Controls::Button(parent);
+		}
+		else if(controlNum == GWEN_WINDOW)
+		{
+			control = new Controls::WindowControl(parent);
+		}
+		
+		return control;
 	}
 }

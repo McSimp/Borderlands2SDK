@@ -8,22 +8,53 @@
 
 #define CREATEDEVICE_IDX 16
 #define ENDSCENE_IDX 42
+#define BEGINSTATEBLOCK_IDX 60
+#define ENDSTATEBLOCK_IDX 61
 
 namespace D3D9Hook
 {
 	typedef HRESULT (WINAPI* tCreateDevice)(IDirect3D9*, UINT, D3DDEVTYPE, HWND, DWORD, D3DPRESENT_PARAMETERS*, IDirect3DDevice9**);
 	typedef HRESULT (WINAPI* tEndScene)(IDirect3DDevice9*);
+	typedef HRESULT (WINAPI* tBeginStateBlock)(IDirect3DDevice9*);
+	typedef HRESULT (WINAPI* tEndStateBlock)(IDirect3DDevice9*, IDirect3DStateBlock9**); 
 
 	tCreateDevice pCreateDevice = NULL;
 	tEndScene pEndScene = NULL;
+	tBeginStateBlock pBeginStateBlock = NULL;
+	tEndStateBlock pEndStateBlock = NULL;
 	PDWORD D3DVTable = NULL;
 	PDWORD D3DDVTable = NULL;
 	IDirect3DDevice9* pD3DDev = NULL;
+
+	HRESULT WINAPI EndScene_Detour(IDirect3DDevice9* pD3DDev);
+	HRESULT WINAPI BeginStateBlock_Detour(IDirect3DDevice9* pD3DDev);
+	HRESULT WINAPI EndStateBlock_Detour(IDirect3DDevice9* pD3DDDev, IDirect3DStateBlock9** ppSB);
 
 	HRESULT WINAPI EndScene_Detour(IDirect3DDevice9* pD3DDev)
 	{
 		GwenManager::OnEndScene();
 		return pEndScene(pD3DDev);
+	}
+
+	HRESULT WINAPI BeginStateBlock_Detour(IDirect3DDevice9* pD3DDev)
+	{
+		Logging::Log("[DirectX Hooking] BeginStateBlock called\n");
+
+		HRESULT result = pBeginStateBlock(pD3DDev);
+		D3DDVTable[ENDSTATEBLOCK_IDX] = (DWORD)EndStateBlock_Detour; // Restore EndStateBlock hook
+		return result;
+	}
+
+	HRESULT WINAPI EndStateBlock_Detour(IDirect3DDevice9* pD3DDDev, IDirect3DStateBlock9** ppSB)
+	{
+		Logging::Log("[DirectX Hooking] EndStateBlock called\n");
+
+		HRESULT result = pEndStateBlock(pD3DDDev, ppSB);
+
+		D3DDVTable[ENDSCENE_IDX] = (DWORD)EndScene_Detour;
+		D3DDVTable[BEGINSTATEBLOCK_IDX] = (DWORD)BeginStateBlock_Detour;
+
+		return result;
 	}
 
 	HRESULT WINAPI hkCreateDevice(IDirect3D9* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, 
@@ -47,7 +78,7 @@ namespace D3D9Hook
 			return D3DERR_INVALIDCALL;
 		}
 
-		*(PDWORD)&D3DVTable[CREATEDEVICE_IDX] = *(PDWORD)&pCreateDevice;
+		D3DVTable[CREATEDEVICE_IDX] = (DWORD)pCreateDevice;
 		pCreateDevice = NULL;
 
 		if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), dwProtect, &dwProtect) == 0)
@@ -60,9 +91,15 @@ namespace D3D9Hook
 		pD3DDev = *ppReturnedDeviceInterface;
 
 		// TODO: May need to VirtualProtect here
-		*(PDWORD)&pEndScene = (DWORD)D3DDVTable[ENDSCENE_IDX];
-		*(PDWORD)&D3DDVTable[ENDSCENE_IDX] = (DWORD)EndScene_Detour; // This may need a more aggressive set (ie. check every second and overwrite)
+		pEndScene = (tEndScene)D3DDVTable[ENDSCENE_IDX];
+		D3DDVTable[ENDSCENE_IDX] = (DWORD)EndScene_Detour; // This may need a more aggressive set (ie. check every second and overwrite)
 		
+		pBeginStateBlock = (tBeginStateBlock)D3DDVTable[BEGINSTATEBLOCK_IDX];
+		D3DDVTable[BEGINSTATEBLOCK_IDX] = (DWORD)BeginStateBlock_Detour;
+
+		pEndStateBlock = (tEndStateBlock)D3DDVTable[ENDSTATEBLOCK_IDX];
+		D3DDVTable[ENDSTATEBLOCK_IDX] = (DWORD)EndStateBlock_Detour;
+
 		Logging::Log("[DirectX Hooking] EndScene hooked successfully\n");
 
 		GwenManager::InitializeRenderer(pD3DDev);
@@ -90,8 +127,8 @@ namespace D3D9Hook
 			throw FatalSDKException(5001, Util::Format("VirtualProtect failed for adding CreateDevice hook (Error = %d)", GetLastError()));
 		}
 
-		*(PDWORD)&pCreateDevice = D3DVTable[CREATEDEVICE_IDX];
-		*(PDWORD)&D3DVTable[CREATEDEVICE_IDX] = (DWORD)hkCreateDevice;
+		pCreateDevice = (tCreateDevice)D3DVTable[CREATEDEVICE_IDX];
+		D3DVTable[CREATEDEVICE_IDX] = (DWORD)hkCreateDevice;
 
 		if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), dwProtect, &dwProtect) == 0)
 		{
