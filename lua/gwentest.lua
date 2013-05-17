@@ -15,3 +15,11 @@ function TestButton()
 	local control = ffi.C.CreateNewControl(GwenControls.Button)
 	print(control)
 end
+
+function BenchmarkFind()
+	profiling.StartTimer("findBench", "Find benchmark")
+	local pc = engine.FindObject("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
+	profiling.StopTimer("findBench")
+
+	print(PtrToNum(pc))
+end

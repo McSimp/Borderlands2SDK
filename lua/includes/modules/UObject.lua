@@ -25,32 +25,12 @@ function funcs.GetName(self)
 
 end
 
+ffi.cdef[[
+	char* LUAFUNC_UObjectGetFullName(struct UObject* obj);
+]]
+
 function funcs.GetFullName(self)
-
-	if NotNull(self.UObject.Class) and NotNull(self.UObject.Outer) then
-
-		local fullname
-
-		if NotNull(self.UObject.Outer.UObject.Outer) then
-			fullname = string.format("%s %s.%s.%s", 
-				self.UObject.Class:GetName(),
-				self.UObject.Outer.UObject.Outer:GetName(),
-				self.UObject.Outer:GetName(),
-				self:GetName()
-			)
-		else
-			fullname = string.format("%s %s.%s", 
-				self.UObject.Class:GetName(),
-				self.UObject.Outer:GetName(),
-				self:GetName()
-			)
-		end
-
-		return fullname
-
-	end
-
-	return "(null)"
+	return ffi.string(ffi.C.LUAFUNC_UObjectGetFullName(self))
 end
 
 -- TOOD: Fix this steaming pile of shit.

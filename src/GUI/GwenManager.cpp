@@ -36,8 +36,8 @@ namespace GwenManager
 		pCanvas = new Controls::Canvas(pSkin);
 		pCanvas->SetSize(x, y);
 
-		pCanvas->SetDrawBackground(true);
-		pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 100));
+		//pCanvas->SetDrawBackground(true);
+		//pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 100));
 	}
 
 	void OnEndScene()

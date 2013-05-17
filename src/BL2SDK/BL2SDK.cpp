@@ -288,4 +288,9 @@ namespace BL2SDK
 	{
 		LogAllUnrealScriptCalls(enabled);
 	}
+
+	extern "C" __declspec(dllexport) char* LUAFUNC_UObjectGetFullName(UObject* obj)
+	{
+		return obj->GetFullName();
+	}
 }
