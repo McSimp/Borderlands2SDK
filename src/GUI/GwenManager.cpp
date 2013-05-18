@@ -7,6 +7,7 @@
 #include "Gwen/Input/Windows.h"
 #include "Gwen/Renderers/DirectX9.h"
 #include "BL2SDK/Settings.h"
+#include "Commands/ConCommand.h"
 
 using namespace Gwen;
 
@@ -62,7 +63,7 @@ namespace GwenManager
 		if(controlNum == GWEN_BUTTON)
 		{
 			Controls::Button* btn = new Controls::Button(parent);
-			btn->SetText("YOU ARE FAGET");
+			//btn->SetText("YOU ARE FAGET");
 			control = btn;
 		}
 		else if(controlNum == GWEN_WINDOW)
@@ -76,5 +77,10 @@ namespace GwenManager
 	extern "C" __declspec(dllexport) TextObject* LUAFUNC_NewTextObject(const char* str)
 	{
 		return new TextObject(str);
+	}
+
+	CON_COMMAND(CleanupCanvas)
+	{
+		pCanvas->RemoveAllChildren();
 	}
 }

@@ -39,7 +39,7 @@ end
 function table.copy(t, lookup_table)
 	local copy = {}
 	for i,v in pairs(t) do
-		if not IsTable(t) then
+		if not IsTable(v) then
 			copy[i] = v
 		else
 			lookup_table = lookup_table or {}
