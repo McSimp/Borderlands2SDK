@@ -30,7 +30,8 @@ ffi.cdef[[
 ]]
 
 function funcs.GetFullName(self)
-	return ffi.string(ffi.C.LUAFUNC_UObjectGetFullName(self))
+	local cast = ffi.cast("struct UObject*", self)
+	return ffi.string(ffi.C.LUAFUNC_UObjectGetFullName(cast))
 end
 
 -- TOOD: Fix this steaming pile of shit.

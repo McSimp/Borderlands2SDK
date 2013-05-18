@@ -36,8 +36,8 @@ namespace GwenManager
 		pCanvas = new Controls::Canvas(pSkin);
 		pCanvas->SetSize(x, y);
 
-		//pCanvas->SetDrawBackground(true);
-		//pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 100));
+		pCanvas->SetDrawBackground(true);
+		pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 100));
 	}
 
 	void OnEndScene()
@@ -54,14 +54,16 @@ namespace GwenManager
 		GWEN_WINDOW
 	};
 
-	extern "C" __declspec(dllexport) Controls::Base* CreateNewControl(GwenControls controlNum)
+	extern "C" __declspec(dllexport) Controls::Base* LUAFUNC_CreateNewControl(GwenControls controlNum)
 	{
 		Controls::Base* parent = pCanvas;
 		Controls::Base* control = NULL;
 
 		if(controlNum == GWEN_BUTTON)
 		{
-			control = new Controls::Button(parent);
+			Controls::Button* btn = new Controls::Button(parent);
+			btn->SetText("YOU ARE FAGET");
+			control = btn;
 		}
 		else if(controlNum == GWEN_WINDOW)
 		{
@@ -69,5 +71,10 @@ namespace GwenManager
 		}
 		
 		return control;
+	}
+
+	extern "C" __declspec(dllexport) TextObject* LUAFUNC_NewTextObject(const char* str)
+	{
+		return new TextObject(str);
 	}
 }
