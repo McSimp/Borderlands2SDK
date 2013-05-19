@@ -23,6 +23,13 @@ typedef struct {
 } GwenRect;
 
 typedef struct {
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
+	unsigned char a;
+} GwenColor;
+
+typedef struct {
 	int* VMT;
 } GwenControl;
 
@@ -30,6 +37,7 @@ typedef struct TextObject TextObject;
 
 GwenControl* LUAFUNC_CreateNewControl(int controlNum);
 TextObject* LUAFUNC_NewTextObject(const char* str);
+const char* LUAFUNC_GetTextObjectString(TextObject& obj);
 ]]
 
 gwen = {}
@@ -54,6 +62,21 @@ end
 
 function gwen.FreeTextObject(obj)
 	ffi.C.free(obj)
+end
+
+function gwen.GetStringFromTextObject(obj)
+	return ffi.string(ffi.C.LUAFUNC_GetTextObjectString(obj))
+end
+
+function Color(r, g, b, a)
+	local obj = ffi.new("GwenColor")
+
+	obj.r = math.clamp(tonumber(r), 0, 255)
+	obj.g = math.clamp(tonumber(g), 0, 255)
+	obj.b = math.clamp(tonumber(b), 0, 255)
+	obj.a = math.clamp(tonumber(a), 0, 255)
+
+	return obj
 end
 
 include("base.lua")

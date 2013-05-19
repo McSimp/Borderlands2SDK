@@ -79,6 +79,11 @@ namespace GwenManager
 		return new TextObject(str);
 	}
 
+	extern "C" __declspec(dllexport) const char* LUAFUNC_GetTextObjectString(TextObject& obj)
+	{
+		return obj.c_str();
+	}
+
 	CON_COMMAND(CleanupCanvas)
 	{
 		pCanvas->RemoveAllChildren();

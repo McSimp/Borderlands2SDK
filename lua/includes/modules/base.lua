@@ -96,6 +96,12 @@ function table.count(table)
 	return count
 end
 
+function math.clamp(value, min, max)
+	if value < min then return min end
+	if value > max then return max end
+	return value
+end
+
 local ffi = require("ffi")
 
 local uint_t = ffi.typeof("unsigned int")

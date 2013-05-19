@@ -77,6 +77,8 @@ typedef bool (__thiscall *tGwen_Controls_Base_IsMenuComponent) (GwenControl*);
 typedef void (__thiscall *tGwen_Controls_Base_CloseMenus) (GwenControl*);
 typedef bool (__thiscall *tGwen_Controls_Base_IsTabable) (GwenControl*);
 typedef void (__thiscall *tGwen_Controls_Base_SetTabable) (GwenControl*, bool);
+
+typedef char const * (__thiscall *tGwen_Controls_Base_GetBaseTypeName) (GwenControl*);
 ]]
 
 local Base = {}
@@ -498,6 +500,16 @@ function Base:SetTabable(tabable)
 end
 
 gwen.meta.Base = Base
+
+local InheritedControl = table.copy(Base)
+InheritedControl.__index = InheritedControl
+
+function InheritedControl:GetBaseTypeName()
+	local func = gwen.GetVFunc(self.control, 168, "tGwen_Controls_Base_GetBaseTypeName")
+	return ffi.string(func(self.control))
+end
+
+gwen.meta.InheritedControl = InheritedControl
 
 --[[
 VMT dump from IDA
