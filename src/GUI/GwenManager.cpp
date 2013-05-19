@@ -8,6 +8,7 @@
 #include "Gwen/Renderers/DirectX9.h"
 #include "BL2SDK/Settings.h"
 #include "Commands/ConCommand.h"
+#include "BL2SDK/Util.h"
 
 using namespace Gwen;
 
@@ -37,14 +38,26 @@ namespace GwenManager
 		pCanvas = new Controls::Canvas(pSkin);
 		pCanvas->SetSize(x, y);
 
-		pCanvas->SetDrawBackground(true);
-		pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 100));
+		//pCanvas->SetDrawBackground(true);
+		//pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 100));
 	}
 
 	void OnEndScene()
 	{
 		if(pCanvas != NULL)
 		{
+			HWND focusWindow = ::GetForegroundWindow();
+			HWND gameWindow = *(HWND*)BL2SDK::pGGameWindow;
+
+			if(focusWindow == gameWindow)
+			{
+				POINT P;
+				::GetCursorPos(&P);
+				::ScreenToClient(gameWindow, &P);
+
+				pCanvas->InputMouseMoved(P.x, P.y, 0, 0);
+			}
+
 			pCanvas->RenderCanvas();
 		}
 	}
@@ -82,6 +95,11 @@ namespace GwenManager
 	extern "C" __declspec(dllexport) const char* LUAFUNC_GetTextObjectString(TextObject& obj)
 	{
 		return obj.c_str();
+	}
+
+	extern "C" __declspec(dllexport) void LUAFUNC_SetWindowTitle(Controls::WindowControl* window, const char* str)
+	{
+		window->SetTitle(str);
 	}
 
 	CON_COMMAND(CleanupCanvas)

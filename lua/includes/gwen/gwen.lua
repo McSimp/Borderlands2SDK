@@ -80,3 +80,7 @@ function Color(r, g, b, a)
 end
 
 include("base.lua")
+include("label.lua")
+include("button.lua")
+include("resizablecontrol.lua")
+include("windowcontrol.lua")

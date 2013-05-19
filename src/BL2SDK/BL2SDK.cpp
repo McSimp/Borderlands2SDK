@@ -22,6 +22,7 @@ namespace BL2SDK
 	unsigned long pGObjects;
 	unsigned long pGNames;
 	unsigned long pGObjHash;
+	unsigned long pGGameWindow;
 	tProcessEvent pProcessEvent;
 	tCallFunction pCallFunction;
 	tFrameStep pFrameStep;
@@ -181,6 +182,10 @@ namespace BL2SDK
 		// Sigscan for UObject::GObjHash
 		pGObjHash = *(unsigned long*)sigscan.Scan((unsigned char*)GObjHash_Pattern, GObjHash_Mask);
 		Logging::LogF("[Internal] GObjHash = 0x%X\n", pGObjHash);
+
+		// Sigscan for GGameWindow
+		pGGameWindow = *(unsigned long*)sigscan.Scan((unsigned char*)GGameWindow_Pattern, GGameWindow_Mask);
+		Logging::LogF("[Internal] GGameWindow = 0x%X\n", pGGameWindow);
 
 		// Sigscan for Unreal exception handler
 		void* addrUnrealEH = sigscan.Scan((unsigned char*)CrashHandler_Pattern, CrashHandler_Mask);
