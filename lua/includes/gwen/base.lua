@@ -166,7 +166,7 @@ end
 -- TODO: Dock position enum
 function Base:Dock(dock)
 	local func = gwen.GetVFunc(self.control, 27, "tGwen_Controls_Base_Dock")
-	func(self.control)
+	func(self.control, dock)
 end
 
 function Base:GetDock()
@@ -497,6 +497,11 @@ end
 function Base:SetTabable(tabable)
 	local func = gwen.GetVFunc(self.control, 137, "tGwen_Controls_Base_SetTabable")
 	func(self.control, tabable)
+end
+
+function Base:AlignBelow(belowControl, border)
+	if border == nil then border = 0 end
+	self:SetPos(self:X(), belowControl:Bottom() + border)
 end
 
 gwen.meta.Base = Base

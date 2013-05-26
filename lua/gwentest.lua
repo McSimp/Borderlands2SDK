@@ -4,16 +4,26 @@ include("includes/gwen/gwen.lua")
 local ffi = require("ffi")
 
 function TestButton()
-	local control = ffi.C.LUAFUNC_CreateNewControl(gwen.Controls.Button)
+	local control = ffi.C.LUAFUNC_CreateNewControl(gwen.Controls.Window, nil)
 
-	controlTest = setmetatable({ control = control }, gwen.meta.Button)
-	controlTest:SetText("Now in the JewSex channel")
+	local windowTest = setmetatable({ control = control }, gwen.meta.WindowControl)
+	windowTest:SetTitle("Hello Everynung")
+	windowTest:SetPos(50, 50)
+	windowTest:SetSize(250, 250)
 
-	controlTest:SetPos(50, 50)
-	print(controlTest:GetTypeName())
-	controlTest:SetSize(150, 50)
+	local control2 = ffi.C.LUAFUNC_CreateNewControl(gwen.Controls.Button, control)
 
-	print(controlTest:GetParent())
-	print(controlTest:GetParent():GetTypeName())
+	local buttonTest = setmetatable({ control = control2 }, gwen.meta.Button)
+	buttonTest:SetText("Now in the JewSex channel")
+	buttonTest:SetSize(50, 100)
+	buttonTest:Dock(8)
+
+	local control3 = ffi.C.LUAFUNC_CreateNewControl(gwen.Controls.Button, control)
+
+	local buttonTest = setmetatable({ control = control3 }, gwen.meta.Button)
+	buttonTest:SetText("Wilko is a baguette")
+	buttonTest:SetSize(50, 100)
+	buttonTest:Dock(8)
+
 end
 

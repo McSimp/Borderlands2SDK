@@ -35,7 +35,7 @@ typedef struct {
 
 typedef struct TextObject TextObject;
 
-GwenControl* LUAFUNC_CreateNewControl(int controlNum);
+GwenControl* LUAFUNC_CreateNewControl(int controlNum, GwenControl* parent);
 TextObject* LUAFUNC_NewTextObject(const char* str);
 const char* LUAFUNC_GetTextObjectString(TextObject& obj);
 ]]

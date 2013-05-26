@@ -183,6 +183,25 @@ struct FFrame : public FOutputDevice
 	struct FOutParmRec* OutParms;
 };
 
+struct FWindowsViewport;
+
+struct FDeferredMessage
+{
+	FWindowsViewport* Viewport;
+	UINT Message;
+	WPARAM wParam;
+	LPARAM lParam;
+
+	struct
+	{
+		SHORT LeftControl;
+		SHORT RightControl;
+		SHORT LeftShift;
+		SHORT RightShift;
+		SHORT Menu;
+	}	KeyStates;
+};
+
 /*
 # ========================================================================================= #
 # Includes

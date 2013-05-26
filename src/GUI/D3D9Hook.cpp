@@ -38,8 +38,6 @@ namespace D3D9Hook
 
 	HRESULT WINAPI BeginStateBlock_Detour(IDirect3DDevice9* pD3DDev)
 	{
-		Logging::Log("[DirectX Hooking] BeginStateBlock called\n");
-
 		HRESULT result = pBeginStateBlock(pD3DDev);
 		D3DDVTable[ENDSTATEBLOCK_IDX] = (DWORD)EndStateBlock_Detour; // Restore EndStateBlock hook
 		return result;
@@ -47,8 +45,6 @@ namespace D3D9Hook
 
 	HRESULT WINAPI EndStateBlock_Detour(IDirect3DDevice9* pD3DDDev, IDirect3DStateBlock9** ppSB)
 	{
-		Logging::Log("[DirectX Hooking] EndStateBlock called\n");
-
 		HRESULT result = pEndStateBlock(pD3DDDev, ppSB);
 
 		D3DDVTable[ENDSCENE_IDX] = (DWORD)EndScene_Detour;
@@ -116,7 +112,7 @@ namespace D3D9Hook
 			throw FatalSDKException(5000, Util::Format("Failed to call Direct3DCreate9 (Error = %d)", GetLastError()));
 		}
 
-		D3DVTable = (PDWORD)*(PDWORD)d3d;
+		D3DVTable = *(PDWORD*)d3d;
 		d3d->Release();
 
 		DWORD dwProtect;

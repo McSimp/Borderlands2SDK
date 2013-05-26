@@ -22,11 +22,10 @@ namespace BL2SDK
 	unsigned long pGObjects;
 	unsigned long pGNames;
 	unsigned long pGObjHash;
-	unsigned long pGGameWindow;
 	tProcessEvent pProcessEvent;
 	tCallFunction pCallFunction;
 	tFrameStep pFrameStep;
-	tExit pExit;
+	tProcessDeferredMessage pProcessDeferredMessage;
 
 	void __stdcall hkProcessEvent(UFunction* function, void* parms, void* result)
 	{
@@ -79,12 +78,6 @@ namespace BL2SDK
 		}
 
 		pCallFunction(caller, stack, result, function);
-	}
-
-	void __cdecl hkExit(int code)
-	{
-		_asm nop;
-		pExit(code);
 	}
 
 	void InjectedCallNext()
@@ -183,10 +176,6 @@ namespace BL2SDK
 		pGObjHash = *(unsigned long*)sigscan.Scan((unsigned char*)GObjHash_Pattern, GObjHash_Mask);
 		Logging::LogF("[Internal] GObjHash = 0x%X\n", pGObjHash);
 
-		// Sigscan for GGameWindow
-		pGGameWindow = *(unsigned long*)sigscan.Scan((unsigned char*)GGameWindow_Pattern, GGameWindow_Mask);
-		Logging::LogF("[Internal] GGameWindow = 0x%X\n", pGGameWindow);
-
 		// Sigscan for Unreal exception handler
 		void* addrUnrealEH = sigscan.Scan((unsigned char*)CrashHandler_Pattern, CrashHandler_Mask);
 		Logging::LogF("[Internal] Unreal Crash handler = 0x%X\n", addrUnrealEH);
@@ -199,6 +188,10 @@ namespace BL2SDK
 		pFrameStep = reinterpret_cast<tFrameStep>(sigscan.Scan((unsigned char*)FrameStep_Pattern, FrameStep_Mask));
 		Logging::LogF("[Internal] FFrame::Step() = 0x%X\n", pFrameStep);
 
+		// Sigscan for FWindowsViewport::ProcessDeferredMessage
+		pProcessDeferredMessage = reinterpret_cast<tProcessDeferredMessage>(sigscan.Scan((unsigned char*)ProcessDeferredMessage_Pattern, ProcessDeferredMessage_Mask));
+		Logging::LogF("[Internal] FWindowsViewport::ProcessDeferredMessage() = 0x%X\n", pProcessDeferredMessage);
+		
 		// Detour UObject::ProcessEvent()
 		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkProcessEvent);
 		detProcessEvent.Attach();
@@ -210,10 +203,6 @@ namespace BL2SDK
 		// Detour UObject::CallFunction()
 		SETUP_SIMPLE_DETOUR(detCallFunction, pCallFunction, hkCallFunction);
 		detCallFunction.Attach();
-
-		pExit = &exit;
-		SETUP_SIMPLE_DETOUR(detExit, pExit, hkExit);
-		detExit.Attach();
 	}
 
 	// This function is used to get the dimensions of the game window for Gwen's renderer
