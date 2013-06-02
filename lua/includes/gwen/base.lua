@@ -199,11 +199,6 @@ function Base:Width()
 	return func(self.control)
 end
 
-function Base:Width()
-	local func = gwen.GetVFunc(self.control, 33, "tGwen_Controls_Base_Width")
-	return func(self.control)
-end
-
 function Base:Height()
 	local func = gwen.GetVFunc(self.control, 34, "tGwen_Controls_Base_Height")
 	return func(self.control)
@@ -502,6 +497,14 @@ end
 function Base:AlignBelow(belowControl, border)
 	if border == nil then border = 0 end
 	self:SetPos(self:X(), belowControl:Bottom() + border)
+end
+
+function Base:AddOnHoverEnter(func)
+	gwen.AddCallback(self.control, 44, "OnHoverEnter", func)
+end
+
+function Base:AddOnHoverLeave(func)
+	gwen.AddCallback(self.control, 56, "OnHoverLeave", func)
 end
 
 gwen.meta.Base = Base

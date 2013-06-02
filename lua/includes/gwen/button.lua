@@ -65,6 +65,38 @@ function Button:SetImageAlpha(multiply)
 	func(self.control, multiply)
 end
 
+function Button:AddOnPress(func)
+	gwen.AddCallback(self.control, 244, "OnPress", func)
+end
+
+function Button:AddOnRightPress(func)
+	gwen.AddCallback(self.control, 256, "OnRightPress", func)
+end
+
+function Button:AddOnDown(func)
+	gwen.AddCallback(self.control, 268, "OnDown", func)
+end
+
+function Button:AddOnUp(func)
+	gwen.AddCallback(self.control, 280, "OnUp", func)
+end
+
+function Button:AddOnDoubleClick(func)
+	gwen.AddCallback(self.control, 292, "OnDoubleClick", func)
+end
+
+function Button:AddOnToggle(func)
+	gwen.AddCallback(self.control, 304, "OnToggle", func)
+end
+
+function Button:AddOnToggleOn(func)
+	gwen.AddCallback(self.control, 316, "OnToggleOn", func)
+end
+
+function Button:AddOnToggleOff(func)
+	gwen.AddCallback(self.control, 328, "OnToggleOff", func)
+end
+
 gwen.meta.Button = Button
 
 --[[

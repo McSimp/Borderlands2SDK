@@ -17,6 +17,7 @@ function TestButton()
 	buttonTest:SetText("Now in the JewSex channel")
 	buttonTest:SetSize(50, 100)
 	buttonTest:Dock(8)
+	buttonTest:AddOnPress(function(panel) print("Button1 pressed") end)
 
 	local control3 = ffi.C.LUAFUNC_CreateNewControl(gwen.Controls.Button, control)
 
@@ -24,6 +25,7 @@ function TestButton()
 	buttonTest:SetText("Wilko is a baguette")
 	buttonTest:SetSize(50, 100)
 	buttonTest:Dock(8)
+	buttonTest:AddOnPress(function(panel) print("Button2 pressed") end)
 
 end
 

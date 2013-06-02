@@ -31,6 +31,10 @@ function ResizableControl:DisableResizing()
 	func(self.control)
 end
 
+function ResizableControl:AddOnResize(func)
+	gwen.AddCallback(self.control, 232, "OnResize", func)
+end
+
 gwen.meta.ResizableControl = ResizableControl
 
 --[[

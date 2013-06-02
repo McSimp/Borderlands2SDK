@@ -205,6 +205,12 @@ namespace GwenManager
 		window->SetTitle(str);
 	}
 
+	extern "C" __declspec(dllexport) void LUAFUNC_AddGwenCallback(Controls::Base* control, int offset, Event::Handler::Function callback)
+	{
+		Event::Caller* eh = (Event::Caller*)((int)control + offset);
+		eh->Add(control, callback);
+	}
+
 	CON_COMMAND(CleanupCanvas)
 	{
 		pCanvas->RemoveAllChildren();

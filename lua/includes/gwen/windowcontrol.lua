@@ -17,6 +17,10 @@ function WindowControl:SetClosable(closeable)
 	func(self.control, closeable)
 end
 
+function WindowControl:AddOnWindowClosed(func)
+	gwen.AddCallback(self.control, 296, "OnWindowClosed", func)
+end
+
 gwen.meta.WindowControl = WindowControl
 
 --[[

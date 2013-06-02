@@ -79,6 +79,7 @@ function Color(r, g, b, a)
 	return obj
 end
 
+include("callbacks.lua")
 include("base.lua")
 include("label.lua")
 include("button.lua")
