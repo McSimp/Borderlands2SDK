@@ -3,13 +3,19 @@
 #include "Gwen/Gwen.h"
 #include "Gwen/Skins/Simple.h"
 #include "Gwen/Skins/TexturedBase.h"
-#include "Gwen/UnitTest/UnitTest.h"
 #include "Gwen/Input/Windows.h"
 #include "Gwen/Renderers/DirectX9.h"
 #include "BL2SDK/Settings.h"
 #include "Commands/ConCommand.h"
 #include "BL2SDK/Util.h"
 #include "BL2SDK/CSimpleDetour.h"
+#include "BL2SDK/GameHooks.h"
+
+// Controls
+#include "gwen/Controls/Base.h"
+#include "gwen/Controls/Button.h"
+#include "gwen/Controls/WindowControl.h"
+#include "gwen/Controls/HorizontalSlider.h"
 
 #define GET_X_LPARAM(lParam)	((int)(short)LOWORD(lParam))
 #define GET_Y_LPARAM(lParam)	((int)(short)HIWORD(lParam))
@@ -29,6 +35,18 @@ namespace GwenManager
 
 	bool gwenEnabled = false;
 
+	void ToggleGwenActive()
+	{
+		gwenEnabled = !gwenEnabled;
+		APlayerController* pc = UObject::FindObject<APlayerController>("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController");
+		if(pc != NULL)
+		{
+			pc->IgnoreButtonInput(gwenEnabled);
+			pc->IgnoreLookInput(gwenEnabled);
+			pc->IgnoreMoveInput(gwenEnabled);
+		}
+	}
+
 	void __stdcall hkProcessDeferredMessage(const FDeferredMessage& deferredMessage)
 	{
 		FWindowsViewport* thisPtr;
@@ -36,7 +54,7 @@ namespace GwenManager
 
 		if(deferredMessage.Message == WM_KEYDOWN && deferredMessage.wParam == VK_F3)
 		{
-			gwenEnabled = !gwenEnabled;
+			ToggleGwenActive();
 		}
 
 		if(gwenEnabled && pCanvas)
@@ -54,7 +72,6 @@ namespace GwenManager
 					return;
 				}
 				break;
-			
 			case WM_CHAR:
 			case WM_SYSCHAR:
 				{
@@ -96,8 +113,9 @@ namespace GwenManager
 					if(iKey != -1)
 					{
 						pCanvas->InputKey(iKey, bDown);
-						return;
 					}
+
+					return;
 				}
 				break;
 			case WM_LBUTTONDOWN:
@@ -106,7 +124,6 @@ namespace GwenManager
 					return;
 				}
 				break;
-
 			case WM_LBUTTONUP:
 				{
 					pCanvas->InputMouseButton(0, false);
@@ -124,6 +141,13 @@ namespace GwenManager
 					pCanvas->InputMouseButton(1, false);
 					return;
 				}
+				break;
+			case WM_SETCURSOR:
+				{
+					SetCursor(LoadCursor(NULL, IDC_ARROW));
+					return;
+				}
+				break;
 			}
 		}
 
@@ -186,7 +210,8 @@ namespace GwenManager
 	enum GwenControls
 	{
 		GWEN_BUTTON,
-		GWEN_WINDOW
+		GWEN_WINDOW,
+		GWEN_HORIZONTALSLIDER
 	};
 
 	extern "C" __declspec(dllexport) Controls::Base* LUAFUNC_CreateNewControl(GwenControls controlNum, Controls::Base* parent)
@@ -207,6 +232,11 @@ namespace GwenManager
 			Controls::WindowControl* wnd = new Controls::WindowControl(parent);
 			wnd->SetDeleteOnClose(true);
 			control = wnd;
+		}
+		else if(controlNum == GWEN_HORIZONTALSLIDER)
+		{
+			Controls::HorizontalSlider* slider = new Controls::HorizontalSlider(parent);
+			control = slider;
 		}
 		
 		return control;
@@ -237,6 +267,16 @@ namespace GwenManager
 	{
 		Logging::LogF("[Gwen] Destructor callback set to 0x%X\n", callback);
 		destructorHook = callback;
+	}
+
+	extern "C" __declspec(dllexport) int LUAFUNC_GetCanvasW()
+	{
+		return pCanvas->GetSize().x;
+	}
+
+	extern "C" __declspec(dllexport) int LUAFUNC_GetCanvasH()
+	{
+		return pCanvas->GetSize().y;
 	}
 
 	CON_COMMAND(CleanupCanvas)

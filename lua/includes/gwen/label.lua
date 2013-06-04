@@ -142,7 +142,6 @@ gwen.meta.Label = Label
 
 --[[
 VMT dump from IDA
-168: public: virtual char const * __thiscall *tGwen_Controls_Label_GetBaseTypeName(void)
 169: public: virtual void __thiscall *tGwen_Controls_Label_SetText(class Gwen::TextObject const &, bool)
 170: public: virtual class Gwen::TextObject const & __thiscall *tGwen_Controls_Label_GetText(void)const
 171: public: virtual void __thiscall *tGwen_Controls_Label_SizeToContents(void)

@@ -22,7 +22,7 @@ function gwen.ExecCallbacks(cbTable, this, pFromPanel)
 	end
 
 	for _,v in ipairs(hookTable) do
-		v(pFromPanel)
+		v(gwen.ControlFromPointer(pFromPanel))
 	end
 end
 

@@ -49,4 +49,44 @@ function GwenTest()
 	button2:Dock(8)
 	button2:AddOnPress(function(panel) print("Button2 pressed") end)
 	print(button2:_GetInternalControl())
+
+	local slider = gwen.CreateControl("HorizontalSlider", window)
+	slider:SetSize(50, 20)
+	slider:Dock(8)
+	slider:AddOnValueChanged(function(panel) print(panel:GetFloatValue()) end)
+	print(slider:_GetInternalControl())
+end
+
+function TimeControllerUI()
+	local dnc = engine.FindObject("WillowSeqAct_DayNightCycle PersistentLevel.Main_Sequence.WillowSeqAct_DayNightCycle", engine.Classes.UWillowSeqAct_DayNightCycle)
+	if dnc == nil then error("DNC was null") end
+
+	local window = gwen.CreateControl("WindowControl")
+	window:SetTitle("Time Controller")
+	window:SetPos(10, gwen.ScrH() - 160)
+	window:SetSize(400, 150)
+
+	local timeSlider = gwen.CreateControl("HorizontalSlider", window)
+	timeSlider:SetSize(50, 30)
+	timeSlider:Dock(POS_TOP)
+	timeSlider:SetRange(0, dnc.InterpData.InterpLength)
+	timeSlider:AddOnValueChanged(function(panel)
+		dnc:SetTimeOfDay(panel:GetFloatValue())
+	end)
+
+	local dayButton = gwen.CreateControl("Button", window)
+	dayButton:SetText("Set time to Day")
+	dayButton:SetSize(50, 40)
+	dayButton:Dock(POS_TOP)
+	dayButton:AddOnPress(function(panel)
+		dnc:SetTimeOfDay(0)
+	end)
+
+	local nightButton = gwen.CreateControl("Button", window)
+	nightButton:SetText("Set time to Night")
+	nightButton:SetSize(50, 40)
+	nightButton:Dock(POS_TOP)
+	nightButton:AddOnPress(function(panel)
+		dnc:SetTimeOfDay(50)
+	end)
 end

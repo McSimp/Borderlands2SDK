@@ -28,7 +28,7 @@ CON_COMMAND(CrashMe)
 
 CON_COMMAND(GetLocalPlayer)
 {
-	AActor* pc = UObject::FindObject<AActor>("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController");
+	APlayerController* pc = UObject::FindObject<APlayerController>("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController");
 	Logging::LogF("pc = 0x%X\n", pc);
 }
 

@@ -38,12 +38,24 @@ typedef struct TextObject TextObject;
 GwenControl* LUAFUNC_CreateNewControl(int controlNum, GwenControl* parent);
 TextObject* LUAFUNC_NewTextObject(const char* str);
 const char* LUAFUNC_GetTextObjectString(TextObject& obj);
+int LUAFUNC_GetCanvasW();
+int LUAFUNC_GetCanvasH();
 ]]
 
 gwen = {}
-gwen.ControlTypes = { Button = 0, WindowControl = 1 }
+gwen.ControlTypes = { Button = 0, WindowControl = 1, HorizontalSlider = 2 }
 gwen.meta = {}
-gwen._ActiveControls = {}
+gwen._ActiveControls = {} -- TODO: Prevent use after free
+
+POS_NONE = 0
+POS_LEFT = 2
+POS_RIGHT = 4
+POS_TOP = 8
+POS_BOTTOM = 16
+POS_CENTERV = 32
+POS_CENTERH = 64
+POS_FILL = 128
+POS_CENTER = 96 -- (CenterV | CenterH)
 
 function gwen.GetVFunc(control, idx, typedef)
 	return ffi.cast(typedef, control.VMT[idx])
@@ -100,6 +112,14 @@ function gwen.CreateControl(controlType, parent)
 	return luaControl
 end
 
+function gwen.ScrW()
+	return ffi.C.LUAFUNC_GetCanvasW()
+end
+
+function gwen.ScrH()
+	return ffi.C.LUAFUNC_GetCanvasH()
+end
+
 function Color(r, g, b, a)
 	local obj = ffi.new("GwenColor")
 
@@ -117,3 +137,5 @@ include("label.lua")
 include("button.lua")
 include("resizablecontrol.lua")
 include("windowcontrol.lua")
+include("slider.lua")
+include("horizontalslider.lua")
