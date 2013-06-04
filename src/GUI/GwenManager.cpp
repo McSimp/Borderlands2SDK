@@ -22,6 +22,11 @@ namespace GwenManager
 	Skin::TexturedBase* pSkin = NULL;
 	Controls::Canvas* pCanvas = NULL;
 
+	typedef void (__thiscall* tGwenBaseDestructor) (Controls::Base*);
+	typedef void (*tGwenBaseDestructorHook) (Controls::Base*);
+
+	tGwenBaseDestructorHook destructorHook = NULL;
+
 	bool gwenEnabled = false;
 
 	void __stdcall hkProcessDeferredMessage(const FDeferredMessage& deferredMessage)
@@ -125,6 +130,19 @@ namespace GwenManager
 		BL2SDK::pProcessDeferredMessage(thisPtr, deferredMessage);
 	}
 
+	void __stdcall hkGwenDestructor()
+	{
+		Controls::Base* caller;
+		_asm mov caller, ecx;
+
+		if(destructorHook != NULL)
+		{
+			destructorHook(caller);
+		}
+
+		((tGwenBaseDestructor)BL2SDK::pGwenDestructor)(caller);
+	}
+
 	void InitializeRenderer(IDirect3DDevice9* pD3DDev)
 	{
 		if(pRenderer) delete pRenderer;
@@ -139,6 +157,10 @@ namespace GwenManager
 		// Detour FWindowsViewport::ProcessDeferredMessage
 		SETUP_SIMPLE_DETOUR(detProcessDeferredMessage, BL2SDK::pProcessDeferredMessage, hkProcessDeferredMessage);
 		detProcessDeferredMessage.Attach();
+
+		// Detour Gwen control destructor so we can let Lua know when controls are deleted
+		SETUP_SIMPLE_DETOUR(detGwenDestructor, BL2SDK::pGwenDestructor, hkGwenDestructor);
+		detGwenDestructor.Attach();
 	}
 
 	void CreateCanvas(int x, int y)
@@ -209,6 +231,12 @@ namespace GwenManager
 	{
 		Event::Caller* eh = (Event::Caller*)((int)control + offset);
 		eh->Add(control, callback);
+	}
+
+	extern "C" __declspec(dllexport) void LUAFUNC_SetDestructorCallback(tGwenBaseDestructorHook callback)
+	{
+		Logging::LogF("[Gwen] Destructor callback set to 0x%X\n", callback);
+		destructorHook = callback;
 	}
 
 	CON_COMMAND(CleanupCanvas)

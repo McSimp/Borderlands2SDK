@@ -3,7 +3,9 @@ local PtrToNum = PtrToNum
 
 ffi.cdef[[
 typedef void (__thiscall *EventHandlerFunction)(GwenControl* this, GwenControl* pFromPanel);
+typedef void (*tGwenBaseDestructorHook) (GwenControl* control);
 void LUAFUNC_AddGwenCallback(GwenControl* control, int offset, EventHandlerFunction callback);
+void LUAFUNC_SetDestructorCallback(tGwenBaseDestructorHook callback);
 ]]
 
 local RegisteredCallbacks = {}
@@ -49,3 +51,15 @@ function gwen.AddCallback(control, offset, name, func)
 
 	print(string.format("[Lua] Gwen callback added for event: %s", name))
 end
+
+local function OnDestructorCalled(control)
+	local ptrNum = PtrToNum(control)
+	for name,cbTable in pairs(RegisteredCallbacks) do
+		if cbTable[ptrNum] ~= nil then
+			cbTable[ptrNum] = nil
+		end
+	end
+end
+
+local destructorCB = ffi.cast("tGwenBaseDestructorHook", OnDestructorCalled)
+ffi.C.LUAFUNC_SetDestructorCallback(destructorCB)

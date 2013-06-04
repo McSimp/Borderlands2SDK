@@ -26,6 +26,7 @@ namespace BL2SDK
 	tCallFunction pCallFunction;
 	tFrameStep pFrameStep;
 	tProcessDeferredMessage pProcessDeferredMessage;
+	void* pGwenDestructor;
 
 	void __stdcall hkProcessEvent(UFunction* function, void* parms, void* result)
 	{
@@ -191,7 +192,13 @@ namespace BL2SDK
 		// Sigscan for FWindowsViewport::ProcessDeferredMessage
 		pProcessDeferredMessage = reinterpret_cast<tProcessDeferredMessage>(sigscan.Scan((unsigned char*)ProcessDeferredMessage_Pattern, ProcessDeferredMessage_Mask));
 		Logging::LogF("[Internal] FWindowsViewport::ProcessDeferredMessage() = 0x%X\n", pProcessDeferredMessage);
-		
+
+		// Sigscan for Gwen::Controls::Base::~Base()
+		CSigScan sdkSigscan(L"BL2SDKDLL.dll");
+
+		pGwenDestructor = reinterpret_cast<void*>(sdkSigscan.Scan((unsigned char*)GwenDestructor_Pattern, GwenDestructor_Mask));
+		Logging::LogF("[Internal] Gwen::Controls::Base::~Base() = 0x%X\n", pGwenDestructor);
+
 		// Detour UObject::ProcessEvent()
 		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkProcessEvent);
 		detProcessEvent.Attach();

@@ -41,8 +41,9 @@ const char* LUAFUNC_GetTextObjectString(TextObject& obj);
 ]]
 
 gwen = {}
-gwen.Controls = { Button = 0, Window = 1 }
+gwen.ControlTypes = { Button = 0, WindowControl = 1 }
 gwen.meta = {}
+gwen._ActiveControls = {}
 
 function gwen.GetVFunc(control, idx, typedef)
 	return ffi.cast(typedef, control.VMT[idx])
@@ -51,8 +52,17 @@ end
 function gwen.ControlFromPointer(cdata)
 	if cdata == nil then return nil end
 
+	-- First check the _ActiveControls table
+	local control = gwen._ActiveControls[PtrToNum(cdata)]
+	if control ~= nil then
+		return control
+	end
+
 	local tbl = { control = cdata }
-	return setmetatable(tbl, gwen.meta[gwen.meta.Base.GetTypeName(tbl)] or "Base")
+	local luaControl = setmetatable(tbl, gwen.meta[gwen.meta.Base.GetTypeName(tbl)] or "Base")
+	gwen._ActiveControls[PtrToNum(control)] = luaControl
+
+	return luaControl
 end
 
 -- TODO: Automatic GC
@@ -66,6 +76,28 @@ end
 
 function gwen.GetStringFromTextObject(obj)
 	return ffi.string(ffi.C.LUAFUNC_GetTextObjectString(obj))
+end
+
+function gwen.CreateControl(controlType, parent)
+	local ctrlNum = gwen.ControlTypes[controlType]
+	if ctrlNum == nil then
+		error(controlType .. " is not a valid control type")
+	end
+
+	if parent ~= nil then
+		parent = parent:_GetInternalControl()
+	end
+
+	-- Call to SDK to create a control and get all the C++ stuff done
+	local control = ffi.C.LUAFUNC_CreateNewControl(ctrlNum, parent)
+	if control == nil then
+		error("An error occurred while creating the control")
+	end
+
+	local luaControl = setmetatable({ control = control }, gwen.meta[controlType])
+	gwen._ActiveControls[PtrToNum(control)] = luaControl
+
+	return luaControl
 end
 
 function Color(r, g, b, a)

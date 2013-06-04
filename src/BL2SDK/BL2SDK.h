@@ -18,6 +18,7 @@ namespace BL2SDK
 	extern tCallFunction pCallFunction;
 	extern tFrameStep pFrameStep;
 	extern tProcessDeferredMessage pProcessDeferredMessage;
+	extern void* pGwenDestructor;
 
 	void LogAllProcessEventCalls(bool enabled);
 	void LogAllUnrealScriptCalls(bool enabled);

@@ -84,6 +84,10 @@ typedef char const * (__thiscall *tGwen_Controls_Base_GetBaseTypeName) (GwenCont
 local Base = {}
 Base.__index = Base
 
+function Base:_GetInternalControl()
+	return self.control
+end
+
 function Base:GetTypeName()
 	local func = gwen.GetVFunc(self.control, 1, "tGwen_Controls_Base_GetTypeName")
 	return ffi.string(func(self.control))
