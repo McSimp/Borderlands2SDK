@@ -1,7 +1,7 @@
 local ffi = require("ffi")
 local engine = engine
 
-local GeneratedTArrays = { "FName", "char" } -- An array of inner type name strings (TODO: Ugh. String table)
+local GeneratedTArrays = { "FName", "char" } -- An array of inner type name strings
 local TARRAY_TEMPLATE = [[%s
 struct TArray_%s_ {
 	%s* Data;

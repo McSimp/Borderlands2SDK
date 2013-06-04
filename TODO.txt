@@ -1,0 +1,61 @@
+C++
+* Create a nicer way to export Lua functions
+* Detach detours? Is this even worth doing?
+* Automatic version in BL2SDK.h
+* Cleanup VirtualProtects in DirectX hooking
+* Get rid of macro indexes in DirectX hooking
+* Fix hook system - use pointers to avoid map copies
+* Fix the MAJOR PROBLEM in hook system - probably can just search for the virtual function on deletion
+* Work out a way to intercept LuaJIT exiting during a failed callback
+* Get rid of Sigscan macros
+* Remove Windows console and just use game/logfile
+* Benchmark and analyse Widen/Narrow functions
+* Oh my god what the fuck is going on in ConCmdManager.cpp
+* Could neaten commands in LuaCommands.cpp
+* Delete SlotMachines commands when done with them
+* Remove as much GameSDK as humanly possible
+* Fix indenting in Gwen DirectX renderer
+* Replace slow DirectX font rendering with something faster
+* Update texturing loading to load from SDK path rather than game path
+* Remove unnessary functions from DirectX renderer for standalone shit
+* Remove CLuaInterface and everything that goes with it (CLuaObject)
+* Remove crap commands from main.cpp
+* Add error exceptions in AntiDebug hook
+* Remake GetFullName() to match the engine's GetFullName function
+* Decide on hook halting in GameHooks.cpp
+* Remake object searching to use the hash table
+
+Lua
+* Cursor enum for SetCursor
+* Maybe move the dock enum to gwen table
+* Implement checking that controls have not been freed before acting on them
+* Figure out what the fuck is going wrong with UObjectIndex
+* Allow for return values to be passed from a ProcessEvent hook back into the engine
+* FFrame.GetFuncArgsHex possible infinite loop
+* FFrameMT.GetTArray does not take into account TArray inner type
+* A file reading/writing library
+* Remove static directory references in sdkgen code
+* Enums in function definition tables and comments of data structures
+* Add Gwen to autoload on init
+* Fix the problem with class fields being given their actual type instead of struct UClass*
+* Upgrade to LuaJIT 2.0.2
+
+Other
+* CrashRpt endpoint on mcsi.mp
+* CrashRpt privacy policy
+* Lua/C++: Get the function flags right for ProcessEvent
+* Set a console key automatically in launcher
+* Add launcher facility to decompress upk files for opening in UE Explorer
+* Lua/C++: Add hook in Lua for when ResetLua is happening
+* Lua/C++: Allow Lua to call ResetLua (for sdkgen)
+* Lua/C++: Pass unrecognized commands to Lua command system
+* Figure out a way to detect if new SDK needs to be generated (I'm thinking hash of Borderlands2.exe?)
+* Organise the SDK folder a bit better -subfolder for gwen textures etc.
+* Find some way to move Launcher source code out of the build folder
+* Decide whether to release source code (If so, hide some Unreal structs that I really shouldn't know)
+* If releasing source, decide on licence
+* Look into a build server and symbol server for crash reporting
+* Test Steam version
+
+Bugs:
+* Console output doesn't work on the Steam version, this is because the SDK on the C++ side of things is using constant indexes for the engine functions, which was generated for the old version of the game. So either get the engine functions on the C++ side to use function names, or just move the concommand system completely into Lua. 

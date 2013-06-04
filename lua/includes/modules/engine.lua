@@ -262,7 +262,7 @@ function MakeEnum(name, identifiers)
 		enum[identifiers[i]] = (i-1)
 	end
 
-	enums[name] = enum -- TODO: Maybe there's a better way
+	enums[name] = enum
 end
 
 local UObjectDataMT = { __index = NilIndex }

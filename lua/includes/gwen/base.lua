@@ -167,7 +167,6 @@ function Base:CanvasPosToLocal(x, y)
 	return ret.x, ret.y
 end
 
--- TODO: Dock position enum
 function Base:Dock(dock)
 	local func = gwen.GetVFunc(self.control, 27, "tGwen_Controls_Base_Dock")
 	func(self.control, dock)
