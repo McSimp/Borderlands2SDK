@@ -42,8 +42,5 @@ namespace BL2SDK
 #include "GameSDK/Engine_structs.h"
 #include "GameSDK/Engine_classes.h"
 #include "GameSDK/Engine_f_structs.h"
-#include "GameSDK/GameFramework_structs.h"
-#include "GameSDK/GameFramework_classes.h"
-#include "GameSDK/GameFramework_f_structs.h"
 
 #endif

@@ -178,6 +178,10 @@ namespace GwenManager
 		pSkin = new Skin::TexturedBase(pRenderer);
 		pSkin->Init(Settings::GetBinFile(L"DefaultSkin.png"));
 
+		// Create a dummy canvas that will be resized later
+		pCanvas = new Controls::Canvas(pSkin);
+		pCanvas->SetSize(1, 1);
+
 		// Detour FWindowsViewport::ProcessDeferredMessage
 		SETUP_SIMPLE_DETOUR(detProcessDeferredMessage, BL2SDK::pProcessDeferredMessage, hkProcessDeferredMessage);
 		detProcessDeferredMessage.Attach();
@@ -189,14 +193,8 @@ namespace GwenManager
 
 	void CreateCanvas(int x, int y)
 	{
-		if(pCanvas) delete pCanvas;
-
 		Logging::LogF("[Gwen] Creating canvas (%dx%d)\n", x, y);
-		pCanvas = new Controls::Canvas(pSkin);
 		pCanvas->SetSize(x, y);
-
-		//pCanvas->SetDrawBackground(true);
-		//pCanvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 100));
 	}
 
 	void OnEndScene()

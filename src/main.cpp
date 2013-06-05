@@ -95,27 +95,6 @@ CON_COMMAND(CountNullObj)
 	Logging::Log("=== END OBJECT DUMP ===\n");
 }
 
-CON_COMMAND(Derp)
-{
-	Logging::Log("=== OBJECT DUMP ===\n");
-	Logging::LogF("%40s | %10s\n", "Name", "ArrayDim");
-	for(int i = 0; i < UObject::GObjObjects()->Count; i++) 
-	{ 
-		UObject* Object = UObject::GObjObjects()->Data[i];
-		//Logging::LogF("%d | 0x%X | %s\n", i, Object, Object->GetFullName()); 
-		if(Object->IsA(UProperty::StaticClass()))
-		{
-			UProperty* prop = (UProperty*)Object;
-			if(prop->ArrayDim > 1 || prop->IsA(UArrayProperty::StaticClass()))
-			{
-				Logging::LogF(" %40s | %10i | %10i\n", prop->Name.GetName(), prop->ArrayDim, prop->IsA(UArrayProperty::StaticClass()));
-			}
-		}
-		
-	} 
-	Logging::Log("=== END OBJECT DUMP ===\n");
-}
-
 extern "C" __declspec(dllexport) DWORD InitializeSDK(LPVOID lpParameter)
 {
 	// The launcher will pass the configuration settings through lpParameter parameter as a struct

@@ -13,7 +13,6 @@ C++
 * Oh my god what the fuck is going on in ConCmdManager.cpp
 * Could neaten commands in LuaCommands.cpp
 * Delete SlotMachines commands when done with them
-* Remove as much GameSDK as humanly possible
 * Fix indenting in Gwen DirectX renderer
 * Replace slow DirectX font rendering with something faster
 * Update texturing loading to load from SDK path rather than game path
@@ -24,6 +23,7 @@ C++
 * Remake GetFullName() to match the engine's GetFullName function
 * Decide on hook halting in GameHooks.cpp
 * Remake object searching to use the hash table
+* Restructure GameSDK to use names not indexes
 
 Lua
 * Cursor enum for SetCursor
@@ -56,6 +56,7 @@ Other
 * Look into a build server and symbol server for crash reporting
 * Test Steam version
 * If Lua modules fail to initialize, give a more prominent warning
+* Handle game resize with Gwen canvas - Looks like the game just locks up when you change res at the moment
 
 Bugs:
 * Console output doesn't work on the Steam version, this is because the SDK on the C++ side of things is using constant indexes for the engine functions, which was generated for the old version of the game. So either get the engine functions on the C++ side to use function names, or just move the concommand system completely into Lua. 

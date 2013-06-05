@@ -60,9 +60,6 @@
     <ClCompile Include="..\..\src\GameSDK\Engine_functions.cpp">
       <Filter>Source Files\GameSDK</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\GameSDK\GameFramework_functions.cpp">
-      <Filter>Source Files\GameSDK</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\BL2SDK\BL2SDK.cpp">
       <Filter>Source Files\BL2SDK</Filter>
     </ClCompile>
@@ -141,15 +138,6 @@
       <Filter>Header Files\GameSDK</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\GameSDK\Engine_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\GameFramework_classes.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\GameFramework_f_structs.h">
-      <Filter>Header Files\GameSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GameSDK\GameFramework_structs.h">
       <Filter>Header Files\GameSDK</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\GameSDK\GameDefines.h">
