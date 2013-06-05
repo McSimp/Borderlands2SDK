@@ -25,18 +25,6 @@ class AActor : public UObject
 public:
 	unsigned char                                      UnknownData00[ 0x14C ];
 
-private:
-	static UClass* pClassPointer;
-
-public:
-	static UClass* StaticClass()
-	{
-		if ( ! pClassPointer )
-			pClassPointer = (UClass*) UObject::GObjObjects()->Data[ 145 ];
-
-		return pClassPointer;
-	};
-
 	void LocalPlayerControllers ( class UClass* BaseClass, class APlayerController** PC );
 };
 
@@ -46,19 +34,6 @@ class UUIRoot : public UObject
 {
 public:
 	unsigned char                                      UnknownData00[ 0xC ];
-
-private:
-	static UClass* pClassPointer;
-
-public:
-	static UClass* StaticClass()
-	{
-		if ( ! pClassPointer )
-			pClassPointer = (UClass*) UObject::GObjObjects()->Data[ 887 ];
-
-		return pClassPointer;
-	};
-
 };
 
 // Class Engine.Interaction
@@ -67,19 +42,6 @@ class UInteraction : public UUIRoot
 {
 public:
 	unsigned char                                      UnknownData00[ 0x30 ];
-
-private:
-	static UClass* pClassPointer;
-
-public:
-	static UClass* StaticClass()
-	{
-		if ( ! pClassPointer )
-			pClassPointer = (UClass*) UObject::GObjObjects()->Data[ 889 ];
-
-		return pClassPointer;
-	};
-
 };
 
 // Class Engine.Console
@@ -151,19 +113,6 @@ class AController : public AActor
 {
 public:
 	unsigned char                                      UnknownData00[ 0x4E4 ];
-	
-private:
-	static UClass* pClassPointer;
-
-public:
-	static UClass* StaticClass()
-	{
-		if ( ! pClassPointer )
-			pClassPointer = (UClass*) UObject::GObjObjects()->Data[ 489 ];
-
-		return pClassPointer;
-	};
-
 };
 
 // Class Engine.PlayerController

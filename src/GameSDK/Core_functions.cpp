@@ -114,28 +114,6 @@ char* UObject::GetFullName()
 	return "(null)"; 
 } 
 
-UClass* UObject::FindClass ( char* ClassFullName ) 
-{ 
-	while ( ! UObject::GObjObjects() ) 
-		Sleep ( 100 ); 
-
-	while ( ! FName::Names() ) 
-		Sleep ( 100 ); 
-
-	for ( int i = 0; i < UObject::GObjObjects()->Count; ++i ) 
-	{ 
-		UObject* Object = UObject::GObjObjects()->Data[ i ]; 
-
-		if ( ! Object ) 
-			continue; 
-
-		if ( ! _stricmp ( Object->GetFullName(), ClassFullName ) ) 
-			return (UClass*) Object; 
-	} 
-
-	return NULL; 
-} 
-
 bool UObject::IsA ( UClass* pClass ) 
 { 
 	for ( UClass* SuperClass = this->Class; SuperClass; SuperClass = ( UClass* ) SuperClass->SuperField ) 
@@ -163,7 +141,7 @@ int UObject::GetBuildChangelistNumber ( )
 	static UFunction* pFnGetBuildChangelistNumber = NULL;
 
 	if ( ! pFnGetBuildChangelistNumber )
-		pFnGetBuildChangelistNumber = (UFunction*) UObject::GObjObjects()->Data[ 5355 ];
+		pFnGetBuildChangelistNumber = UObject::FindObject<UFunction>("Function Core.Object.GetBuildChangelistNumber");
 
 	UObject_execGetBuildChangelistNumber_Parms GetBuildChangelistNumber_Parms;
 
@@ -186,7 +164,7 @@ int UObject::GetEngineVersion ( )
 	static UFunction* pFnGetEngineVersion = NULL;
 
 	if ( ! pFnGetEngineVersion )
-		pFnGetEngineVersion = (UFunction*) UObject::GObjObjects()->Data[ 5359 ];
+		pFnGetEngineVersion = UObject::FindObject<UFunction>("Function Core.Object.GetEngineVersion");
 
 	UObject_execGetEngineVersion_Parms GetEngineVersion_Parms;
 

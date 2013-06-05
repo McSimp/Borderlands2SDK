@@ -19,11 +19,7 @@
 # ========================================================================================= #
 */
 
-UClass* AActor::pClassPointer = NULL;
-UClass* UUIRoot::pClassPointer = NULL;
-UClass* UInteraction::pClassPointer = NULL;
 UClass* UConsole::pClassPointer = NULL;
-UClass* AController::pClassPointer = NULL;
 UClass* APlayerController::pClassPointer = NULL;
 UClass* UCanvas::pClassPointer = NULL;
 
@@ -43,7 +39,7 @@ void UConsole::eventConsoleCommand ( struct FString Command )
 	static UFunction* pFnConsoleCommand = NULL;
 
 	if ( ! pFnConsoleCommand )
-		pFnConsoleCommand = (UFunction*) UObject::GObjObjects()->Data[ 18442 ];
+		pFnConsoleCommand = UObject::FindObject<UFunction>("Function Engine.Console.ConsoleCommand");
 
 	UConsole_eventConsoleCommand_Parms ConsoleCommand_Parms;
 	memcpy ( &ConsoleCommand_Parms.Command, &Command, 0xC );
@@ -61,7 +57,7 @@ void UConsole::eventOutputText ( struct FString Text )
 	static UFunction* pFnOutputText = NULL;
 
 	if ( ! pFnOutputText )
-		pFnOutputText = (UFunction*) UObject::GObjObjects()->Data[ 18449 ];
+		pFnOutputText = UObject::FindObject<UFunction>("Function Engine.Console.OutputText");
 
 	UConsole_eventOutputText_Parms OutputText_Parms;
 	memcpy ( &OutputText_Parms.Text, &Text, 0xC );
@@ -79,7 +75,7 @@ void APlayerController::IgnoreButtonInput ( unsigned long bNewButtonInput )
 	static UFunction* pFnIgnoreButtonInput = NULL;
 
 	if ( ! pFnIgnoreButtonInput )
-		pFnIgnoreButtonInput = (UFunction*) UObject::GObjObjects()->Data[ 13724 ];
+		pFnIgnoreButtonInput = UObject::FindObject<UFunction>("Function Engine.PlayerController.IgnoreButtonInput");
 
 	APlayerController_execIgnoreButtonInput_Parms IgnoreButtonInput_Parms;
 	IgnoreButtonInput_Parms.bNewButtonInput = bNewButtonInput;
@@ -97,7 +93,7 @@ void APlayerController::IgnoreLookInput ( unsigned long bNewLookInput )
 	static UFunction* pFnIgnoreLookInput = NULL;
 
 	if ( ! pFnIgnoreLookInput )
-		pFnIgnoreLookInput = (UFunction*) UObject::GObjObjects()->Data[ 13719 ];
+		pFnIgnoreLookInput = UObject::FindObject<UFunction>("Function Engine.PlayerController.IgnoreLookInput");
 
 	APlayerController_execIgnoreLookInput_Parms IgnoreLookInput_Parms;
 	IgnoreLookInput_Parms.bNewLookInput = bNewLookInput;
@@ -115,7 +111,7 @@ void APlayerController::IgnoreMoveInput ( unsigned long bNewMoveInput )
 	static UFunction* pFnIgnoreMoveInput = NULL;
 
 	if ( ! pFnIgnoreMoveInput )
-		pFnIgnoreMoveInput = (UFunction*) UObject::GObjObjects()->Data[ 13713 ];
+		pFnIgnoreMoveInput = UObject::FindObject<UFunction>("Function Engine.PlayerController.IgnoreMoveInput");
 
 	APlayerController_execIgnoreMoveInput_Parms IgnoreMoveInput_Parms;
 	IgnoreMoveInput_Parms.bNewMoveInput = bNewMoveInput;

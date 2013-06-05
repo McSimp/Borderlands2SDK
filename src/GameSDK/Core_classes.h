@@ -73,7 +73,6 @@ public:
 
 		return NULL; 
 	}
-	static UClass* FindClass ( char* ClassFullName ); 
 
 	bool IsA ( UClass* pClass ); 
 

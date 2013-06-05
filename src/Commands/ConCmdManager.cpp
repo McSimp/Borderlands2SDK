@@ -64,7 +64,6 @@ namespace ConCmdManager
 		UConsole* console = (UConsole*)pCaller;
 		
 		UConsole_eventConsoleCommand_Parms* parms = (UConsole_eventConsoleCommand_Parms*)pParms;
-		//Logging::LogF("[ConCmd] Engine concmd = %ls\n", parms->Command);
 
 		// Because 'say' is appended to everything, take that off
 		wchar_t* ptr = parms->Command.Data;
@@ -72,7 +71,6 @@ namespace ConCmdManager
 		{
 			ptr = ptr + 4;
 		}
-		//Logging::LogF("[ConCmd] New command = \"%ls\"\n", ptr);
 
 		// Convert to a normal string because #1 I don't give a fuck and #2 That's terror
 		std::wstring temp(ptr);
@@ -85,19 +83,34 @@ namespace ConCmdManager
 		if(iConCommands != ConCommands.end())
 		{
 			// Add command to history
+			// If the last thing in history was this command, don't add it to history
 			/*
-			if(console->HistoryTop == 0 ? wcscmp(console->History[16 - 1].Data, temp.c_str()) : wcscmp(console->History[console->HistoryTop - 1].Data, temp.c_str()))
+			wchar_t* data = NULL;
+			if(console->HistoryTop == 0)
 			{
-				BL2SDK::InjectedCallNext();
-				console->PurgeCommandFromHistory(FString((wchar_t*)temp.c_str()));
+				data = console->History[15].Data;
+			}
+			else
+			{
+				data = console->History[console->HistoryTop - 1].Data;
+			}
 
-				console->History[console->HistoryTop] = FString((wchar_t*)temp.c_str());
-				console->HistoryTop = (console->HistoryTop + 1) % 16;
+			bool equal = false;
+			if(data != NULL)
+			{
+				equal = _wcsicmp(data, ptr) == 0;
+			}
 
-				if(console->HistoryBot == -1 || console->HistoryBot == console->HistoryTop)
-				{
-					console->HistoryBot = (console->HistoryBot + 1) % 16;
-				}
+
+			BL2SDK::InjectedCallNext();
+			console->PurgeCommandFromHistory(FString(ptr));
+
+			console->History[console->HistoryTop] = FString((wchar_t*)temp.c_str());
+			console->HistoryTop = (console->HistoryTop + 1) % 16;
+
+			if(console->HistoryBot == -1 || console->HistoryBot == console->HistoryTop)
+			{
+				console->HistoryBot = (console->HistoryBot + 1) % 16;
 			}
 			console->HistoryCur = console->HistoryTop;
 			*/

@@ -23,7 +23,6 @@ C++
 * Remake GetFullName() to match the engine's GetFullName function
 * Decide on hook halting in GameHooks.cpp
 * Remake object searching to use the hash table
-* Restructure GameSDK to use names not indexes
 
 Lua
 * Cursor enum for SetCursor
@@ -59,4 +58,3 @@ Other
 * Handle game resize with Gwen canvas - Looks like the game just locks up when you change res at the moment
 
 Bugs:
-* Console output doesn't work on the Steam version, this is because the SDK on the C++ side of things is using constant indexes for the engine functions, which was generated for the old version of the game. So either get the engine functions on the C++ side to use function names, or just move the concommand system completely into Lua. 

@@ -78,21 +78,13 @@ CON_COMMAND(DumpObj)
 	Logging::Log("=== END OBJECT DUMP ===\n");
 }
 
-CON_COMMAND(CountNullObj)
+CON_COMMAND(GetVersions)
 {
-	Logging::Log("=== OBJECT DUMP ===\n");
-	int count = 0;
-	for(int i = 0; i < UObject::GObjObjects()->Count; i++) 
-	{ 
-		UObject* Object = UObject::GObjObjects()->Data[i];
-		if(!Object)
-		{
-			Logging::LogF("%d\n", i);
-			count++;
-		}
-	} 
-	Logging::LogF("Count Null = %d\n", count);
-	Logging::Log("=== END OBJECT DUMP ===\n");
+	UObject* obj = UObject::FindObject<UFunction>("Function Core.Object.GetEngineVersion");
+	int engVer = obj->GetEngineVersion();
+	int buildVer = obj->GetBuildChangelistNumber();
+
+	Logging::LogF("Versions: %d %d\n", engVer, buildVer);
 }
 
 extern "C" __declspec(dllexport) DWORD InitializeSDK(LPVOID lpParameter)
