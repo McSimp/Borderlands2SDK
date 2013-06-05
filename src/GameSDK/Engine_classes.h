@@ -24,8 +24,6 @@ class AActor : public UObject
 {
 public:
 	unsigned char                                      UnknownData00[ 0x14C ];
-
-	void LocalPlayerControllers ( class UClass* BaseClass, class APlayerController** PC );
 };
 
 // Class Engine.UIRoot

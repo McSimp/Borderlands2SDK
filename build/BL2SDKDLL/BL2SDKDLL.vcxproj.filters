@@ -227,5 +227,8 @@
     <ClInclude Include="..\..\src\BL2SDK\GameHooks.h">
       <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\GUI\DirectX9.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

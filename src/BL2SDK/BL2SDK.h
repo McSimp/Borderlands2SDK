@@ -13,11 +13,13 @@ namespace BL2SDK
 	typedef void (__thiscall *tCallFunction) (UObject*, FFrame&, void* const, UFunction*);
 	typedef void (__thiscall *tFrameStep) (FFrame*, UObject*, void* const);
 	typedef void (__thiscall *tProcessDeferredMessage) (FWindowsViewport*, const FDeferredMessage&);
+	typedef void (__thiscall *tViewportResize) (FWindowsViewport*, unsigned int, unsigned int, bool, bool, int, int);
 
 	extern tProcessEvent pProcessEvent;
 	extern tCallFunction pCallFunction;
 	extern tFrameStep pFrameStep;
 	extern tProcessDeferredMessage pProcessDeferredMessage;
+	extern tViewportResize pViewportResize;
 	extern void* pGwenDestructor;
 
 	void LogAllProcessEventCalls(bool enabled);

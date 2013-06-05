@@ -4,7 +4,7 @@
 #include "Gwen/Skins/Simple.h"
 #include "Gwen/Skins/TexturedBase.h"
 #include "Gwen/Input/Windows.h"
-#include "Gwen/Renderers/DirectX9.h"
+#include "GUI/DirectX9.h"
 #include "BL2SDK/Settings.h"
 #include "Commands/ConCommand.h"
 #include "BL2SDK/Util.h"
@@ -167,6 +167,16 @@ namespace GwenManager
 		((tGwenBaseDestructor)BL2SDK::pGwenDestructor)(caller);
 	}
 
+	void __stdcall hkViewportResize(unsigned int newSizeX, unsigned int newSizeY, bool newFullscreen, bool unknown, int posX, int posY)
+	{
+		FWindowsViewport* caller;
+		_asm mov caller, ecx;
+
+		Logging::LogF("[Gwen] Viewport resized: ResX = %d, ResY = %d, Fullscreen = %d, Unk = %d\n", newSizeX, newSizeY, newFullscreen, unknown);
+
+		BL2SDK::pViewportResize(caller, newSizeX, newSizeY, newFullscreen, unknown, posX, posY);
+	}
+
 	void InitializeRenderer(IDirect3DDevice9* pD3DDev)
 	{
 		if(pRenderer) delete pRenderer;
@@ -189,11 +199,15 @@ namespace GwenManager
 		// Detour Gwen control destructor so we can let Lua know when controls are deleted
 		SETUP_SIMPLE_DETOUR(detGwenDestructor, BL2SDK::pGwenDestructor, hkGwenDestructor);
 		detGwenDestructor.Attach();
+
+		// Detour FWindowsViewport::Resize to resize the canvas
+		SETUP_SIMPLE_DETOUR(detViewportResize, BL2SDK::pViewportResize, hkViewportResize);
+		detViewportResize.Attach();
 	}
 
-	void CreateCanvas(int x, int y)
+	void UpdateCanvas(int x, int y)
 	{
-		Logging::LogF("[Gwen] Creating canvas (%dx%d)\n", x, y);
+		Logging::LogF("[Gwen] Updating canvas size (%dx%d)\n", x, y);
 		pCanvas->SetSize(x, y);
 	}
 

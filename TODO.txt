@@ -13,10 +13,8 @@ C++
 * Oh my god what the fuck is going on in ConCmdManager.cpp
 * Could neaten commands in LuaCommands.cpp
 * Delete SlotMachines commands when done with them
-* Fix indenting in Gwen DirectX renderer
 * Replace slow DirectX font rendering with something faster
 * Update texturing loading to load from SDK path rather than game path
-* Remove unnessary functions from DirectX renderer for standalone shit
 * Remove CLuaInterface and everything that goes with it (CLuaObject)
 * Remove crap commands from main.cpp
 * Add error exceptions in AntiDebug hook
@@ -55,6 +53,7 @@ Other
 * Look into a build server and symbol server for crash reporting
 * Test Steam version
 * If Lua modules fail to initialize, give a more prominent warning
-* Handle game resize with Gwen canvas - Looks like the game just locks up when you change res at the moment
 
 Bugs:
+* Gwen canvas will resize, but game will lock up completely if resize and there has been a Gwen window on the screen at any point
+* Gwen cursor does not work correctly in full screen - I think it's fine in borderless windowed though

@@ -26,6 +26,7 @@ namespace BL2SDK
 	tCallFunction pCallFunction;
 	tFrameStep pFrameStep;
 	tProcessDeferredMessage pProcessDeferredMessage;
+	tViewportResize pViewportResize;
 	void* pGwenDestructor;
 
 	void __stdcall hkProcessEvent(UFunction* function, void* parms, void* result)
@@ -193,6 +194,10 @@ namespace BL2SDK
 		pProcessDeferredMessage = reinterpret_cast<tProcessDeferredMessage>(sigscan.Scan((unsigned char*)ProcessDeferredMessage_Pattern, ProcessDeferredMessage_Mask));
 		Logging::LogF("[Internal] FWindowsViewport::ProcessDeferredMessage() = 0x%X\n", pProcessDeferredMessage);
 
+		// Sigscan for FWindowsViewport::Resize
+		pViewportResize = reinterpret_cast<tViewportResize>(sigscan.Scan((unsigned char*)ViewportResize_Pattern, ViewportResize_Mask));
+		Logging::LogF("[Internal] FWindowsViewport::Resize() = 0x%X\n", pViewportResize);
+
 		// Sigscan for Gwen::Controls::Base::~Base()
 		CSigScan sdkSigscan(L"BL2SDKDLL.dll");
 
@@ -218,7 +223,7 @@ namespace BL2SDK
 		UGameViewportClient_eventPostRender_Parms* realParms = reinterpret_cast<UGameViewportClient_eventPostRender_Parms*>(parms);
 		UCanvas* canvas = realParms->Canvas;
 
-		GwenManager::CreateCanvas(canvas->SizeX, canvas->SizeY);
+		GwenManager::UpdateCanvas(canvas->SizeX, canvas->SizeY);
 
 		GameHooks::EngineHookManager->RemoveStaticHook(function, "GetCanvas");
 		return true;

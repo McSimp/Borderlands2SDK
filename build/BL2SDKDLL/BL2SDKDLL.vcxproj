@@ -142,6 +142,7 @@
     <ClInclude Include="..\..\src\GameSDK\GameDefines.h" />
     <ClInclude Include="..\..\src\GameSDK\GameSDK.h" />
     <ClInclude Include="..\..\src\GUI\D3D9Hook.h" />
+    <ClInclude Include="..\..\src\GUI\DirectX9.h" />
     <ClInclude Include="..\..\src\GUI\GwenManager.h" />
     <ClInclude Include="..\..\src\LuaInterface\CLuaInterface.h" />
     <ClInclude Include="..\..\src\LuaInterface\CLuaObject.h" />
