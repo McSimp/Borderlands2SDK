@@ -38,7 +38,6 @@ Lua
 * Enums in function definition tables and comments of data structures
 * Add Gwen to autoload on init
 * Fix the problem with class fields being given their actual type instead of struct UClass*
-* Upgrade to LuaJIT 2.0.2
 
 Other
 * CrashRpt endpoint on mcsi.mp
@@ -56,6 +55,7 @@ Other
 * If releasing source, decide on licence
 * Look into a build server and symbol server for crash reporting
 * Test Steam version
+* If Lua modules fail to initialize, give a more prominent warning
 
 Bugs:
 * Console output doesn't work on the Steam version, this is because the SDK on the C++ side of things is using constant indexes for the engine functions, which was generated for the old version of the game. So either get the engine functions on the C++ side to use function names, or just move the concommand system completely into Lua. 
