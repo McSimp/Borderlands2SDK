@@ -77,6 +77,9 @@ typedef bool (__thiscall *tGwen_Controls_Base_IsMenuComponent) (GwenControl*);
 typedef void (__thiscall *tGwen_Controls_Base_CloseMenus) (GwenControl*);
 typedef bool (__thiscall *tGwen_Controls_Base_IsTabable) (GwenControl*);
 typedef void (__thiscall *tGwen_Controls_Base_SetTabable) (GwenControl*, bool);
+typedef void (__thiscall *tGwen_Controls_Base_Invalidate) (GwenControl*);
+typedef void (__thiscall *tGwen_Controls_Base_InvalidateChildren) (GwenControl*, bool);
+typedef void (__thiscall *tGwen_Controls_Base_Position) (GwenControl*, int, int, int);
 
 typedef char const * (__thiscall *tGwen_Controls_Base_GetBaseTypeName) (GwenControl*);
 ]]
@@ -497,6 +500,25 @@ function Base:SetTabable(tabable)
 	func(self.control, tabable)
 end
 
+function Base:Invalidate()
+	local func = gwen.GetVFunc(self.control, 142, "tGwen_Controls_Base_Invalidate")
+	func(self.control)
+end
+
+function Base:InvalidateChildren(bRecursive)
+	if bRecursive == nil then bRecursive = false end
+	local func = gwen.GetVFunc(self.control, 143, "tGwen_Controls_Base_InvalidateChildren")
+	func(self.control, bRecursive)
+end
+
+function Base:Position(pos, xpadding, ypadding)
+	if xpadding == nil then xpadding = 0 end
+	if ypadding == nil then ypadding = 0 end
+
+	local func = gwen.GetVFunc(self.control, 144, "tGwen_Controls_Base_Position")
+	func(self.control, pos, xpadding, ypadding)
+end
+
 function Base:AlignBelow(belowControl, border)
 	if border == nil then border = 0 end
 	self:SetPos(self:X(), belowControl:Bottom() + border)
@@ -516,7 +538,7 @@ local InheritedControl = table.copy(Base)
 InheritedControl.__index = InheritedControl
 
 function InheritedControl:GetBaseTypeName()
-	local func = gwen.GetVFunc(self.control, 168, "tGwen_Controls_Base_GetBaseTypeName")
+	local func = gwen.GetVFunc(self.control, 171, "tGwen_Controls_Base_GetBaseTypeName")
 	return ffi.string(func(self.control))
 end
 
@@ -666,30 +688,33 @@ VMT dump from IDA
 #139: public: virtual bool __thiscall Gwen::Controls::Base::AccelOnlyFocus(void)
 #140: public: virtual bool __thiscall Gwen::Controls::Base::HandleAccelerator(class std::basic_string<wchar_t, struct std::char_traits<wchar_t>, class std::allocator<wchar_t>> &)
 #141: protected: virtual class Gwen::Controls::Base * __thiscall Gwen::Controls::Base::Inner(void)
-#142: protected: virtual void __thiscall Gwen::Controls::Base::RecurseLayout(class Gwen::Skin::Base *)
-#143: protected: virtual void __thiscall Gwen::Controls::Base::Layout(class Gwen::Skin::Base *)
-#144: public: virtual void __thiscall Gwen::Controls::Base::PostLayout(class Gwen::Skin::Base *)
-#145: public: virtual void __thiscall Gwen::Controls::Base::DragAndDrop_SetPackage(bool, class std::basic_string<char, struct std::char_traits<char>, class std::allocator<char>> const &, void *)
-#146: public: virtual bool __thiscall Gwen::Controls::Base::DragAndDrop_Draggable(void)
-#147: public: virtual bool __thiscall Gwen::Controls::Base::DragAndDrop_ShouldStartDrag(void)
-#148: public: virtual void __thiscall Gwen::Controls::Base::DragAndDrop_StartDragging(struct Gwen::DragAndDrop::Package *, int, int)
-#149: public: virtual struct Gwen::DragAndDrop::Package * __thiscall Gwen::Controls::Base::DragAndDrop_GetPackage(int, int)
-#150: public: virtual void __thiscall Gwen::Controls::Base::DragAndDrop_EndDragging(bool, int, int)
-#151: public: virtual void __thiscall Gwen::Controls::Base::DragAndDrop_HoverEnter(struct Gwen::DragAndDrop::Package *, int, int)
-#152: public: virtual void __thiscall Gwen::Controls::Base::DragAndDrop_HoverLeave(struct Gwen::DragAndDrop::Package *)
-#153: public: virtual void __thiscall Gwen::Controls::Base::DragAndDrop_Hover(struct Gwen::DragAndDrop::Package *, int, int)
-#154: public: virtual bool __thiscall Gwen::Controls::Base::DragAndDrop_HandleDrop(struct Gwen::DragAndDrop::Package *, int, int)
-#155: public: virtual bool __thiscall Gwen::Controls::Base::DragAndDrop_CanAcceptPackage(struct Gwen::DragAndDrop::Package *)
-#156: public: virtual void __thiscall Gwen::Controls::Base::Anim_WidthIn(float, float, float)
-#157: public: virtual void __thiscall Gwen::Controls::Base::Anim_HeightIn(float, float, float)
-#158: public: virtual void __thiscall Gwen::Controls::Base::Anim_WidthOut(float, bool, float, float)
-#159: public: virtual void __thiscall Gwen::Controls::Base::Anim_HeightOut(float, bool, float, float)
-#160: public: virtual class Gwen::Controls::Base * __thiscall Gwen::Controls::Base::DynamicCast(char const *)
-#161: public: virtual class Gwen::TextObject __thiscall Gwen::Controls::Base::GetChildValue(class std::basic_string<char, struct std::char_traits<char>, class std::allocator<char>> const &)
-#162: public: virtual class Gwen::TextObject __thiscall Gwen::Controls::Base::GetValue(void)
-#163: public: virtual void __thiscall Gwen::Controls::Base::SetValue(class Gwen::TextObject const &)
-#164: public: virtual void __thiscall Gwen::Controls::Base::DoAction(void)
-#165: public: virtual void __thiscall Gwen::Controls::Base::SetAction(class Gwen::Event::Handler *, void (__thiscall Gwen::Event::Handler::*)(struct Gwen::Event::Information const &), struct Gwen::Event::Packet const &)
-#166: public: virtual class Gwen::ControlList __thiscall Gwen::Controls::Base::GetNamedChildren(class std::basic_string<char, struct std::char_traits<char>, class std::allocator<char>> const &, bool)
-#167: public: virtual int __thiscall Gwen::Controls::Base::GetNamedChildren(class Gwen::ControlList &, class std::basic_string<char, struct std::char_traits<char>, class std::allocator<char>> const &, bool)
+142: public: virtual void __thiscall Gwen::Controls::Base::Invalidate(void)
+143: public: virtual void __thiscall Gwen::Controls::Base::InvalidateChildren(bool)
+144: public: virtual void __thiscall Gwen::Controls::Base::Position(int, int, int)
+#145: protected: virtual void __thiscall Gwen::Controls::Base::RecurseLayout(class Gwen::Skin::Base *)
+#146: protected: virtual void __thiscall Gwen::Controls::Base::Layout(class Gwen::Skin::Base *)
+#147: public: virtual void __thiscall Gwen::Controls::Base::PostLayout(class Gwen::Skin::Base *)
+#148: public: virtual void __thiscall Gwen::Controls::Base::DragAndDrop_SetPackage(bool, class std::basic_string<char, struct std::char_traits<char>, class std::allocator<char>> const &, void *)
+#149: public: virtual bool __thiscall Gwen::Controls::Base::DragAndDrop_Draggable(void)
+#150: public: virtual bool __thiscall Gwen::Controls::Base::DragAndDrop_ShouldStartDrag(void)
+#151: public: virtual void __thiscall Gwen::Controls::Base::DragAndDrop_StartDragging(struct Gwen::DragAndDrop::Package *, int, int)
+#152: public: virtual struct Gwen::DragAndDrop::Package * __thiscall Gwen::Controls::Base::DragAndDrop_GetPackage(int, int)
+#153: public: virtual void __thiscall Gwen::Controls::Base::DragAndDrop_EndDragging(bool, int, int)
+#154: public: virtual void __thiscall Gwen::Controls::Base::DragAndDrop_HoverEnter(struct Gwen::DragAndDrop::Package *, int, int)
+#155: public: virtual void __thiscall Gwen::Controls::Base::DragAndDrop_HoverLeave(struct Gwen::DragAndDrop::Package *)
+#156: public: virtual void __thiscall Gwen::Controls::Base::DragAndDrop_Hover(struct Gwen::DragAndDrop::Package *, int, int)
+#157: public: virtual bool __thiscall Gwen::Controls::Base::DragAndDrop_HandleDrop(struct Gwen::DragAndDrop::Package *, int, int)
+#158: public: virtual bool __thiscall Gwen::Controls::Base::DragAndDrop_CanAcceptPackage(struct Gwen::DragAndDrop::Package *)
+#159: public: virtual void __thiscall Gwen::Controls::Base::Anim_WidthIn(float, float, float)
+#160: public: virtual void __thiscall Gwen::Controls::Base::Anim_HeightIn(float, float, float)
+#161: public: virtual void __thiscall Gwen::Controls::Base::Anim_WidthOut(float, bool, float, float)
+#162: public: virtual void __thiscall Gwen::Controls::Base::Anim_HeightOut(float, bool, float, float)
+#163: public: virtual class Gwen::Controls::Base * __thiscall Gwen::Controls::Base::DynamicCast(char const *)
+#164: public: virtual class Gwen::TextObject __thiscall Gwen::Controls::Base::GetChildValue(class std::basic_string<char, struct std::char_traits<char>, class std::allocator<char>> const &)
+#165: public: virtual class Gwen::TextObject __thiscall Gwen::Controls::Base::GetValue(void)
+#166: public: virtual void __thiscall Gwen::Controls::Base::SetValue(class Gwen::TextObject const &)
+#167: public: virtual void __thiscall Gwen::Controls::Base::DoAction(void)
+#168: public: virtual void __thiscall Gwen::Controls::Base::SetAction(class Gwen::Event::Handler *, void (__thiscall Gwen::Event::Handler::*)(struct Gwen::Event::Information const &), struct Gwen::Event::Packet const &)
+#169: public: virtual class Gwen::ControlList __thiscall Gwen::Controls::Base::GetNamedChildren(class std::basic_string<char, struct std::char_traits<char>, class std::allocator<char>> const &, bool)
+#170: public: virtual int __thiscall Gwen::Controls::Base::GetNamedChildren(class Gwen::ControlList &, class std::basic_string<char, struct std::char_traits<char>, class std::allocator<char>> const &, bool)
 ]]

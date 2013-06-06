@@ -21,6 +21,9 @@ require("FFrame")
 -- Load engine functions
 require("engine")
 
+-- Load Gwen
+include("gwen/gwen.lua")
+
 local generateSDK = false
 
 local function NeedsSDKGenerated()

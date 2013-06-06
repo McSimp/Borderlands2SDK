@@ -1,5 +1,5 @@
 -- gwen test
-include("includes/gwen/gwen.lua")
+
 --[[
 local ffi = require("ffi")
 
@@ -34,6 +34,7 @@ function GwenTest()
 	window:SetTitle("Buttons and whatnot")
 	window:SetPos(50, 50)
 	window:SetSize(250, 250)
+	window:MakeModal()
 	print(window:_GetInternalControl())
 
 	local button1 = gwen.CreateControl("Button", window)

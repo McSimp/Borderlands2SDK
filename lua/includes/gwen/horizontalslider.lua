@@ -8,7 +8,7 @@ local HorizontalSlider = table.copy(gwen.meta.Slider)
 HorizontalSlider.__index = HorizontalSlider
 
 function HorizontalSlider:UpdateBarFromValue()
-	local func = gwen.GetVFunc(self.control, 180, "tGwen_Controls_HorizontalSlider_UpdateBarFromValue")
+	local func = gwen.GetVFunc(self.control, 183, "tGwen_Controls_HorizontalSlider_UpdateBarFromValue")
 	func(self.control)
 end
 
@@ -16,5 +16,5 @@ gwen.meta.HorizontalSlider = HorizontalSlider
 
 --[[
 VMT dump from IDA
-180: public: virtual void __thiscall Gwen::Controls::HorizontalSlider::UpdateBarFromValue(void)
+183: public: virtual void __thiscall Gwen::Controls::HorizontalSlider::UpdateBarFromValue(void)
 ]]

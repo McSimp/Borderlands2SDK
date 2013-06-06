@@ -165,7 +165,7 @@ Log-Action "Bulding GWEN in Release..."
 Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "Release" "/m"
 
 Log-Action "Moving built files to SDK..."
-Copy-Built-File "gwen\gwen\lib\windows\vs2010\gwen_staticd" "..\lib\gwen_staticd.lib"
+Copy-Built-File "gwen\gwen\lib\windows\vs2010\gwen_staticd.lib" "..\lib\gwen_staticd.lib"
 Copy-Built-File "gwen\gwen\lib\windows\vs2010\gwen_static.lib" "..\lib\gwen_static.lib"
 
 Write-Host "All thirdparty libraries successfully built and copied to SDK" -foregroundcolor green -backgroundcolor black
