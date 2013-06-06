@@ -14,13 +14,12 @@ C++
 * Could neaten commands in LuaCommands.cpp
 * Delete SlotMachines commands when done with them
 * Replace slow DirectX font rendering with something faster
-* Update texturing loading to load from SDK path rather than game path
 * Remove CLuaInterface and everything that goes with it (CLuaObject)
 * Remove crap commands from main.cpp
-* Add error exceptions in AntiDebug hook
 * Remake GetFullName() to match the engine's GetFullName function
 * Decide on hook halting in GameHooks.cpp
 * Remake object searching to use the hash table
+* The whole namespace thing is getting a bit messy, might need to think about using a class
 
 Lua
 * Cursor enum for SetCursor
@@ -34,7 +33,8 @@ Lua
 * Remove static directory references in sdkgen code
 * Enums in function definition tables and comments of data structures
 * Add Gwen to autoload on init
-* Fix the problem with class fields being given their actual type instead of struct UClass*
+* Create file structure for sdkgen automatically
+* Get the SDKGen to run on coroutines so maybe we can render something to tell the user about the sdk generating
 
 Other
 * CrashRpt endpoint on mcsi.mp

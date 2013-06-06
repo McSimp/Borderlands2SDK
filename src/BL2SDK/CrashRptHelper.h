@@ -9,6 +9,7 @@ namespace CrashRptHelper
 	//int InstallThread();
 	void SoftCrash(int code);
 	bool GenerateReport(unsigned int code, PEXCEPTION_POINTERS ep);
+	void AddProperty(const std::wstring& propertyName, const std::wstring& value);
 }
 
 #endif

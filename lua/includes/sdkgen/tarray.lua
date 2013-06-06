@@ -46,7 +46,7 @@ function TArrayTypes.Generate(innerType)
 
 	table.insert(GeneratedTArrays, propTypeClean)
 
-	print("[SDKGen] TArray for " .. propType)
+	SDKGen.DebugPrint("[SDKGen] TArray for " .. propType)
 
 	file:write(string.format(TARRAY_TEMPLATE, forwardDec, propTypeClean, propType))
 end

@@ -24,6 +24,7 @@ require("engine")
 local generateSDK = false
 
 local function NeedsSDKGenerated()
+	-- Log calls to the slow object index if we're generating the SDK
 	engine.LogObjectIndex = generateSDK
 	return generateSDK
 end

@@ -113,6 +113,12 @@ namespace CrashRptHelper
 		return true;
 	}
 
+	void AddProperty(const std::wstring& propertyName, const std::wstring& value)
+	{
+		if(!crashRptReady) return;
+		pcrAddPropertyW(propertyName.c_str(), value.c_str());
+	}
+
 	void Cleanup()
 	{
 		if(!crashRptReady) return;
@@ -133,6 +139,7 @@ namespace CrashRptHelper
 		if(!crashRptReady)
 		{
 			Logging::Log("[CrashRpt] Cannot report error - CrashRpt is not initialized properly\n");
+			return;
 		}
 
 		CR_EXCEPTION_INFO ei;
@@ -154,7 +161,7 @@ namespace CrashRptHelper
 		if(!crashRptReady)
 		{
 			Logging::Log("[CrashRpt] Cannot generate report - CrashRpt is not initialized properly\n");
-			return false;	
+			return false;
 		}
 
 		CR_EXCEPTION_INFO ei;

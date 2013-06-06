@@ -37,7 +37,7 @@ end
 function Package:ProcessConst(const)
 	if const == DefaultConst then return end
 
-	print("[SDKGen] Constant " .. const:GetFullName())
+	SDKGen.DebugPrint("[SDKGen] Constant " .. const:GetFullName())
 
 	local value = const.UConst.Value:GetLuaString()
 	local idx = const.UObject.Name.Index

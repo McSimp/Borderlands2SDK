@@ -16,7 +16,8 @@ namespace Settings
 {
 	void Initialize(LauncherStruct* args);
 	std::wstring GetLogFilePath();
-	std::wstring GetBinFile(const std::wstring &filename);
+	std::wstring GetBinFile(const std::wstring& filename);
+	std::wstring GetGwenFile(const std::wstring& filename);
 }
 
 #endif

@@ -22,6 +22,9 @@ namespace BL2SDK
 	extern tViewportResize pViewportResize;
 	extern void* pGwenDestructor;
 
+	extern int EngineVersion;
+	extern int ChangelistNumber;
+
 	void LogAllProcessEventCalls(bool enabled);
 	void LogAllUnrealScriptCalls(bool enabled);
 	bool GetGameVersion(std::wstring& appVersion);

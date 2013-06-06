@@ -105,7 +105,7 @@ end
 function ScriptStruct:GenerateDefinition()
 	local scriptStruct = self.Struct
 
-	print("[SDKGen] Struct " .. scriptStruct:GetFullName())
+	SDKGen.DebugPrint("[SDKGen] Struct " .. scriptStruct:GetFullName())
 
 	-- Start by defining the struct with its name
 	local count = SDKGen.CountObject(scriptStruct.UObject.Name, engine.Classes.UScriptStruct)

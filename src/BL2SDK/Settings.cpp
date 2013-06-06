@@ -20,10 +20,17 @@ namespace Settings
 		return GetBinFile(L"BL2SDKLog.txt");
 	}
 
-	std::wstring GetBinFile(const std::wstring &filename)
+	std::wstring GetBinFile(const std::wstring& filename)
 	{
 		std::wstring newPath;
 		newPath = binPath + filename;
+		return newPath;
+	}
+
+	std::wstring GetGwenFile(const std::wstring& filename)
+	{
+		std::wstring newPath;
+		newPath = binPath + L"gwen\\" + filename;
 		return newPath;
 	}
 }

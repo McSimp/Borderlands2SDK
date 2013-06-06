@@ -223,7 +223,10 @@ CLuaObject* CLuaInterface::NewUserData(CLuaObject* metaT)
 void CLuaInterface::PushUserData(CLuaObject* metaT, void* v, unsigned char type)
 {
 	if(!metaT)
+	{
 		this->Error("CLuaInterface - No Metatable!\n");
+		return;
+	}
 
 	UserData* data = (UserData*)lua_newuserdata(m_pState, sizeof(UserData));
 	data->data = v;
@@ -809,6 +812,8 @@ void CLuaInterface::SetSDKValues()
 	sdkTable->SetMember("addrGObjHash", (double)BL2SDK::pGObjHash);
 	sdkTable->SetMember("addrFrameStep", (double)(unsigned long)BL2SDK::pFrameStep);
 	sdkTable->SetMember("addrCallFunction", (double)(unsigned long)BL2SDK::pCallFunction);
+	sdkTable->SetMember("engineVersion", (double)BL2SDK::EngineVersion);
+	sdkTable->SetMember("changeListVersion", (double)BL2SDK::ChangelistNumber);
 
 	this->Global()->SetMember("bl2sdk", sdkTable);
 

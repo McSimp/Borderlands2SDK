@@ -78,15 +78,6 @@ CON_COMMAND(DumpObj)
 	Logging::Log("=== END OBJECT DUMP ===\n");
 }
 
-CON_COMMAND(GetVersions)
-{
-	UObject* obj = UObject::FindObject<UFunction>("Function Core.Object.GetEngineVersion");
-	int engVer = obj->GetEngineVersion();
-	int buildVer = obj->GetBuildChangelistNumber();
-
-	Logging::LogF("Versions: %d %d\n", engVer, buildVer);
-}
-
 extern "C" __declspec(dllexport) DWORD InitializeSDK(LPVOID lpParameter)
 {
 	// The launcher will pass the configuration settings through lpParameter parameter as a struct

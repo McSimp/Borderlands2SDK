@@ -3,6 +3,7 @@
 #include "Gwen/Font.h"
 #include "Gwen/Texture.h"
 #include "Gwen/WindowProvider.h"
+#include "BL2SDK/Settings.h"
 
 #define D3DFVF_VERTEXFORMAT2D ( D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1 )
 
@@ -276,7 +277,8 @@ namespace Gwen
 		{
 			IDirect3DTexture9* ptr = NULL;
 			D3DXIMAGE_INFO ImageInfo;
-			HRESULT hr = D3DXCreateTextureFromFileExW( m_pDevice, pTexture->name.GetUnicode().c_str(), 0, 0, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, &ImageInfo, NULL, &ptr );
+			std::wstring texPath = Settings::GetGwenFile(pTexture->name.GetUnicode());
+			HRESULT hr = D3DXCreateTextureFromFileExW( m_pDevice, texPath.c_str(), 0, 0, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, &ImageInfo, NULL, &ptr );
 
 			if ( hr != S_OK )
 			{

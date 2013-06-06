@@ -186,7 +186,7 @@ namespace GwenManager
 		pRenderer = new Renderer::DirectX9(pD3DDev);
 
 		pSkin = new Skin::TexturedBase(pRenderer);
-		pSkin->Init(Settings::GetBinFile(L"DefaultSkin.png"));
+		pSkin->Init(L"DefaultSkin.png");
 
 		// Create a dummy canvas that will be resized later
 		pCanvas = new Controls::Canvas(pSkin);

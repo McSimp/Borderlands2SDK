@@ -29,6 +29,9 @@ namespace BL2SDK
 	tViewportResize pViewportResize;
 	void* pGwenDestructor;
 
+	int EngineVersion = -1;
+	int ChangelistNumber = -1;
+
 	void __stdcall hkProcessEvent(UFunction* function, void* parms, void* result)
 	{
 		// Get "this"
@@ -113,7 +116,7 @@ namespace BL2SDK
 
 	bool GetGameVersion(std::wstring& appVersion)
 	{
-		wchar_t* filename = L"Borderlands2.exe";
+		const wchar_t* filename = L"Borderlands2.exe";
 
 		// Allocate a block of memory for the version info
 		DWORD dummy;
@@ -229,6 +232,18 @@ namespace BL2SDK
 		return true;
 	}
 
+	void InitializeGameVersions()
+	{
+		UObject* obj = UObject::StaticClass(); // Any UObject* will do
+		EngineVersion = obj->GetEngineVersion();
+		ChangelistNumber = obj->GetBuildChangelistNumber();
+
+		CrashRptHelper::AddProperty(L"EngineVersion", Util::Format(L"%d", EngineVersion));
+		CrashRptHelper::AddProperty(L"ChangelistNumber", Util::Format(L"%d", ChangelistNumber));
+
+		Logging::LogF("[Internal] Engine Version = %d, Build Changelist = %d\n", EngineVersion, ChangelistNumber);
+	}
+
 	// This function is used to ensure that everything gets called in the game thread once the game itself has loaded
 	bool GameReady(UObject* caller, UFunction* function, void* parms, void* result) 
 	{
@@ -237,7 +252,9 @@ namespace BL2SDK
 		Logging::InitializeExtern();
 		Logging::InitializeGameConsole();
 		Logging::PrintLogHeader();
-	
+
+		InitializeGameVersions();
+
 		LuaManager::Initialize();
 
 		ConCmdManager::Initialize();

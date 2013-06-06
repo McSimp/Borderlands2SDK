@@ -11,6 +11,9 @@ local FILE_HEADER = [[
 
 SDKGen = { Package = {}, Errors = {}, PackageOrder = {} }
 
+SDKGen.DebugPrint = function(...) return end
+--SDKGen.DebugPrint = print
+
 function SDKGen.SortProperty(propA, propB)
 	-- Note that propA and propB should already be UProperty*
 
@@ -78,7 +81,8 @@ function SDKGen.GetPropertyType(prop)
 
 	if prop:IsA(engine.Classes.UClassProperty) then
 		prop = ffi.cast("struct UClassProperty*", prop)
-		propType = string.format(propType, prop.UClassProperty.MetaClass:GetCName())
+		--propType = string.format(propType, prop.UClassProperty.MetaClass:GetCName())
+		propType = string.format(propType, "UClass")
 	elseif prop:IsA(engine.Classes.UObjectProperty) then -- Covers UComponentProp too
 		prop = ffi.cast("struct UObjectProperty*", prop)
 		propType = string.format(propType, prop.UObjectProperty.PropertyClass:GetCName())

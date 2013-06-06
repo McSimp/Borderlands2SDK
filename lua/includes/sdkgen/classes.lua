@@ -110,7 +110,7 @@ function Class:GenerateDefinition()
 	local class = self.ClassObj
 	local cname = class:GetCName()
 
-	print("[SDKGen] Class " .. class:GetFullName())
+	SDKGen.DebugPrint("[SDKGen] Class " .. class:GetFullName())
 
 	-- Start by defining the class with name_Data and put the fields in there
 	local classText = "struct " .. cname .. "_Data {\n"

@@ -1,6 +1,8 @@
 #include "BL2SDK/BL2SDK.h"
 #include "BL2SDK/CSimpleDetour.h"
 #include "BL2SDK/Logging.h"
+#include "BL2SDK/Exceptions.h"
+#include "BL2SDK/Util.h"
 
 #include <winternl.h>
 #define STATUS_SUCCESS ((NTSTATUS)0x00000000L)
@@ -46,12 +48,28 @@ namespace BL2SDK
 
 	void HookAntiDebug()
 	{
-		pNtSetInformationThread = (tNtSIT)GetProcAddress(GetModuleHandle(L"ntdll.dll"), "NtSetInformationThread"); // TODO: Error handling
+		HMODULE hNtdll = GetModuleHandle(L"ntdll.dll");
+		if(!hNtdll)
+		{
+			throw FatalSDKException(7000, Util::Format("GetModuleHandle failed for ntdll.dll (Error = 0x%X)", GetLastError()));
+		}
+
+		pNtSetInformationThread = (tNtSIT)GetProcAddress(hNtdll, "NtSetInformationThread");
+		if(!pNtSetInformationThread)
+		{
+			throw FatalSDKException(7001, Util::Format("GetProcAddress failed for NtSetInformationThread (Error = 0x%X)", GetLastError()));
+		}
+
 		SETUP_SIMPLE_DETOUR(detNtSIT, pNtSetInformationThread, hkNtSetInformationThread);
 		detNtSIT.Attach();
 		Logging::Log("[AntiDebug] Hook added for NtSetInformationThread\n");
 
-		pNtQueryInformationProcess = (tNtQIP)GetProcAddress(GetModuleHandle(L"ntdll.dll"), "NtQueryInformationProcess"); // TODO: Error handling
+		pNtQueryInformationProcess = (tNtQIP)GetProcAddress(hNtdll, "NtQueryInformationProcess");
+		if(!pNtQueryInformationProcess)
+		{
+			throw FatalSDKException(7002, Util::Format("GetProcAddress failed for NtQueryInformationProcess (Error = 0x%X)", GetLastError()));
+		}
+
 		SETUP_SIMPLE_DETOUR(detNtQIP, pNtQueryInformationProcess, hkNtQueryInformationProcess);
 		detNtQIP.Attach();
 		Logging::Log("[AntiDebug] Hook added for NtQueryInformationProcess\n");

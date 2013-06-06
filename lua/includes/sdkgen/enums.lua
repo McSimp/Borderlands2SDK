@@ -7,7 +7,7 @@ local DefaultEnum = engine.FindObject("Enum Core.Default__Enum", engine.Classes.
 function Package:ProcessEnum(enum)
 	if enum == DefaultEnum then return end
 
-	print("[SDKGen] Enum " .. enum:GetFullName())
+	SDKGen.DebugPrint("[SDKGen] Enum " .. enum:GetFullName())
 
 	local enumText = string.format("engine.MakeEnum(\"%s\", {\n", enum:GetName())
 
