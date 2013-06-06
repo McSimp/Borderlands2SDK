@@ -221,12 +221,16 @@ namespace BL2SDK
 	}
 
 	// This function is used to get the dimensions of the game window for Gwen's renderer
+	// It will also initialize Lua and the command system, so the SDK is essentially fully operational at this point
 	bool GetCanvasPostRender(UObject* caller, UFunction* function, void* parms, void* result)
 	{
 		UGameViewportClient_eventPostRender_Parms* realParms = reinterpret_cast<UGameViewportClient_eventPostRender_Parms*>(parms);
 		UCanvas* canvas = realParms->Canvas;
 
 		GwenManager::UpdateCanvas(canvas->SizeX, canvas->SizeY);
+
+		LuaManager::Initialize();
+		ConCmdManager::Initialize();
 
 		GameHooks::EngineHookManager->RemoveStaticHook(function, "GetCanvas");
 		return true;
@@ -254,10 +258,6 @@ namespace BL2SDK
 		Logging::PrintLogHeader();
 
 		InitializeGameVersions();
-
-		LuaManager::Initialize();
-
-		ConCmdManager::Initialize();
 
 		GameHooks::EngineHookManager->RemoveStaticHook(function, "StartupSDK");
 

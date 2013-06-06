@@ -813,7 +813,7 @@ void CLuaInterface::SetSDKValues()
 	sdkTable->SetMember("addrFrameStep", (double)(unsigned long)BL2SDK::pFrameStep);
 	sdkTable->SetMember("addrCallFunction", (double)(unsigned long)BL2SDK::pCallFunction);
 	sdkTable->SetMember("engineVersion", (double)BL2SDK::EngineVersion);
-	sdkTable->SetMember("changeListVersion", (double)BL2SDK::ChangelistNumber);
+	sdkTable->SetMember("changelistNumber", (double)BL2SDK::ChangelistNumber);
 
 	this->Global()->SetMember("bl2sdk", sdkTable);
 

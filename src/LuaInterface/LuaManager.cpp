@@ -5,6 +5,7 @@
 namespace LuaManager
 {
 	CLuaInterface* g_Lua;
+	bool resetOnCompletion = false;
 
 	void Initialize()
 	{
@@ -17,13 +18,26 @@ namespace LuaManager
 			Logging::Log("[Lua] Failed to initialize Lua modules\n");
 		}
 
-		// And we're done
-		Logging::Log("[Lua] Lua initialized (" LUA_VERSION ")\n");
+		if(resetOnCompletion)
+		{
+			resetOnCompletion = false;
+			LuaManager::Shutdown();
+			LuaManager::Initialize();
+		}
+		else
+		{
+			Logging::Log("[Lua] Lua initialized (" LUA_VERSION ")\n");
+		}
 	}
 
 	void Shutdown()
 	{
 		delete g_Lua;
+	}
+
+	extern "C" __declspec(dllexport) void LUAFUNC_SetResetLuaFlag()
+	{
+		resetOnCompletion = true;
 	}
 }
 

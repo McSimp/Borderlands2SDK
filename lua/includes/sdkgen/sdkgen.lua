@@ -1,5 +1,9 @@
 local ffi = require("ffi")
 
+ffi.cdef[[
+void LUAFUNC_SetResetLuaFlag();
+]]
+
 local FILE_HEADER = [[
 -- ###################################
 -- # Borderlands 2 SDK
@@ -281,6 +285,22 @@ local function CreateLoaderFile()
 	file:close()
 end
 
+local VERSION_TEMPLATE = 
+[[SDKGEN_ENGINE_VERSION = %d
+SDKGEN_CHANGELIST_NUMBER = %d
+]]
+local function CreateVersionFile()
+	local file = io.open("D:\\dev\\bl\\Borderlands2SDK\\bin\\Debug\\lua\\sdkgen\\version.lua", "w+")
+	file:write(string.format(VERSION_TEMPLATE, bl2sdk.engineVersion, bl2sdk.changelistNumber))
+	file:close()
+end
+
+print("[SDKGen] Generating SDK...")
+
 ProcessPackages()
 CreateLoaderFile()
+CreateVersionFile()
 PrintErrors()
+
+-- Set a flag in the SDK to reset the lua state when this has finished executing
+ffi.C.LUAFUNC_SetResetLuaFlag()

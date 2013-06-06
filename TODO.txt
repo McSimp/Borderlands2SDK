@@ -32,7 +32,6 @@ Lua
 * A file reading/writing library
 * Remove static directory references in sdkgen code
 * Enums in function definition tables and comments of data structures
-* Add Gwen to autoload on init
 * Create file structure for sdkgen automatically
 * Get the SDKGen to run on coroutines so maybe we can render something to tell the user about the sdk generating
 
@@ -43,9 +42,7 @@ Other
 * Set a console key automatically in launcher
 * Add launcher facility to decompress upk files for opening in UE Explorer
 * Lua/C++: Add hook in Lua for when ResetLua is happening
-* Lua/C++: Allow Lua to call ResetLua (for sdkgen)
 * Lua/C++: Pass unrecognized commands to Lua command system
-* Figure out a way to detect if new SDK needs to be generated (I'm thinking hash of Borderlands2.exe?)
 * Organise the SDK folder a bit better -subfolder for gwen textures etc.
 * Find some way to move Launcher source code out of the build folder
 * Decide whether to release source code (If so, hide some Unreal structs that I really shouldn't know)

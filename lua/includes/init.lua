@@ -24,15 +24,25 @@ require("engine")
 -- Load Gwen
 include("gwen/gwen.lua")
 
-local generateSDK = false
-
 local function NeedsSDKGenerated()
-	-- Log calls to the slow object index if we're generating the SDK
-	engine.LogObjectIndex = generateSDK
+	local generateSDK = true
+
+	local versionFile = io.open("D:\\dev\\bl\\Borderlands2SDK\\bin\\Debug\\lua\\sdkgen\\version.lua", "r")
+	if versionFile ~= nil then
+		include("../sdkgen/version.lua")
+
+		if SDKGEN_ENGINE_VERSION >= bl2sdk.engineVersion and
+		SDKGEN_CHANGELIST_NUMBER >= bl2sdk.changelistNumber then
+			generateSDK = false
+		end
+	end
+
 	return generateSDK
 end
 
 if NeedsSDKGenerated() then
+	-- Log calls to the slow object index if we're generating the SDK
+	engine.LogObjectIndex = true
 	engine.Initialize()
 	include("sdkgen/sdkgen.lua")
 else
