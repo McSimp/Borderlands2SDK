@@ -259,6 +259,13 @@ namespace BL2SDK
 
 		InitializeGameVersions();
 
+		// Set console key to Tilde if not already set
+		UConsole* console = UObject::FindObject<UConsole>("WillowConsole WillowGameEngine.WillowGameViewportClient.WillowConsole");
+		if(console && console->ConsoleKey == FName("None"))
+		{
+			console->ConsoleKey = FName("Tilde");
+		}
+
 		GameHooks::EngineHookManager->RemoveStaticHook(function, "StartupSDK");
 
 		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient.PostRender", "GetCanvas", &GetCanvasPostRender);

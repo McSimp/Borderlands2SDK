@@ -34,6 +34,7 @@ Lua
 * Enums in function definition tables and comments of data structures
 * Create file structure for sdkgen automatically
 * Get the SDKGen to run on coroutines so maybe we can render something to tell the user about the sdk generating
+* Pass UObject caller to function hooks
 
 Other
 * CrashRpt endpoint on mcsi.mp

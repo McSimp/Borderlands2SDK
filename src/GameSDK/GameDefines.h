@@ -78,17 +78,18 @@ struct FNameEntry
 struct FName 
 { 
 	int				Index; 
-	unsigned char	unknownData00[ 0x4 ]; 
+	int             Number;
 
-	FName() : Index ( 0 ) {}; 
+	FName() : Index ( 0 ), Number ( 0 ) {}; 
 
-	FName ( int i ) : Index ( i ) {}; 
+	FName ( int i ) : Index ( i ), Number ( 0 ) {}; 
 
 	~FName() {}; 
 
 	FName ( const char* FindName ) 
 	{ 
 		static TArray< int > NameCache; 
+		Number = 0;
 
 		for ( int i = 0; i < NameCache.Count; ++i ) 
 		{ 
