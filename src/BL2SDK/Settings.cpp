@@ -33,4 +33,11 @@ namespace Settings
 		newPath = binPath + L"gwen\\" + filename;
 		return newPath;
 	}
+
+	std::wstring GetLuaFile(const std::wstring& filename)
+	{
+		std::wstring newPath;
+		newPath = binPath + L"lua\\" + filename;
+		return newPath;
+	}
 }

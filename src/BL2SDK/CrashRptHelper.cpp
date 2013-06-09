@@ -3,6 +3,7 @@
 #include "BL2SDK/Settings.h"
 #include "BL2SDK/Logging.h"
 #include "BL2SDK/Util.h"
+#include "generated/SDKVersion.h"
 
 // Am I a horrible person for using this?
 #define CRASHRPTFUNC(func) p##func = (p##func##t)GetProcAddress(hCrashRpt, #func)

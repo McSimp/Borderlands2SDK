@@ -31,9 +31,6 @@ namespace BL2SDK
 	void InjectedCallNext();
 	void Initialize(LauncherStruct* args);
 	void Cleanup();
-
-	const std::string Version = "Fucking kawaii";
-	const std::wstring VersionW = L"Fucking kawaii";
 }
 
 #endif

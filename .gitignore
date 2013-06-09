@@ -105,3 +105,5 @@ thirdparty/LuaJIT/src/*.exp
 thirdparty/LuaJIT/src/*.dll
 *.sublime*
 lua/sdkgen/*
+thirdparty/cryptopp/*
+src/generated/*

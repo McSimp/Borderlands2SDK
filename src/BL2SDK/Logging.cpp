@@ -6,6 +6,7 @@
 #include "BL2SDK/Logging.h"
 #include "BL2SDK/Util.h"
 #include "BL2SDK/Exceptions.h"
+#include "generated/SDKVersion.h"
 
 namespace Logging
 {

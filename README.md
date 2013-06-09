@@ -19,12 +19,6 @@ Running
 
 Running the SDK at the moment is still a little bit involed, and will not work correctly with the Steam version. I'll be improving the launcher to make things a bit easier. 
 
-### Binding a console key
-
-Before you do anything, I suggest binding a key to the in-game console. 
-Browse to `%USERPROFILE%\Documents\My Games\Borderlands 2\WillowGame\Config\` and open up `WillowInput.ini`.
-You'll then want to search for `ConsoleKey=` and change that line to `ConsoleKey=Tilde` (or whatever key you want).
-
 ### Compiling and setting up
 
 To compile, open the solution and build it as you normally would. After you've done that, copy the `lua` folder in the root directory of the repository into the `build\Debug` or `build\Release` directory.

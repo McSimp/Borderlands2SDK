@@ -7,6 +7,7 @@
 #include "BL2SDK/Util.h"
 #include "BL2SDK/Exceptions.h"
 #include "BL2SDK/Settings.h"
+#include "generated/SDKVersion.h"
 
 // TODO: Get these out of here
 CON_COMMAND(CrashMe)

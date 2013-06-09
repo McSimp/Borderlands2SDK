@@ -1,7 +1,6 @@
 C++
 * Create a nicer way to export Lua functions
 * Detach detours? Is this even worth doing?
-* Automatic version in BL2SDK.h
 * Cleanup VirtualProtects in DirectX hooking
 * Get rid of macro indexes in DirectX hooking
 * Fix hook system - use pointers to avoid map copies
@@ -20,6 +19,7 @@ C++
 * Decide on hook halting in GameHooks.cpp
 * Remake object searching to use the hash table
 * The whole namespace thing is getting a bit messy, might need to think about using a class
+* If Lua hash check fails, do something about it
 
 Lua
 * Cursor enum for SetCursor
@@ -40,7 +40,6 @@ Other
 * CrashRpt endpoint on mcsi.mp
 * CrashRpt privacy policy
 * Lua/C++: Get the function flags right for ProcessEvent
-* Set a console key automatically in launcher
 * Add launcher facility to decompress upk files for opening in UE Explorer
 * Lua/C++: Add hook in Lua for when ResetLua is happening
 * Lua/C++: Pass unrecognized commands to Lua command system
