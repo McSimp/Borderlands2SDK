@@ -90,7 +90,7 @@ if($LastExitCode -ne 0)
     $dirty = " DIRTY"
 }
 
-$version = $gitBranch + ":" + $gitTag + $dirty
+$version = $gitBranch + "@" + $gitTag + $dirty
 
 $versionHeader = [System.IO.StreamWriter] ($outputDir.Path + "SDKVersion.h")
 $versionHeader.WriteLine("#include <string>
@@ -98,7 +98,7 @@ $versionHeader.WriteLine("#include <string>
 namespace BL2SDK
 {
     const std::string Version = ""$version"";
-	const std::wstring VersionW = L""$version"";
+    const std::wstring VersionW = L""$version"";
 }")
 
 $versionHeader.close()
