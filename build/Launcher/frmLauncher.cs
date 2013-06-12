@@ -147,6 +147,7 @@ namespace Launcher
                 try
                 {
                     Injector syringe = new Injector(bl2Proc);
+                    syringe.SetDLLSearchPath(Directory.GetCurrentDirectory());
                     syringe.InjectLibrary("BL2SDKDLL.dll");
 
                     SettingsStruct arg = new SettingsStruct() 

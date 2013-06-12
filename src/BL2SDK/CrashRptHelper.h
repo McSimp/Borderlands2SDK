@@ -6,7 +6,6 @@ namespace CrashRptHelper
 {
 	bool Initialize();
 	void Cleanup();
-	//int InstallThread();
 	void SoftCrash(int code);
 	bool GenerateReport(unsigned int code, PEXCEPTION_POINTERS ep);
 	void AddProperty(const std::wstring& propertyName, const std::wstring& value);

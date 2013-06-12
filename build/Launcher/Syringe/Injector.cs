@@ -115,6 +115,68 @@ namespace Syringe
 
         public bool EjectOnDispose { get; set; }
 
+        public void SetDLLSearchPath(string searchPath)
+        {
+            // (in?)sanity check, pretty sure this is never possible as the constructor will error - left over from how it previously was developed
+            if(_process == null)
+                throw new InvalidOperationException("This injector has no associated process and thus cannot inject a library");
+            if(_handle == IntPtr.Zero)
+                throw new InvalidOperationException("This injector does not have a valid handle to the associated process and thus cannot inject a library");
+
+            if(!Directory.Exists(searchPath))
+                throw new FileNotFoundException(string.Format("Unable to find DLL search path to inject into process {1}", searchPath, _process.ProcessName), searchPath);
+
+            // convenience variables
+            string fullPath = Path.GetFullPath(searchPath);
+
+            // declare resources that need to be freed in finally
+            IntPtr pSearchRemote = IntPtr.Zero; // pointer to allocated memory of search path string
+            IntPtr hThread = IntPtr.Zero; // handle to thread from CreateRemoteThread
+            IntPtr pSearchFullPathUnmanaged = Marshal.StringToHGlobalUni(fullPath); // unmanaged C-String pointer
+
+            try
+            {
+                uint sizeUni = (uint)Encoding.Unicode.GetByteCount(fullPath);
+
+                // Get Handle to Kernel32.dll and pointer to SetDllDirectory
+                IntPtr hKernel32 = Imports.GetModuleHandle("Kernel32");
+                if(hKernel32 == IntPtr.Zero)
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                IntPtr hSetDir = Imports.GetProcAddress(hKernel32, "SetDllDirectoryW");
+                if(hSetDir == IntPtr.Zero)
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                // allocate memory to the local process for searchFullPath
+                pSearchRemote = Imports.VirtualAllocEx(_handle, IntPtr.Zero, sizeUni, AllocationType.Commit, MemoryProtection.ReadWrite);
+                if(pSearchRemote == IntPtr.Zero)
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                // write searchFullPath to pSearchRemote
+                int bytesWritten;
+                if(!Imports.WriteProcessMemory(_handle, pSearchRemote, pSearchFullPathUnmanaged, sizeUni, out bytesWritten) || bytesWritten != (int)sizeUni)
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                // set dll search path via call to SetDllDirectory using CreateRemoteThread
+                hThread = Imports.CreateRemoteThread(_handle, IntPtr.Zero, 0, hSetDir, pSearchRemote, 0, IntPtr.Zero);
+                if(hThread == IntPtr.Zero)
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                if(Imports.WaitForSingleObject(hThread, (uint)ThreadWaitValue.Infinite) != (uint)ThreadWaitValue.Object0)
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                uint success;
+                if(!Imports.GetExitCodeThread(hThread, out success))
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                if(success == 0)
+                    throw new Exception("Return value of SetDllDirectory was 0, possible Win32Exception", new Win32Exception(Marshal.GetLastWin32Error()));
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(pSearchFullPathUnmanaged); // free unmanaged string
+                Imports.CloseHandle(hThread); // close thread from CreateRemoteThread
+                Imports.VirtualFreeEx(_process.Handle, pSearchRemote, 0, AllocationType.Release); // Free memory allocated
+            }
+        }
+
         /// <summary>
         /// Injects a library into this Injector's process. <paramref name="libPath"/> can be 
         /// relative or absolute; either way, the injected module will be referred to by module name only.

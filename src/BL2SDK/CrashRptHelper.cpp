@@ -5,33 +5,10 @@
 #include "BL2SDK/Util.h"
 #include "generated/SDKVersion.h"
 
-// Am I a horrible person for using this?
-#define CRASHRPTFUNC(func) p##func = (p##func##t)GetProcAddress(hCrashRpt, #func)
-#define CRASHRPT_ERROR(name) TCHAR (##name)[256]; pcrGetLastErrorMsgW(##name, 256)
+#define CRASHRPT_ERROR(name) TCHAR (##name)[256]; crGetLastErrorMsgW(##name, 256);
 
 namespace CrashRptHelper
 {
-	// Surely there must be a better way to do this.
-
-	typedef int (WINAPI *pcrInstallWt)(PCR_INSTALL_INFOW);
-	typedef int (WINAPI *pcrUninstallt)();
-	typedef int (WINAPI *pcrGetLastErrorMsgWt)(LPWSTR pszBuffer, UINT uBuffSize);
-	typedef int (WINAPI *pcrAddFile2Wt)(LPCWSTR pszFile, LPCWSTR pszDestFile, LPCWSTR pszDesc, DWORD dwFlags);
-	//typedef int (WINAPI *pcrInstallToCurrentThread2t)(DWORD dwFlags);
-	typedef int (WINAPI *pcrGenerateErrorReportt)(CR_EXCEPTION_INFO* pExceptionInfo);
-	typedef int (WINAPI *pcrAddPropertyWt)(LPCWSTR pszPropName, LPCWSTR pszPropValue);
-	typedef int (WINAPI *pcrAddRegKeyWt)(LPCWSTR pszRegKey, LPCWSTR pszDstFileName, DWORD dwFlags);
-
-	HMODULE hCrashRpt = NULL;
-	pcrInstallWt pcrInstallW = NULL; 
-	pcrUninstallt pcrUninstall = NULL;
-	pcrGetLastErrorMsgWt pcrGetLastErrorMsgW = NULL;
-	pcrAddFile2Wt pcrAddFile2W = NULL;
-	//pcrInstallToCurrentThread2t pcrInstallToCurrentThread2 = NULL;
-	pcrGenerateErrorReportt pcrGenerateErrorReport = NULL;
-	pcrAddPropertyWt pcrAddPropertyW = NULL;
-	pcrAddRegKeyWt pcrAddRegKeyW = NULL;
-
 	bool crashRptReady = false;
 
 	BOOL WINAPI CrashCallback(LPVOID lpvState)
@@ -42,37 +19,6 @@ namespace CrashRptHelper
 
 	bool Initialize()
 	{		
-#ifdef _DEBUG
-		std::wstring dllPath = Settings::GetBinFile(L"CrashRpt1401d.dll");
-#else
-		std::wstring dllPath = Settings::GetBinFile(L"CrashRpt1401.dll");
-#endif
-
-		// Load the crashrpt dll
-		hCrashRpt = LoadLibrary(dllPath.c_str());
-		if(hCrashRpt == NULL)
-		{
-			Logging::Log("[CrashRpt] ERROR: Failed to load CrashRpt library (LoadLibrary returned NULL)\n");
-			return false; // I'm happy for CrashRpt not to work, so I'm not going to throw an exception
-		}
-
-		// Get a pointers to cr functions
-		CRASHRPTFUNC(crInstallW);
-		CRASHRPTFUNC(crUninstall);
-		CRASHRPTFUNC(crGetLastErrorMsgW);
-		CRASHRPTFUNC(crAddFile2W);
-		//CRASHRPTFUNC(crInstallToCurrentThread2);
-		CRASHRPTFUNC(crGenerateErrorReport);
-		CRASHRPTFUNC(crAddPropertyW);
-		CRASHRPTFUNC(crAddRegKeyW);
-
-		// TOOD: Merge this into CRASHRPTFUNC which I should probably make inline
-		if(!pcrInstallW || !pcrUninstall || !pcrGetLastErrorMsgW || !pcrAddFile2W /*|| !pcrInstallToCurrentThread2*/ || !pcrGenerateErrorReport || !pcrAddPropertyW || !pcrAddRegKeyW)
-		{
-			Logging::Log("[CrashRpt] ERROR: Failed to find all CrashRpt functions\n");
-			return false;
-		}
-		
 		// Setup the crash reporter
 		CR_INSTALL_INFO info;  
 		memset(&info, 0, sizeof(CR_INSTALL_INFO));  
@@ -87,11 +33,11 @@ namespace CrashRptHelper
 		//info.pszPrivacyPolicyURL = L"http://mcsi.mp/cr/privacy.html"; 
 
 		// Install exception handlers
-		int result = pcrInstallW(&info);    
+		int result = crInstallW(&info);    
 		if(result != 0)
 		{    
 			// Something goes wrong. Get error message.
-			CRASHRPT_ERROR(szErrorMsg);
+			CRASHRPT_ERROR(szErrorMsg)
 			Logging::LogF("[CrashRpt] ERROR: Failed to install CrashRpt. Result = %i, Error = %ls\n", result, szErrorMsg);
 			return false;
 		} 
@@ -99,17 +45,19 @@ namespace CrashRptHelper
 		crashRptReady = true;
 		
 		// Add our log file to the error report
-		pcrAddFile2W(Settings::GetLogFilePath().c_str(), NULL, L"Log File", CR_AF_MAKE_FILE_COPY);
+		crAddFile2W(Settings::GetLogFilePath().c_str(), NULL, L"Log File", CR_AF_MAKE_FILE_COPY);
 
 		// Add the version of Borderlands 2 to the report if it can be obtained
 		std::wstring gameVer;
 		if(BL2SDK::GetGameVersion(gameVer))
 		{
-			pcrAddPropertyW(L"BL2VER", gameVer.c_str());
+			crAddPropertyW(L"BL2VER", gameVer.c_str());
 		}
 
 		// Add the bin path
-		pcrAddPropertyW(L"BinPath", Settings::GetBinFile(L"").c_str());
+		crAddPropertyW(L"BinPath", Settings::GetBinFile(L"").c_str());
+
+		Logging::Log("[CrashRpt] Crash reporting successfully initialized\n");
 
 		return true;
 	}
@@ -117,23 +65,14 @@ namespace CrashRptHelper
 	void AddProperty(const std::wstring& propertyName, const std::wstring& value)
 	{
 		if(!crashRptReady) return;
-		pcrAddPropertyW(propertyName.c_str(), value.c_str());
+		crAddPropertyW(propertyName.c_str(), value.c_str());
 	}
 
 	void Cleanup()
 	{
 		if(!crashRptReady) return;
-
-		pcrUninstall();
-		FreeLibrary(hCrashRpt);
+		crUninstall();
 	}
-
-	/*
-	int InstallThread()
-	{
-		return pcrInstallToCurrentThread2(0);
-	}
-	*/
 
 	void SoftCrash(int code = 0)
 	{
@@ -149,7 +88,7 @@ namespace CrashRptHelper
 		ei.exctype = CR_SEH_EXCEPTION;
 		ei.code = code;
 		ei.bManual = true;
-		if(pcrGenerateErrorReport(&ei) != 0)
+		if(crGenerateErrorReport(&ei) != 0)
 		{
 			Util::Popup(L"SDK Error", L"An error occurred in the BL2 SDK, please check the logfile for details.");
 		}
@@ -171,10 +110,10 @@ namespace CrashRptHelper
 		ei.exctype = CR_SEH_EXCEPTION;
 		ei.code = code;
 		ei.pexcptrs = ep;
-		int result = pcrGenerateErrorReport(&ei);
+		int result = crGenerateErrorReport(&ei);
 		if(result != 0)
 		{
-			CRASHRPT_ERROR(szErrorMsg);
+			CRASHRPT_ERROR(szErrorMsg)
 			Logging::LogF("[CrashRpt] ERROR: Failed to generate report. Result = %i, Error = %ls\n", result, szErrorMsg);
 			return false;
 		}
