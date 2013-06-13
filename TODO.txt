@@ -35,6 +35,8 @@ Lua
 * Create file structure for sdkgen automatically
 * Get the SDKGen to run on coroutines so maybe we can render something to tell the user about the sdk generating
 * Pass UObject caller to function hooks
+* SDKGen const-ness
+* Update bit.band usage to use flags.IsSet
 
 Other
 * CrashRpt endpoint on mcsi.mp
@@ -46,7 +48,6 @@ Other
 * Organise the SDK folder a bit better -subfolder for gwen textures etc.
 * Find some way to move Launcher source code out of the build folder
 * Decide whether to release source code (If so, hide some Unreal structs that I really shouldn't know)
-* If releasing source, decide on licence
 * Look into a build server and symbol server for crash reporting
 * Test Steam version
 * If Lua modules fail to initialize, give a more prominent warning

@@ -22,7 +22,11 @@ function gwen.ExecCallbacks(cbTable, this, pFromPanel)
 	end
 
 	for _,v in ipairs(hookTable) do
-		v(gwen.ControlFromPointer(pFromPanel))
+		local status, err = pcall(v, gwen.ControlFromPointer(pFromPanel))
+		if not status then
+			print("Error in Gwen callback: " .. err)
+		end
+		--v(gwen.ControlFromPointer(pFromPanel))
 	end
 end
 

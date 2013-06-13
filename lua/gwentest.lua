@@ -30,7 +30,7 @@ function GwenTest()
 end
 
 function TimeControllerUI()
-	local dnc = engine.FindObject("WillowSeqAct_DayNightCycle PersistentLevel.Main_Sequence.WillowSeqAct_DayNightCycle", engine.Classes.UWillowSeqAct_DayNightCycle)
+	local dnc = engine.FindObjectExactClass("WillowSeqAct_DayNightCycle PersistentLevel.Main_Sequence.WillowSeqAct_DayNightCycle", engine.Classes.UWillowSeqAct_DayNightCycle)
 	if dnc == nil then error("DNC was null") end
 
 	local window = gwen.CreateControl("WindowControl")
@@ -61,4 +61,42 @@ function TimeControllerUI()
 	nightButton:AddOnPress(function(panel)
 		dnc:SetTimeOfDay(50)
 	end)
+end
+
+function SetDNCycleRate(rate)
+	local gd = engine.FindObjectExactClass("GlobalsDefinition GD_Globals.General.Globals", engine.Classes.UGlobalsDefinition)
+	gd.DayNightCycleRate = rate
+
+	local ri = engine.FindObjectExactClass("WillowGameReplicationInfo TheWorld.PersistentLevel.WillowGameReplicationInfo", engine.Classes.AWillowGameReplicationInfo)
+	ri.DayNightCycleRate = rate
+	ri.DayNightCycleRateBaseValue = rate
+
+	local dnc = engine.FindObjectExactClass("WillowSeqAct_DayNightCycle PersistentLevel.Main_Sequence.WillowSeqAct_DayNightCycle", engine.Classes.UWillowSeqAct_DayNightCycle)
+	dnc.PlayRate = rate
+
+	print("Changed rate to " .. tostring(rate))
+end
+
+function Noclip()
+	local pc = engine.FindObjectExactClass("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
+	local pawn = pc.AcknowledgedPawn
+	
+	pawn:CheatGhost()
+	pawn:CheatFly()
+end
+
+function UnNoclip()
+	local pc = engine.FindObjectExactClass("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
+	local pawn = pc.AcknowledgedPawn
+	
+	pawn:CheatWalk()
+end
+
+function Brap()
+	local boneName = engine.LocalPlayer().Pawn.Mesh:GetBoneName(6)
+	local startTrace = engine.LocalPlayer().Pawn.Mesh:GetBoneLocation("Head", 0)
+
+	print(boneName.Index, boneName.Number, boneName:GetName())
+
+	print(startTrace.X, startTrace.Y, startTrace.Z)
 end

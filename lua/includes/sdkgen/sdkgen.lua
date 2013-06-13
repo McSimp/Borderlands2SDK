@@ -47,9 +47,9 @@ local types = {
 	StrProperty = { c = "struct FString" },
 	NameProperty = { c = "struct FName" },
 	DelegateProperty = { c = "struct FScriptDelegate" },
-	ObjectProperty = { c = "struct %s*", size = 4, generated = true, doNotCopy = true },
-	ClassProperty = { c = "struct %s*", size = 4, generated = true, doNotCopy = true },
-	ComponentProperty = { c = "struct %s*", size = 4, generated = true, doNotCopy = true },
+	ObjectProperty = { c = "struct %s*", size = 4, generated = true, objPointer = true },
+	ClassProperty = { c = "struct %s*", size = 4, generated = true, objPointer = true },
+	ComponentProperty = { c = "struct %s*", size = 4, generated = true, objPointer = true },
 	InterfaceProperty = { c = "struct FScriptInterface" },
 	StructProperty = { c = "struct %s", generated = true },
 	ArrayProperty = { c = "struct TArray_%s_", size = 12, generated = true }

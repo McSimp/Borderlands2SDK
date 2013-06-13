@@ -22,6 +22,8 @@ namespace BL2SDK
 	unsigned long pGObjects;
 	unsigned long pGNames;
 	unsigned long pGObjHash;
+	unsigned long pGCRCTable;
+	unsigned long pNameHash;
 	tProcessEvent pProcessEvent;
 	tCallFunction pCallFunction;
 	tFrameStep pFrameStep;
@@ -180,6 +182,14 @@ namespace BL2SDK
 		// Sigscan for UObject::GObjHash
 		pGObjHash = *(unsigned long*)sigscan.Scan((unsigned char*)GObjHash_Pattern, GObjHash_Mask);
 		Logging::LogF("[Internal] GObjHash = 0x%X\n", pGObjHash);
+
+		// Sigscan for GCRCTable
+		pGCRCTable = *(unsigned long*)sigscan.Scan((unsigned char*)GCRCTable_Pattern, GCRCTable_Mask);
+		Logging::LogF("[Internal] GCRCTable = 0x%X\n", pGCRCTable);
+
+		// Sigscan for NameHash
+		pNameHash = *(unsigned long*)sigscan.Scan((unsigned char*)NameHash_Pattern, NameHash_Mask);
+		Logging::LogF("[Internal] NameHash = 0x%X\n", pNameHash);
 
 		// Sigscan for Unreal exception handler
 		void* addrUnrealEH = sigscan.Scan((unsigned char*)CrashHandler_Pattern, CrashHandler_Mask);

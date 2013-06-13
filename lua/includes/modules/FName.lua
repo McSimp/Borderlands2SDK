@@ -7,3 +7,4 @@ function FNameMT.GetName(self)
 end
 
 ffi.metatype("struct FName", { __index = FNameMT })
+

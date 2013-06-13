@@ -810,6 +810,8 @@ void CLuaInterface::SetSDKValues()
 	sdkTable->SetMember("addrGObjects", (double)BL2SDK::pGObjects);
 	sdkTable->SetMember("addrProcessEvent", (double)(unsigned long)BL2SDK::pProcessEvent);
 	sdkTable->SetMember("addrGObjHash", (double)BL2SDK::pGObjHash);
+	sdkTable->SetMember("addrGCRCTable", (double)BL2SDK::pGCRCTable);
+	sdkTable->SetMember("addrNameHash", (double)BL2SDK::pNameHash);
 	sdkTable->SetMember("addrFrameStep", (double)(unsigned long)BL2SDK::pFrameStep);
 	sdkTable->SetMember("addrCallFunction", (double)(unsigned long)BL2SDK::pCallFunction);
 	sdkTable->SetMember("engineVersion", (double)BL2SDK::EngineVersion);

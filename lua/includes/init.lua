@@ -7,6 +7,9 @@ require("base")
 -- Profiling library
 require("profiling")
 
+-- Flags
+require("flags")
+
 -- Import data structures
 include("structs/base.lua")
 include("classes/base.lua")
@@ -31,8 +34,8 @@ local function NeedsSDKGenerated()
 	if versionFile ~= nil then
 		include("../sdkgen/version.lua")
 
-		if SDKGEN_ENGINE_VERSION >= bl2sdk.engineVersion and
-		SDKGEN_CHANGELIST_NUMBER >= bl2sdk.changelistNumber then
+		if SDKGEN_ENGINE_VERSION == bl2sdk.engineVersion and
+		SDKGEN_CHANGELIST_NUMBER == bl2sdk.changelistNumber then
 			generateSDK = false
 		end
 	end

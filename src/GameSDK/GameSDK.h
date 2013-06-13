@@ -31,11 +31,19 @@
 #define ViewportResize_Pattern "\x55\x8B\xEC\x6A\xFF\x68\x00\x00\x00\x00\x64\xA1\x00\x00\x00\x00\x50\x81\xEC\x00\x00\x00\x00\xA1\x00\x00\x00\x00\x33\xC5\x89\x45\xF0\x53\x56\x57\x50\x8D\x45\xF4\x64\xA3\x00\x00\x00\x00\xBE"
 #define ViewportResize_Mask "xxxxxx????xx????xxx????x????xxxxxxxxxxxxxx????x"
 
+#define GCRCTable_Pattern "\x00\x00\x00\x00\x8D\x64\x24\x00\x8B\xD6\xC1\xE2\x18"
+#define GCRCTable_Mask "????xxxxxxxxx"
+
+#define NameHash_Pattern "\x00\x00\x00\x00\x85\xF6\x74\x56\xFF\x45\xFC\x85\xF6\x74\x4F"
+#define NameHash_Mask "????xxxxxxxxxxx"
+
 namespace BL2SDK
 {
 	extern unsigned long pGObjects;
 	extern unsigned long pGNames;
 	extern unsigned long pGObjHash;
+	extern unsigned long pGCRCTable;
+	extern unsigned long pNameHash;
 }
 
 #include "GameSDK/GameDefines.h"

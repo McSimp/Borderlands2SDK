@@ -37,9 +37,9 @@ local function ProcessRetval(field)
 	if not propData then return "" end
 	local propType = SDKGen.GetPropertyType(field)
 
-	-- not basic means it's cdata, and not doNotCopy means that it's cdata, but a pointer
+	-- not basic means it's cdata, and not objPointer means that it's cdata, but a pointer
 	-- so it doesn't need to be cloned.
-	if not propData.basic and not propData.doNotCopy then
+	if not propData.basic and not propData.objPointer then
 		text = text .. string.format("\t\t\t\tcType = ffi.typeof(%q),\n", propType)
 	end
 
@@ -75,10 +75,31 @@ local function ProcessArgument(field)
 	if not propData then return "" end
 	local propType = SDKGen.GetPropertyType(field)
 
+	local flags = 0
+
 	if not propData.basic then -- not basic means it's cdata
-		text = text .. string.format("\t\t\t\tcdata = true,\n")
-		text = text .. string.format("\t\t\t\ttype = ffi.typeof(%q),\n", propType)
+		if field:IsA(engine.Classes.UClassProperty) then
+			flags = bit.bor(flags, FUNCPARM_CLASS)
+		elseif field:IsA(engine.Classes.UNameProperty) then
+			flags = bit.bor(flags, FUNCPARM_NAME)
+		elseif field:IsA(engine.Classes.UStrProperty) then
+			flags = bit.bor(flags, FUNCPARM_STRING)
+		elseif field:IsA(engine.Classes.UStructProperty) then
+			flags = bit.bor(flags, FUNCPARM_STRUCT)
+		elseif field:IsA(engine.Classes.UArrayProperty) then
+			flags = bit.bor(flags, FUNCPARM_TARRAY)
+		end
+
+		if field:IsA(engine.Classes.UObjectProperty) and not field:IsA(engine.Classes.UClassProperty) then
+			flags = bit.bor(flags, FUNCPARM_OBJPOINTER)
+			field = ffi.cast("struct UObjectProperty*", field)
+			text = text .. string.format("\t\t\t\tclassName = %q,\n", field.UObjectProperty.PropertyClass:GetCName())
+			propType = "struct UObject*"
+		else
+			text = text .. string.format("\t\t\t\ttype = ffi.typeof(%q),\n", propType)
+		end
 	else
+		flags = bit.bor(flags, FUNCPARM_LUATYPE)
 		text = text .. string.format("\t\t\t\ttype = %q,\n", propData.lua)
 	end
 
@@ -91,6 +112,9 @@ local function ProcessArgument(field)
 			text = text .. string.format("\t\t\t\tenumName = %q,\n", field.UByteProperty.Enum:GetName())
 		end
 	end
+
+	-- Write flags
+	text = text .. string.format("\t\t\t\tflags = %d,\n", flags)
 
 	-- Offset and closing bracket
 	text = text .. string.format("\t\t\t\toffset = %d\n\t\t\t},\n", field.UProperty.Offset)
