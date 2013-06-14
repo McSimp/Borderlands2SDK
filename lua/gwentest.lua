@@ -93,8 +93,8 @@ function UnNoclip()
 end
 
 function Brap()
-	local boneName = engine.LocalPlayer().Pawn.Mesh:GetBoneName(6)
-	local startTrace = engine.LocalPlayer().Pawn.Mesh:GetBoneLocation("Head", 0)
+	local boneName = LocalPlayer().Pawn.Mesh:GetBoneName(6)
+	local startTrace = LocalPlayer().Pawn.Mesh:GetBoneLocation("Head", 0)
 
 	print(boneName.Index, boneName.Number, boneName:GetName())
 

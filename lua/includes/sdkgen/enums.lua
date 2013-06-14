@@ -9,7 +9,7 @@ function Package:ProcessEnum(enum)
 
 	SDKGen.DebugPrint("[SDKGen] Enum " .. enum:GetFullName())
 
-	local enumText = string.format("engine.MakeEnum(\"%s\", {\n", enum:GetName())
+	local enumText = string.format("enums.MakeEnum(\"%s\", {\n", enum:GetName())
 
 	local processedNames = {}
 	local names = enum.UEnum.Names

@@ -167,7 +167,7 @@ end
 
 local pc = engine.FindObject("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
 pc = ffi.cast("struct AWillowPlayerController*", pc)
-LocalPlayer = pc
+--LocalPlayer = pc
 --local time = 1/40
 local time = 2
 

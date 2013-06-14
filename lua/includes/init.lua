@@ -21,6 +21,8 @@ require("FString")
 require("UObject")
 require("FFrame")
 
+require("enums")
+
 -- Load engine functions
 require("engine")
 
