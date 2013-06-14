@@ -69,10 +69,10 @@ function FuncMT.__call(funcData, obj, ...)
 		-- If arg expects a lua type, and it's not the right lua type
 		if flags.IsSet(v.flags, FUNCPARM_LUATYPE) and type(luaArg) ~= v.type then
 			error(string.format("Arg #%d (%s) expects the Lua type %q", k, v.name, v.type))
-		end
+		
 
 		-- If we're expecting a class, it should be a UClass* or an engine.Classes.name table with a static member
-		if flags.IsSet(v.flags, FUNCPARM_CLASS) then
+		elseif flags.IsSet(v.flags, FUNCPARM_CLASS) then
 			if type(luaArg) == "table" then
 				if luaArg.static ~= nil then
 					luaArg = luaArg.static
@@ -82,11 +82,11 @@ function FuncMT.__call(funcData, obj, ...)
 			elseif not ffi.istype(v.type, luaArg) then
 				error(string.format("Arg #%d (%s) expects a class", k, v.name))
 			end
-		end
+		
 
 		-- If we're expecting a name and we get a string, we need to convert it to an FName
 		-- If it's not a string, it should be a struct FName
-		if flags.IsSet(v.flags, FUNCPARM_NAME) then
+		elseif flags.IsSet(v.flags, FUNCPARM_NAME) then
 			if type(luaArg) == "string" then
 				local name = FindName(luaArg)
 				if name == nil then
@@ -96,33 +96,33 @@ function FuncMT.__call(funcData, obj, ...)
 			elseif not ffi.istype(v.type, luaArg) then
 				error(string.format("Arg #%d (%s) expects a name", k, v.name))
 			end
-		end
+		
 
 		-- If we're expecting an FString, and we get a normal string, convert it to an FString
 		-- Otherwise make sure it's a struct FString
-		if flags.IsSet(v.flags, FUNCPARM_STRING) then
+		elseif flags.IsSet(v.flags, FUNCPARM_STRING) then
 			if type(luaArg) == "string" then
 				luaArg = FString.GetFromLuaString(luaArg)
 			elseif not ffi.istype(v.type, luaArg) then
 				error(string.format("Arg #%d (%s) expects a string", k, v.name))
 			end
-		end
+		
 
 		-- If it's a TArray, accept a table or an actual struct TArray
-		if flags.IsSet(v.flags, FUNCPARM_TARRAY) then
+		elseif flags.IsSet(v.flags, FUNCPARM_TARRAY) then
 			if type(luaArg) == "table" then
 				-- TODO: Convert table, set luaArg to struct
 				error("NYI: Converting lua table to TArray")
 			elseif not ffi.istype(v.type, luaArg) then
 				error(string.format("Arg #%d (%s) expects a %q", k, v.name, v.type))
 			end
-		end
+		
 
-		if flags.IsSet(v.flags, FUNCPARM_STRUCT) and not ffi.istype(v.type, luaArg) then
+		elseif flags.IsSet(v.flags, FUNCPARM_STRUCT) and not ffi.istype(v.type, luaArg) then
 			error(string.format("Arg #%d (%s) expects a %q", k, v.name, tostring(v.type)))
-		end
+		
 
-		if flags.IsSet(v.flags, FUNCPARM_OBJPOINTER) and (luaArg.IsA == nil or not luaArg:IsA(v.class)) then
+		elseif flags.IsSet(v.flags, FUNCPARM_OBJPOINTER) and (luaArg.IsA == nil or not luaArg:IsA(v.class)) then
 			error(string.format("Arg #%d (%s) expects an object pointer for %s", k, v.name, v.class.name))
 		end
 
@@ -133,11 +133,13 @@ function FuncMT.__call(funcData, obj, ...)
 		::continue::
 	end
 
+	--[[
 	local parms = ""
 	for i=0,(funcData.dataSize-1) do
 		parms = parms .. string.format("%s ", bit.tohex(paramBlock[i], 2))
 	end
 	print(parms)
+	]]
 
 	-- Have we got a pointer?
 	if not funcData.ptr or funcData.ptr == nil then

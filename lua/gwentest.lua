@@ -77,19 +77,41 @@ function SetDNCycleRate(rate)
 	print("Changed rate to " .. tostring(rate))
 end
 
-function Noclip()
-	local pc = engine.FindObjectExactClass("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
+function ToggleNoclip()
+	print("Toggling Noclip")
+
+	local pc = LocalPlayer()
 	local pawn = pc.AcknowledgedPawn
 	
-	pawn:CheatGhost()
-	pawn:CheatFly()
+	if pc.bCheatFlying then
+		pc.bCheatFlying = false
+		pawn:CheatWalk()
+		pc:Restart(false)
+
+		pawn.AccelRate = 2048
+		pawn.AirSpeed = 440
+	else
+		pawn:CheatFly()
+		pc.bCheatFlying = true
+		pc:GotoState("PlayerFlying")
+
+		pawn.AccelRate = 20000
+		pawn.AirSpeed = 3000
+
+		pawn:CheatGhost()
+	end
 end
 
-function UnNoclip()
-	local pc = engine.FindObjectExactClass("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
-	local pawn = pc.AcknowledgedPawn
-	
-	pawn:CheatWalk()
+function AddKeyHook()
+	engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.InputKey, "NoclipKeyHook", function(cid, key, event)
+		if key:GetName() == "V" and event == enums.EInputEvent.IE_Pressed then
+			ToggleNoclip()
+		end
+	end)
+end
+
+function RemoveKeyHook()
+	engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.InputKey, "NoclipKeyHook")
 end
 
 function Brap()

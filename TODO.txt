@@ -37,6 +37,8 @@ Lua
 * Pass UObject caller to function hooks
 * SDKGen const-ness
 * Update bit.band usage to use flags.IsSet
+* Add FName __eq metamethod
+* Add __tostring for structs
 
 Other
 * CrashRpt endpoint on mcsi.mp
@@ -55,3 +57,4 @@ Other
 Bugs:
 * Gwen canvas will resize, but game will lock up completely if resize and there has been a Gwen window on the screen at any point
 * Gwen cursor does not work correctly in full screen - I think it's fine in borderless windowed though
+* Tabs in Unreal console are fucked

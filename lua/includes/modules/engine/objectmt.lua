@@ -86,7 +86,8 @@ function UObjectMT.__newindex(self, k, v)
 	-- Then while this class has a base class, check that.
 	local baseClass = classInfo
 	while baseClass do
-		if obj[baseClass.name][k] == nil and type(v) == nil then
+		local cv = obj[baseClass.name][k]
+		if cv == nil and type(cv) ~= "cdata" then
 			baseClass = baseClass.base
 		else
 			obj[baseClass.name][k] = v
