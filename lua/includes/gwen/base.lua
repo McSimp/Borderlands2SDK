@@ -524,12 +524,24 @@ function Base:AlignBelow(belowControl, border)
 	self:SetPos(self:X(), belowControl:Bottom() + border)
 end
 
-function Base:AddOnHoverEnter(func)
-	gwen.AddCallback(self.control, 44, "OnHoverEnter", func)
-end
+Base.Events = {}
+Base.Events.OnHoverEnter = 44
+Base.Events.OnHoverLeave = 56
 
-function Base:AddOnHoverLeave(func)
-	gwen.AddCallback(self.control, 56, "OnHoverLeave", func)
+Base.listeners = {}
+
+function Base:__newindex(k, v)
+	if self.Events[k] ~= nil then
+		if type(v) == "function" or v == nil then
+			gwen.SetCallback(self.control, self.Events[k], k, v)
+		else
+			error("A Gwen callback must be a function or nil")
+		end
+
+		rawset(self.listeners, k, v)
+	else -- normal set
+		rawset(self, k, v)
+	end
 end
 
 gwen.meta.Base = Base

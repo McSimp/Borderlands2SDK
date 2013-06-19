@@ -6,6 +6,7 @@ typedef void (__thiscall *EventHandlerFunction)(GwenControl* this, GwenControl* 
 typedef void (*tGwenBaseDestructorHook) (GwenControl* control);
 void LUAFUNC_AddGwenCallback(GwenControl* control, int offset, EventHandlerFunction callback);
 void LUAFUNC_SetDestructorCallback(tGwenBaseDestructorHook callback);
+void LUAFUNC_RemoveGwenCallback(GwenControl* control, int offset, EventHandlerFunction callback);
 ]]
 
 local RegisteredCallbacks = {}
@@ -14,23 +15,35 @@ local CallbackFFIFuncs = {}
 function gwen.ExecCallbacks(cbTable, this, pFromPanel)
 	local ptrNum = PtrToNum(pFromPanel)
 
-	local hookTable = cbTable[ptrNum]
+	local hook = cbTable[ptrNum]
 
-	if hookTable == nil then
-		print(string.format("[Lua] Warning: gwen.ExecCallbacks called on 0x%X with no hook table", ptrNum))
+	if hook == nil then
+		print(string.format("[Lua] Warning: gwen.ExecCallbacks called on 0x%X with no hook", ptrNum))
 		return
 	end
 
-	for _,v in ipairs(hookTable) do
-		local status, err = pcall(v, gwen.ControlFromPointer(pFromPanel))
-		if not status then
-			print("Error in Gwen callback: " .. err)
-		end
-		--v(gwen.ControlFromPointer(pFromPanel))
+	local status, err = pcall(hook, gwen.ControlFromPointer(pFromPanel))
+	if not status then
+		print("Error in Gwen callback: " .. err)
 	end
+	--v(gwen.ControlFromPointer(pFromPanel))
 end
 
-function gwen.AddCallback(control, offset, name, func)
+function gwen.SetCallback(control, offset, name, func)
+	local ptrNum = PtrToNum(control)
+
+	-- First, if we're setting the CB to nil, we might need to tell gwen we don't want the CB anymore
+	if func == nil and RegisteredCallbacks[name] ~= nil and RegisteredCallbacks[name][ptrNum] ~= nil then
+		-- Remove CB from gwen
+		ffi.C.LUAFUNC_RemoveGwenCallback(control, offset, CallbackFFIFuncs[name])
+		RegisteredCallbacks[name][ptrNum] = nil
+
+		-- TODO: Do we want to remove the FFI callback as well?
+
+		print(string.format("[Lua] Gwen callback removed for event: %s", name))
+		return
+	end
+
 	-- We haven't registered any callbacks for this yet, so we need to make a new
 	-- FFI callback function for this particular event.
 	if CallbackFFIFuncs[name] == nil then
@@ -45,13 +58,12 @@ function gwen.AddCallback(control, offset, name, func)
 		print(string.format("[Lua] Created new FFI CB for Gwen event: %s", name))
 	end
 
-	local ptrNum = PtrToNum(control)
+	-- If the callback hasn't been set yet, 
 	if RegisteredCallbacks[name][ptrNum] == nil then
-		RegisteredCallbacks[name][ptrNum] = {}
 		ffi.C.LUAFUNC_AddGwenCallback(control, offset, CallbackFFIFuncs[name])
 	end
 
-	table.insert(RegisteredCallbacks[name][ptrNum], func)
+	RegisteredCallbacks[name][ptrNum] = func
 
 	print(string.format("[Lua] Gwen callback added for event: %s", name))
 end

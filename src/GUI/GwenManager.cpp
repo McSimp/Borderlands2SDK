@@ -12,10 +12,11 @@
 #include "BL2SDK/GameHooks.h"
 
 // Controls
-#include "gwen/Controls/Base.h"
-#include "gwen/Controls/Button.h"
-#include "gwen/Controls/WindowControl.h"
-#include "gwen/Controls/HorizontalSlider.h"
+#include "gwen/Controls.h"
+//#include "gwen/Controls/Base.h"
+//#include "gwen/Controls/Button.h"
+//#include "gwen/Controls/WindowControl.h"
+//#include "gwen/Controls/HorizontalSlider.h"
 
 #define GET_X_LPARAM(lParam)	((int)(short)LOWORD(lParam))
 #define GET_Y_LPARAM(lParam)	((int)(short)HIWORD(lParam))
@@ -186,7 +187,7 @@ namespace GwenManager
 		pRenderer = new Renderer::DirectX9(pD3DDev);
 
 		pSkin = new Skin::TexturedBase(pRenderer);
-		pSkin->Init(L"DefaultSkin.png");
+		pSkin->Init(L"GModDefault.png");
 
 		// Create a dummy canvas that will be resized later
 		pCanvas = new Controls::Canvas(pSkin);
@@ -223,7 +224,8 @@ namespace GwenManager
 	{
 		GWEN_BUTTON,
 		GWEN_WINDOW,
-		GWEN_HORIZONTALSLIDER
+		GWEN_HORIZONTALSLIDER,
+		GWEN_COMBOBOX
 	};
 
 	extern "C" __declspec(dllexport) Controls::Base* LUAFUNC_CreateNewControl(GwenControls controlNum, Controls::Base* parent)
@@ -236,8 +238,7 @@ namespace GwenManager
 
 		if(controlNum == GWEN_BUTTON)
 		{
-			Controls::Button* btn = new Controls::Button(parent);
-			control = btn;
+			control = new Controls::Button(parent);
 		}
 		else if(controlNum == GWEN_WINDOW)
 		{
@@ -247,8 +248,11 @@ namespace GwenManager
 		}
 		else if(controlNum == GWEN_HORIZONTALSLIDER)
 		{
-			Controls::HorizontalSlider* slider = new Controls::HorizontalSlider(parent);
-			control = slider;
+			control = new Controls::HorizontalSlider(parent);
+		}
+		else if(controlNum == GWEN_COMBOBOX)
+		{
+			control = new Controls::ComboBox(parent);
 		}
 		
 		return control;
@@ -257,6 +261,11 @@ namespace GwenManager
 	extern "C" __declspec(dllexport) TextObject* LUAFUNC_NewTextObject(const char* str)
 	{
 		return new TextObject(str);
+	}
+
+	extern "C" __declspec(dllexport) void LUAFUNC_DestroyTextObject(TextObject* obj)
+	{
+		delete obj;
 	}
 
 	extern "C" __declspec(dllexport) const char* LUAFUNC_GetTextObjectString(TextObject& obj)
@@ -273,6 +282,12 @@ namespace GwenManager
 	{
 		Event::Caller* eh = (Event::Caller*)((int)control + offset);
 		eh->Add(control, callback);
+	}
+
+	extern "C" __declspec(dllexport) void LUAFUNC_RemoveGwenCallback(Controls::Base* control, int offset, Event::Handler::Function callback)
+	{
+		Event::Caller* eh = (Event::Caller*)((int)control + offset);
+		eh->RemoveHandler(control);
 	}
 
 	extern "C" __declspec(dllexport) void LUAFUNC_SetDestructorCallback(tGwenBaseDestructorHook callback)

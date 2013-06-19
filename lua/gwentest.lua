@@ -12,20 +12,24 @@ function GwenTest()
 	button1:SetText("Button1")
 	button1:SetSize(50, 100)
 	button1:Dock(8)
-	button1:AddOnPress(function(panel) print("Button1 pressed") end)
+	button1.OnPress = function(panel) print("Button1 pressed") end
 	print(button1:_GetInternalControl())
 
 	local button2 = gwen.CreateControl("Button", window)
 	button2:SetText("Button2")
 	button2:SetSize(50, 100)
 	button2:Dock(8)
-	button2:AddOnPress(function(panel) print("Button2 pressed") end)
+	button2.OnPress = function(panel) print("Button2 pressed") end
+	button2.OnHoverEnter = function(panel) print("Button2 hovered") end
+	button2.OnHoverEnter = nil
+	button2.SomeDataIWant = "Hello World!"
+	button2.OnHoverEnter = function(panel) print("Button2 hovered new!") end
 	print(button2:_GetInternalControl())
 
 	local slider = gwen.CreateControl("HorizontalSlider", window)
 	slider:SetSize(50, 20)
 	slider:Dock(8)
-	slider:AddOnValueChanged(function(panel) print(panel:GetFloatValue()) end)
+	slider.OnValueChanged = function(panel) print(panel:GetFloatValue()) end
 	print(slider:_GetInternalControl())
 end
 

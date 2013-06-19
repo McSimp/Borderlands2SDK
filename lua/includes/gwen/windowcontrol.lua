@@ -36,9 +36,7 @@ function WindowControl:DestroyModal()
 	func(self.control)
 end
 
-function WindowControl:AddOnWindowClosed(func)
-	gwen.AddCallback(self.control, 296, "OnWindowClosed", func)
-end
+WindowControl.Events.OnWindowClosed = 296
 
 gwen.meta.WindowControl = WindowControl
 

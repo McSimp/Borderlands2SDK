@@ -61,9 +61,7 @@ function Slider:GetMax()
 	return func(self.control)
 end
 
-function Slider:AddOnValueChanged(func)
-	gwen.AddCallback(self.control, 232, "OnValueChanged", func)
-end
+Slider.Events.OnValueChanged = 232
 
 gwen.meta.Slider = Slider
 

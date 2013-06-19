@@ -1,8 +1,6 @@
 local ffi = require("ffi")
 
 ffi.cdef[[
-void free(void* _Memory);
-
 typedef struct {
 	int x;
 	int y;
@@ -38,6 +36,7 @@ typedef struct TextObject TextObject;
 GwenControl* LUAFUNC_CreateNewControl(int controlNum, GwenControl* parent);
 TextObject* LUAFUNC_NewTextObject(const char* str);
 const char* LUAFUNC_GetTextObjectString(TextObject& obj);
+void LUAFUNC_DestroyTextObject(TextObject*);
 int LUAFUNC_GetCanvasW();
 int LUAFUNC_GetCanvasH();
 ]]
@@ -83,7 +82,7 @@ function gwen.GetTextObject(str)
 end
 
 function gwen.FreeTextObject(obj)
-	ffi.C.free(obj)
+	ffi.C.LUAFUNC_DestroyTextObject(obj)
 end
 
 function gwen.GetStringFromTextObject(obj)

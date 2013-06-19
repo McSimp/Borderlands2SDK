@@ -39,6 +39,7 @@ Lua
 * Update bit.band usage to use flags.IsSet
 * Add FName __eq metamethod
 * Add __tostring for structs
+* Bind the rest of the gwen controls
 
 Other
 * CrashRpt endpoint on mcsi.mp
