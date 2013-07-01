@@ -4,3 +4,7 @@
 [submodule "thirdparty/LuaJIT"]
 	path = thirdparty/LuaJIT
 	url = http://luajit.org/git/luajit-2.0.git
+[submodule "thirdparty/crashrpt"]
+	path = thirdparty/crashrpt
+	url = https://github.com/McSimp/crashrpt-mirror.git
+	ignore = untracked

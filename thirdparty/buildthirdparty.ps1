@@ -100,14 +100,14 @@ Log-Action "Moving built files to SDK..."
 Copy-Built-File "LuaJIT\src\lua51.lib" "..\lib\lua51.lib"
 
 Log-Action "Removing Crashrpt from SDK..."
-Cleanup-File "..\bin\Debug\CrashRpt1401d.dll"
-Cleanup-File "..\bin\Release\CrashRpt1401.dll"
+Cleanup-File "..\bin\Debug\CrashRpt1402d.dll"
+Cleanup-File "..\bin\Release\CrashRpt1402.dll"
 Cleanup-File "..\bin\Debug\crashrpt_lang.ini"
 Cleanup-File "..\bin\Release\crashrpt_lang.ini"
-Cleanup-File "..\bin\Debug\CrashSender1401d.exe"
-Cleanup-File "..\bin\Release\CrashSender1401.exe"
-Cleanup-File "..\lib\CrashRpt1401.lib"
-Cleanup-File "..\lib\CrashRpt1401d.lib"
+Cleanup-File "..\bin\Debug\CrashSender1402d.exe"
+Cleanup-File "..\bin\Release\CrashSender1402.exe"
+Cleanup-File "..\lib\CrashRpt1402.lib"
+Cleanup-File "..\lib\CrashRpt1402d.lib"
 
 Log-Action "Cleaning CrashRpt solution..."
 Run-MSBuild "crashrpt\CrashRpt_vs2010.sln" "Debug" "/t:Clean /m"
@@ -120,17 +120,17 @@ Log-Action "Building CrashRpt in Release..."
 Run-MSBuild "crashrpt\CrashRpt_vs2010.sln" "Release" "/m"
 
 Log-Action "Moving built files to SDK..."
-Copy-Built-File "crashrpt\bin\CrashRpt1401d.dll" "..\bin\Debug\CrashRpt1401d.dll"
-Copy-Built-File "crashrpt\bin\CrashRpt1401.dll" "..\bin\Release\CrashRpt1401.dll"
+Copy-Built-File "crashrpt\bin\CrashRpt1402d.dll" "..\bin\Debug\CrashRpt1402d.dll"
+Copy-Built-File "crashrpt\bin\CrashRpt1402.dll" "..\bin\Release\CrashRpt1402.dll"
 
 Copy-Built-File "crashrpt\lang_files\crashrpt_lang_EN.ini" "..\bin\Debug\crashrpt_lang.ini"
 Copy-Built-File "crashrpt\lang_files\crashrpt_lang_EN.ini" "..\bin\Release\crashrpt_lang.ini"
 
-Copy-Built-File "crashrpt\bin\CrashSender1401d.exe" "..\bin\Debug\CrashSender1401d.exe"
-Copy-Built-File "crashrpt\bin\CrashSender1401.exe" "..\bin\Release\CrashSender1401.exe"
+Copy-Built-File "crashrpt\bin\CrashSender1402d.exe" "..\bin\Debug\CrashSender1402d.exe"
+Copy-Built-File "crashrpt\bin\CrashSender1402.exe" "..\bin\Release\CrashSender1402.exe"
 
-Copy-Built-File "crashrpt\lib\CrashRpt1401d.lib" "..\lib\CrashRpt14010d.lib"
-Copy-Built-File "crashrpt\lib\CrashRpt1401.lib" "..\lib\CrashRpt1401.lib"
+Copy-Built-File "crashrpt\lib\CrashRpt1402d.lib" "..\lib\CrashRpt1402d.lib"
+Copy-Built-File "crashrpt\lib\CrashRpt1402.lib" "..\lib\CrashRpt1402.lib"
 
 if(Test-Path "gwen\gwen\Projects\windows")
 {
