@@ -102,12 +102,6 @@
     <ClCompile Include="..\..\src\LuaInterface\CLuaInterface.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\LuaInterface\CLuaObject.cpp">
-      <Filter>Source Files\LuaInterface</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\LuaInterface\LuaManager.cpp">
-      <Filter>Source Files\LuaInterface</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\BL2SDK\AntiDebug.cpp">
       <Filter>Source Files\BL2SDK</Filter>
     </ClCompile>
@@ -182,19 +176,7 @@
     <ClInclude Include="..\..\src\GUI\D3D9Hook.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\LuaInterface\UserData.h">
-      <Filter>Header Files\LuaInterface</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\LuaInterface\CLuaInterface.h">
-      <Filter>Header Files\LuaInterface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\LuaInterface\ILuaTable.h">
-      <Filter>Header Files\LuaInterface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\LuaInterface\CLuaObject.h">
-      <Filter>Header Files\LuaInterface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\LuaInterface\LuaManager.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\thirdparty\LuaJIT\src\lauxlib.h">
@@ -229,6 +211,15 @@
     </ClInclude>
     <ClInclude Include="..\..\src\GUI\DirectX9.h">
       <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GameSDK\Signatues.h">
+      <Filter>Header Files\GameSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GameSDK\MemorySignature.h">
+      <Filter>Header Files\GameSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\Exports.h">
+      <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

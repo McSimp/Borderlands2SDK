@@ -39,11 +39,11 @@
 
 namespace BL2SDK
 {
-	extern unsigned long pGObjects;
-	extern unsigned long pGNames;
-	extern unsigned long pGObjHash;
-	extern unsigned long pGCRCTable;
-	extern unsigned long pNameHash;
+	extern void* pGObjects;
+	extern void* pGNames;
+	extern void* pGObjHash;
+	extern void* pGCRCTable;
+	extern void* pNameHash;
 }
 
 #include "GameSDK/GameDefines.h"

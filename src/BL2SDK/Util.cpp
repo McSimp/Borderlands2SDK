@@ -98,7 +98,7 @@ namespace Util
 
 	// This will convert a string like "Hello World" to "48 65 6C 6C 6F 20 57 6F 72 6C 64"
 	// Taken mostly from http://stackoverflow.com/questions/3381614/c-convert-string-to-hexadecimal-and-vice-versa
-	std::string StringToHex(const unsigned char* input, size_t len)
+	std::string StringToHex(const char* input, size_t len)
 	{
 		static const char* const lut = "0123456789ABCDEF";
 

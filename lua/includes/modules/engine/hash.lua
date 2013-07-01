@@ -5,9 +5,9 @@ local bit = require("bit")
 local OBJECT_HASH_BINS = 32*1024
 local NAME_HASH_BINS = 65536
 
-local ObjHash = ffi.cast("struct UObject**", bl2sdk.addrGObjHash)
-local CRCTable = ffi.cast("unsigned int*", bl2sdk.addrGCRCTable)
-local NameHash = ffi.cast("struct FNameEntry**", bl2sdk.addrNameHash)
+local ObjHash = ffi.cast("struct UObject**", bl2sdk.GObjHash)
+local CRCTable = ffi.cast("unsigned int*", bl2sdk.GCRCTable)
+local NameHash = ffi.cast("struct FNameEntry**", bl2sdk.NameHash)
 
 local function GetObjectHash(objName)
 	return bit.band(bit.bxor(objName.Index, objName.Number), OBJECT_HASH_BINS - 1)

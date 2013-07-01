@@ -50,17 +50,13 @@ if(!(Test-Path $luaIncludesDir))
 Write-Host "[Prebuild] Creating LuaHashes.h"
 
 $hashHeader = [System.IO.StreamWriter] ($outputDir.Path + "LuaHashes.h")
-$hashHeader.WriteLine("struct FileHash
-{
-	const wchar_t* file;
-	const char* hash;
-};
-");
+$hashHeader.WriteLine("namespace LuaHashes
+{");
 
 $luaFiles = Get-ChildItem $luaIncludesDir -Include *.lua -Recurse
 $numFiles = $luaFiles.Length
-$hashHeader.WriteLine("static int NumLuaHashes = $numFiles;")
-$hashHeader.WriteLine("static FileHash LuaHashes[] = {")
+$hashHeader.WriteLine("`tint Count = $numFiles;")
+$hashHeader.WriteLine("`tFileHash HashList[] = {")
 
 foreach($file in $luaFiles)
 {
@@ -68,10 +64,11 @@ foreach($file in $luaFiles)
     $relative = $relative -replace "\\", "\\"
 
     $hash = Get-SHA256 $file.FullName
-    $hashHeader.WriteLine("`t{ L""$relative"", ""$hash"" },")
+    $hashHeader.WriteLine("`t`t{ L""$relative"", ""$hash"" },")
 }
 
-$hashHeader.WriteLine("};")
+$hashHeader.WriteLine("`t};")
+$hashHeader.WriteLine("}")
 $hashHeader.close()
 
 Write-Host "[Prebuild] $numFiles entries added to LuaHashes.h"

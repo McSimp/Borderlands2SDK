@@ -124,8 +124,6 @@
     <ClCompile Include="..\..\src\GUI\DirectX9.cpp" />
     <ClCompile Include="..\..\src\GUI\GwenManager.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\CLuaInterface.cpp" />
-    <ClCompile Include="..\..\src\LuaInterface\CLuaObject.cpp" />
-    <ClCompile Include="..\..\src\LuaInterface\LuaManager.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -151,14 +149,13 @@
     <ClInclude Include="..\..\src\GameSDK\Engine_structs.h" />
     <ClInclude Include="..\..\src\GameSDK\GameDefines.h" />
     <ClInclude Include="..\..\src\GameSDK\GameSDK.h" />
+    <ClInclude Include="..\..\src\GameSDK\MemorySignature.h" />
+    <ClInclude Include="..\..\src\GameSDK\Signatues.h" />
     <ClInclude Include="..\..\src\GUI\D3D9Hook.h" />
     <ClInclude Include="..\..\src\GUI\DirectX9.h" />
     <ClInclude Include="..\..\src\GUI\GwenManager.h" />
     <ClInclude Include="..\..\src\LuaInterface\CLuaInterface.h" />
-    <ClInclude Include="..\..\src\LuaInterface\CLuaObject.h" />
-    <ClInclude Include="..\..\src\LuaInterface\ILuaTable.h" />
-    <ClInclude Include="..\..\src\LuaInterface\LuaManager.h" />
-    <ClInclude Include="..\..\src\LuaInterface\UserData.h" />
+    <ClInclude Include="..\..\src\LuaInterface\Exports.h" />
     <ClInclude Include="..\..\thirdparty\crashrpt\include\CrashRpt.h" />
     <ClInclude Include="..\..\thirdparty\LuaJIT\src\lauxlib.h" />
     <ClInclude Include="..\..\thirdparty\LuaJIT\src\lua.h" />

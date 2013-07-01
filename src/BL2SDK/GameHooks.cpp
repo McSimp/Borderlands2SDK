@@ -1,5 +1,6 @@
 #include "BL2SDK/GameHooks.h"
 #include "BL2SDK/Logging.h"
+#include "LuaInterface/Exports.h"
 
 namespace GameHooks
 {
@@ -9,10 +10,10 @@ namespace GameHooks
 	void Initialize()
 	{
 		EngineHookManager = new CHookManager("EngineHooks");
-		Logging::LogF("[GameHooks] EngineHookManager = 0x%X\n", EngineHookManager);
+		Logging::LogF("[GameHooks] EngineHookManager = 0x%p\n", EngineHookManager);
 
 		UnrealScriptHookManager = new CHookManager("UnrealScriptHooks");
-		Logging::LogF("[GameHooks] UnrealScriptHookManager = 0x%X\n", UnrealScriptHookManager);
+		Logging::LogF("[GameHooks] UnrealScriptHookManager = 0x%p\n", UnrealScriptHookManager);
 	}
 
 	void Cleanup()
@@ -88,24 +89,24 @@ namespace GameHooks
 		return true;
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_AddStaticEngineHook(UFunction* function, tProcessEventHook* funcHook)
+	FFI_EXPORT void LUAFUNC_AddStaticEngineHook(UFunction* function, tProcessEventHook* funcHook)
 	{
 		CHookManager::tFuncNameHookPair hookPair = std::make_pair("LuaHook", funcHook);
 		EngineHookManager->AddStaticHook(function, hookPair);
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_RemoveStaticEngineHook(UFunction* function)
+	FFI_EXPORT void LUAFUNC_RemoveStaticEngineHook(UFunction* function)
 	{
 		EngineHookManager->RemoveStaticHook(function, "LuaHook");
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_AddStaticScriptHook(UFunction* function, tCallFunctionHook* funcHook)
+	FFI_EXPORT void LUAFUNC_AddStaticScriptHook(UFunction* function, tCallFunctionHook* funcHook)
 	{
 		CHookManager::tFuncNameHookPair hookPair = std::make_pair("LuaHook", funcHook);
 		UnrealScriptHookManager->AddStaticHook(function, hookPair);
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_RemoveStaticScriptHook(UFunction* function)
+	FFI_EXPORT void LUAFUNC_RemoveStaticScriptHook(UFunction* function)
 	{
 		UnrealScriptHookManager->RemoveStaticHook(function, "LuaHook");
 	}

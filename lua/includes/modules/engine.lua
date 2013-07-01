@@ -11,8 +11,8 @@ local engine = {}
 _G["engine"] = engine
 
 -- Core engine data structures that we'll need access to
-engine.Objects = TArray.Create("struct UObject*", ffi.cast("struct TArray*", bl2sdk.addrGObjects))
-engine.Names = TArray.Create("struct FNameEntry*", ffi.cast("struct TArray*", bl2sdk.addrGNames))
+engine.Objects = TArray.Create("struct UObject*", ffi.cast("struct TArray*", bl2sdk.GObjects))
+engine.Names = TArray.Create("struct FNameEntry*", ffi.cast("struct TArray*", bl2sdk.GNames))
 
 engine._ClassesInternal = {} -- maps a class pointer to its metadata
 engine.Classes = {} -- maps a name to a class

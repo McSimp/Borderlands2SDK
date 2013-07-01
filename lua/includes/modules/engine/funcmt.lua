@@ -25,7 +25,7 @@ FUNCPARM_STRUCT = 64
 ffi.cdef[[
 typedef void (__thiscall *tProcessEvent) (struct UObject*, struct UFunction*, void*, void*);
 ]]
-local pProcessEvent = ffi.cast("tProcessEvent", bl2sdk.addrProcessEvent)
+local pProcessEvent = ffi.cast("tProcessEvent", bl2sdk.ProcessEvent)
 
 local FuncMT = {}
 

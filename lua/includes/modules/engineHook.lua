@@ -8,6 +8,7 @@ local error = error
 local unpack = unpack
 local pairs = pairs
 local string = string
+local pcall = pcall
 
 ffi.cdef[[
 typedef bool (*tProcessEventHook) (struct UObject*, struct UFunction*, char*, void*);
@@ -42,7 +43,11 @@ function ProcessHooks(pObject, pFunction, pParms, pResult)
 	end
 
 	for _,v in pairs(hookTable) do
-		v(unpack(argData)) -- TODO: Return value
+		local status, ret = pcall(v, unpack(argData))
+		if not status then
+			print("Error in EngineHook: " .. ret)
+		end
+		--v(unpack(argData)) -- TODO: Return value
 	end
 
 	return true

@@ -8,10 +8,11 @@
 #include "BL2SDK/Util.h"
 #include "Commands/ConCmdManager.h"
 #include "GUI/D3D9Hook.h"
-#include "LuaInterface/LuaManager.h"
 #include "BL2SDK/Exceptions.h"
 #include "BL2SDK/AntiDebug.h"
 #include "GUI/GwenManager.h"
+#include "GameSDK/Signatues.h"
+#include "LuaInterface/Exports.h"
 
 namespace BL2SDK
 {
@@ -19,17 +20,19 @@ namespace BL2SDK
 	bool logAllProcessEvent = false;
 	bool logAllUnrealScriptCalls = false;
 
-	unsigned long pGObjects;
-	unsigned long pGNames;
-	unsigned long pGObjHash;
-	unsigned long pGCRCTable;
-	unsigned long pNameHash;
+	void* pGObjects;
+	void* pGNames;
+	void* pGObjHash;
+	void* pGCRCTable;
+	void* pNameHash;
 	tProcessEvent pProcessEvent;
 	tCallFunction pCallFunction;
 	tFrameStep pFrameStep;
 	tProcessDeferredMessage pProcessDeferredMessage;
 	tViewportResize pViewportResize;
 	void* pGwenDestructor;
+
+	CLuaInterface* Lua;
 
 	int EngineVersion = -1;
 	int ChangelistNumber = -1;
@@ -168,54 +171,54 @@ namespace BL2SDK
 		CSigScan sigscan(L"Borderlands2.exe");
 
 		// Sigscan for GOBjects
-		pGObjects = *(unsigned long*)sigscan.Scan((unsigned char*)GObjects_Pattern, GObjects_Mask);
-		Logging::LogF("[Internal] GObjects = 0x%X\n", pGObjects);
+		pGObjects = *(void**)sigscan.Scan(Signatures::GObjects);
+		Logging::LogF("[Internal] GObjects = 0x%p\n", pGObjects);
 
 		// Sigscan for GNames
-		pGNames = *(unsigned long*)sigscan.Scan((unsigned char*)GNames_Pattern, GNames_Mask);
-		Logging::LogF("[Internal] GNames = 0x%X\n", pGNames);
+		pGNames = *(void**)sigscan.Scan(Signatures::GNames);
+		Logging::LogF("[Internal] GNames = 0x%p\n", pGNames);
 
 		// Sigscan for UObject::ProcessEvent which will be used for pretty much everything
-		pProcessEvent = reinterpret_cast<tProcessEvent>(sigscan.Scan((unsigned char*)ProcessEvent_Pattern, ProcessEvent_Mask));
-		Logging::LogF("[Internal] UObject::ProcessEvent() = 0x%X\n", pProcessEvent);
+		pProcessEvent = reinterpret_cast<tProcessEvent>(sigscan.Scan(Signatures::ProcessEvent));
+		Logging::LogF("[Internal] UObject::ProcessEvent() = 0x%p\n", pProcessEvent);
 
 		// Sigscan for UObject::GObjHash
-		pGObjHash = *(unsigned long*)sigscan.Scan((unsigned char*)GObjHash_Pattern, GObjHash_Mask);
-		Logging::LogF("[Internal] GObjHash = 0x%X\n", pGObjHash);
+		pGObjHash = *(void**)sigscan.Scan(Signatures::GObjHash);
+		Logging::LogF("[Internal] GObjHash = 0x%p\n", pGObjHash);
 
 		// Sigscan for GCRCTable
-		pGCRCTable = *(unsigned long*)sigscan.Scan((unsigned char*)GCRCTable_Pattern, GCRCTable_Mask);
-		Logging::LogF("[Internal] GCRCTable = 0x%X\n", pGCRCTable);
+		pGCRCTable = *(void**)sigscan.Scan(Signatures::GCRCTable);
+		Logging::LogF("[Internal] GCRCTable = 0x%p\n", pGCRCTable);
 
 		// Sigscan for NameHash
-		pNameHash = *(unsigned long*)sigscan.Scan((unsigned char*)NameHash_Pattern, NameHash_Mask);
-		Logging::LogF("[Internal] NameHash = 0x%X\n", pNameHash);
+		pNameHash = *(void**)sigscan.Scan(Signatures::NameHash);
+		Logging::LogF("[Internal] NameHash = 0x%p\n", pNameHash);
 
 		// Sigscan for Unreal exception handler
-		void* addrUnrealEH = sigscan.Scan((unsigned char*)CrashHandler_Pattern, CrashHandler_Mask);
-		Logging::LogF("[Internal] Unreal Crash handler = 0x%X\n", addrUnrealEH);
+		void* addrUnrealEH = sigscan.Scan(Signatures::CrashHandler);
+		Logging::LogF("[Internal] Unreal Crash handler = 0x%p\n", addrUnrealEH);
 
 		// Sigscan for UObject::CallFunction
-		pCallFunction = reinterpret_cast<tCallFunction>(sigscan.Scan((unsigned char*)CallFunction_Pattern, CallFunction_Mask));
-		Logging::LogF("[Internal] UObject::CallFunction() = 0x%X\n", pCallFunction);
+		pCallFunction = reinterpret_cast<tCallFunction>(sigscan.Scan(Signatures::CallFunction));
+		Logging::LogF("[Internal] UObject::CallFunction() = 0x%p\n", pCallFunction);
 
 		// Sigscan for FFrame::Step
-		pFrameStep = reinterpret_cast<tFrameStep>(sigscan.Scan((unsigned char*)FrameStep_Pattern, FrameStep_Mask));
-		Logging::LogF("[Internal] FFrame::Step() = 0x%X\n", pFrameStep);
+		pFrameStep = reinterpret_cast<tFrameStep>(sigscan.Scan(Signatures::FrameStep));
+		Logging::LogF("[Internal] FFrame::Step() = 0x%p\n", pFrameStep);
 
 		// Sigscan for FWindowsViewport::ProcessDeferredMessage
-		pProcessDeferredMessage = reinterpret_cast<tProcessDeferredMessage>(sigscan.Scan((unsigned char*)ProcessDeferredMessage_Pattern, ProcessDeferredMessage_Mask));
-		Logging::LogF("[Internal] FWindowsViewport::ProcessDeferredMessage() = 0x%X\n", pProcessDeferredMessage);
+		pProcessDeferredMessage = reinterpret_cast<tProcessDeferredMessage>(sigscan.Scan(Signatures::ProcessDeferredMessage));
+		Logging::LogF("[Internal] FWindowsViewport::ProcessDeferredMessage() = 0x%p\n", pProcessDeferredMessage);
 
 		// Sigscan for FWindowsViewport::Resize
-		pViewportResize = reinterpret_cast<tViewportResize>(sigscan.Scan((unsigned char*)ViewportResize_Pattern, ViewportResize_Mask));
-		Logging::LogF("[Internal] FWindowsViewport::Resize() = 0x%X\n", pViewportResize);
+		pViewportResize = reinterpret_cast<tViewportResize>(sigscan.Scan(Signatures::ViewportResize));
+		Logging::LogF("[Internal] FWindowsViewport::Resize() = 0x%p\n", pViewportResize);
 
 		// Sigscan for Gwen::Controls::Base::~Base()
 		CSigScan sdkSigscan(L"BL2SDKDLL.dll");
 
-		pGwenDestructor = reinterpret_cast<void*>(sdkSigscan.Scan((unsigned char*)GwenDestructor_Pattern, GwenDestructor_Mask));
-		Logging::LogF("[Internal] Gwen::Controls::Base::~Base() = 0x%X\n", pGwenDestructor);
+		pGwenDestructor = reinterpret_cast<void*>(sdkSigscan.Scan(Signatures::GwenDestructor));
+		Logging::LogF("[Internal] Gwen::Controls::Base::~Base() = 0x%p\n", pGwenDestructor);
 
 		// Detour UObject::ProcessEvent()
 		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkProcessEvent);
@@ -239,7 +242,9 @@ namespace BL2SDK
 
 		GwenManager::UpdateCanvas(canvas->SizeX, canvas->SizeY);
 
-		LuaManager::Initialize();
+		Lua = new CLuaInterface();
+		Lua->InitializeModules();
+
 		ConCmdManager::Initialize();
 
 		GameHooks::EngineHookManager->RemoveStaticHook(function, "GetCanvas");
@@ -317,19 +322,20 @@ namespace BL2SDK
 	{
 		Logging::Cleanup();
 		GameHooks::Cleanup();
+		delete Lua;
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_LogAllProcessEventCalls(bool enabled)
+	FFI_EXPORT void LUAFUNC_LogAllProcessEventCalls(bool enabled)
 	{
 		LogAllProcessEventCalls(enabled);
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_LogAllUnrealScriptCalls(bool enabled)
+	FFI_EXPORT void LUAFUNC_LogAllUnrealScriptCalls(bool enabled)
 	{
 		LogAllUnrealScriptCalls(enabled);
 	}
 
-	extern "C" __declspec(dllexport) char* LUAFUNC_UObjectGetFullName(UObject* obj)
+	FFI_EXPORT char* LUAFUNC_UObjectGetFullName(UObject* obj)
 	{
 		return obj->GetFullName();
 	}

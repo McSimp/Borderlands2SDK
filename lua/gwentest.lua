@@ -46,25 +46,25 @@ function TimeControllerUI()
 	timeSlider:SetSize(50, 30)
 	timeSlider:Dock(POS_TOP)
 	timeSlider:SetRange(0, dnc.InterpData.InterpLength)
-	timeSlider:AddOnValueChanged(function(panel)
+	timeSlider.OnValueChanged = function(panel)
 		dnc:SetTimeOfDay(panel:GetFloatValue())
-	end)
+	end
 
 	local dayButton = gwen.CreateControl("Button", window)
 	dayButton:SetText("Set time to Day")
 	dayButton:SetSize(50, 40)
 	dayButton:Dock(POS_TOP)
-	dayButton:AddOnPress(function(panel)
+	dayButton.OnPress = function(panel)
 		dnc:SetTimeOfDay(0)
-	end)
+	end
 
 	local nightButton = gwen.CreateControl("Button", window)
 	nightButton:SetText("Set time to Night")
 	nightButton:SetSize(50, 40)
 	nightButton:Dock(POS_TOP)
-	nightButton:AddOnPress(function(panel)
+	nightButton.OnPress = function(panel)
 		dnc:SetTimeOfDay(50)
-	end)
+	end
 end
 
 function SetDNCycleRate(rate)

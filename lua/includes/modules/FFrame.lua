@@ -4,7 +4,7 @@ local bit = require("bit")
 ffi.cdef[[
 typedef void (__thiscall *tFrameStep) (struct FFrame*, struct UObject*, void*);
 ]]
-local pFrameStep = ffi.cast("tFrameStep", bl2sdk.addrFrameStep)
+local pFrameStep = ffi.cast("tFrameStep", bl2sdk.FrameStep)
 
 local FFrameMT = {}
 

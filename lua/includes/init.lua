@@ -37,7 +37,7 @@ local function NeedsSDKGenerated()
 		include("../sdkgen/version.lua")
 
 		if SDKGEN_ENGINE_VERSION == bl2sdk.engineVersion and
-		SDKGEN_CHANGELIST_NUMBER == bl2sdk.changelistNumber then
+		SDKGEN_CHANGELIST_NUMBER == bl2sdk.changeListNumber then
 			generateSDK = false
 		end
 	end

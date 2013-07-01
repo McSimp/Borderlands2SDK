@@ -1,4 +1,4 @@
 [submodule "thirdparty/gwen"]
 	path = thirdparty/gwen
-	url = git://github.com/garrynewman/GWEN.git
+	url = git://github.com/McSimp/GWEN.git
 	ignore = dirty

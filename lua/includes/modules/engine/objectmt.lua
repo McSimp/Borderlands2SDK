@@ -39,7 +39,8 @@ function UObjectMT.__index(self, k)
 
 	-- This seems to be working now. If problems come back, just flip this
 	-- Also remember to jit.on() on ALL returns!
-	--jit.off()
+	-- 1/07/2013 - Scratch that, still seems to break after lots of calls
+	jit.off()
 
 	-- Since we have casted, check the actual class type first
 	-- Then while this class has a base class, check that.
@@ -47,20 +48,22 @@ function UObjectMT.__index(self, k)
 	while baseClass do
 		local v = obj[baseClass.name][k]
 		if v ~= nil then
+			jit.on()
 			return v
 		elseif v == nil and type(v) == "cdata" then -- null pointer
+			jit.on()
 			return nil
 		elseif baseClass.funcs[k] ~= nil then
+			jit.on()
 			return setmetatable(baseClass.funcs[k], FuncMT)
 		else
 			baseClass = baseClass.base
 		end
 	end
 	
-	print("[Lua] Warning: Object index not found", k)
+	print("[Lua] Warning: Object index not found for __index", k)
 
-	--jit.on()
-
+	jit.on()
 	return nil
 end
 
@@ -82,6 +85,8 @@ function UObjectMT.__newindex(self, k, v)
 	-- Cast this object to the right type
 	local obj = ffi.cast(classInfo.ptrType, self)
 
+	jit.off()
+
 	-- Since we have casted, check the actual class type first
 	-- Then while this class has a base class, check that.
 	local baseClass = classInfo
@@ -91,11 +96,13 @@ function UObjectMT.__newindex(self, k, v)
 			baseClass = baseClass.base
 		else
 			obj[baseClass.name][k] = v
+			jit.on()
 			return
 		end
 	end
 	
-	print("[Lua] Warning: Object index not found", k)
+	print("[Lua] Warning: Object index not found for __newindex", k)
+	jit.on()
 end
 
 local UObjectDataMT = {}

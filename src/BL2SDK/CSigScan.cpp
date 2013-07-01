@@ -4,7 +4,7 @@
 
 // Based off CSigScan from AlliedModders
 
-CSigScan::CSigScan(wchar_t* moduleName)
+CSigScan::CSigScan(const wchar_t* moduleName)
 {
 	m_moduleHandle = GetModuleHandle(moduleName);
 	if(m_moduleHandle == NULL)
@@ -21,7 +21,7 @@ CSigScan::CSigScan(wchar_t* moduleName)
 		throw FatalSDKException(3001, Util::Format("Sigscan failed (VirtualQuery returned NULL, Error = %d)", GetLastError()));
 	}
  
-	m_pModuleBase = (unsigned char*)mem.AllocationBase;
+	m_pModuleBase = (char*)mem.AllocationBase;
 	if(m_pModuleBase == NULL)
 	{
 		throw FatalSDKException(3002, "Sigscan failed (mem.AllocationBase was NULL)");
@@ -38,16 +38,21 @@ CSigScan::CSigScan(wchar_t* moduleName)
 	m_moduleLen = (size_t)pe->OptionalHeader.SizeOfImage;
 }
 
-void* CSigScan::Scan(unsigned char* sig, char* mask)
+void* CSigScan::Scan(const MemorySignature& sigStruct)
+{
+	return Scan(sigStruct.Sig, sigStruct.Mask, sigStruct.Length);
+}
+
+void* CSigScan::Scan(const char* sig, const char* mask)
 {
 	int sigLength = strlen(mask);
 	return Scan(sig, mask, sigLength);
 }
 
-void* CSigScan::Scan(unsigned char* sig, char* mask, int sigLength)
+void* CSigScan::Scan(const char* sig, const char* mask, int sigLength)
 {
-	unsigned char *pData = m_pModuleBase;
-	unsigned char *pEnd = m_pModuleBase + m_moduleLen;
+	char* pData = m_pModuleBase;
+	char* pEnd = m_pModuleBase + m_moduleLen;
 
     while(pData < pEnd) 
 	{

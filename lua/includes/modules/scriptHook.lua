@@ -19,7 +19,7 @@ typedef void (__thiscall *tCallFunction) (struct UObject*, struct FFrame*, void*
 
 module("scriptHook")
 
-CallFunction = ffi.cast("tCallFunction", bl2sdk.addrCallFunction)
+CallFunction = ffi.cast("tCallFunction", bl2sdk.CallFunction)
 
 RegisteredHooks = {}
 
@@ -37,9 +37,9 @@ function ProcessHooks(Object, Stack, Result, Function)
 	for _,v in pairs(hookTable) do
 		local codePtr = Stack.Code
 		--local ret = v(Object, Stack, Result, Function)
-		local success, ret = pcall(v, Object, Stack, Result, Function)
-		if not success then 
-			print(ret)
+		local status, ret = pcall(v, Object, Stack, Result, Function)
+		if not status then
+			print("Error in ScriptHook: " .. ret)
 			ret = false
 		end
 

@@ -3,6 +3,7 @@
 
 #include "GameSDK/GameSDK.h"
 #include "BL2SDK/Settings.h"
+#include "LuaInterface/CLuaInterface.h"
 
 #include <string>
 
@@ -21,6 +22,8 @@ namespace BL2SDK
 	extern tProcessDeferredMessage pProcessDeferredMessage;
 	extern tViewportResize pViewportResize;
 	extern void* pGwenDestructor;
+
+	extern CLuaInterface* Lua;
 
 	extern int EngineVersion;
 	extern int ChangelistNumber;

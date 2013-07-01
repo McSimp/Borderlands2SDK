@@ -139,12 +139,6 @@ if(Test-Path "gwen\gwen\Projects\windows")
 	Write-Host "GWEN project files removed"
 }
 
-Log-Action "Fixing runtime library in GWEN premake config..."
-(Get-Content "gwen\gwen\Projects\premake4.lua") | Foreach-Object {
-	$_ -replace '"StaticRuntime", ', ''
-} | Set-Content "gwen\gwen\Projects\premake4.lua"
-
-
 Log-Action "Creating GWEN project files..."
 Push-Location gwen\gwen\Projects
 cmd /c Build.bat

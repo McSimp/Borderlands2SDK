@@ -11,7 +11,7 @@ namespace Util
 	std::string Narrow(const std::wstring& input);
 	void Popup(const std::wstring& strName, const std::wstring& strText);
 	void CloseGame();
-	std::string StringToHex(const unsigned char* input, size_t len);
+	std::string StringToHex(const char* input, size_t len);
 }
 
 #endif

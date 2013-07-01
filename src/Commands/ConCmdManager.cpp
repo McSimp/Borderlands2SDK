@@ -2,13 +2,10 @@
 #include "BL2SDK/Logging.h"
 #include "Commands/ConCmdManager.h"
 #include "Commands/ConCommand.h"
-#include "LuaInterface/LuaManager.h"
 #include "BL2SDK/GameHooks.h"
 
 #include <map>
 #include <sstream>
-
-//using LuaInterface::Lua;
 
 namespace ConCmdManager
 {

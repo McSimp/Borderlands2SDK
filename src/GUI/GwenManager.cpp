@@ -10,13 +10,10 @@
 #include "BL2SDK/Util.h"
 #include "BL2SDK/CSimpleDetour.h"
 #include "BL2SDK/GameHooks.h"
+#include "LuaInterface/Exports.h"
 
 // Controls
 #include "gwen/Controls.h"
-//#include "gwen/Controls/Base.h"
-//#include "gwen/Controls/Button.h"
-//#include "gwen/Controls/WindowControl.h"
-//#include "gwen/Controls/HorizontalSlider.h"
 
 #define GET_X_LPARAM(lParam)	((int)(short)LOWORD(lParam))
 #define GET_Y_LPARAM(lParam)	((int)(short)HIWORD(lParam))
@@ -228,7 +225,7 @@ namespace GwenManager
 		GWEN_COMBOBOX
 	};
 
-	extern "C" __declspec(dllexport) Controls::Base* LUAFUNC_CreateNewControl(GwenControls controlNum, Controls::Base* parent)
+	FFI_EXPORT Controls::Base* LUAFUNC_CreateNewControl(GwenControls controlNum, Controls::Base* parent)
 	{
 		if(parent == NULL)
 		{
@@ -258,50 +255,50 @@ namespace GwenManager
 		return control;
 	}
 
-	extern "C" __declspec(dllexport) TextObject* LUAFUNC_NewTextObject(const char* str)
+	FFI_EXPORT TextObject* LUAFUNC_NewTextObject(const char* str)
 	{
 		return new TextObject(str);
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_DestroyTextObject(TextObject* obj)
+	FFI_EXPORT void LUAFUNC_DestroyTextObject(TextObject* obj)
 	{
 		delete obj;
 	}
 
-	extern "C" __declspec(dllexport) const char* LUAFUNC_GetTextObjectString(TextObject& obj)
+	FFI_EXPORT const char* LUAFUNC_GetTextObjectString(TextObject& obj)
 	{
 		return obj.c_str();
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_SetWindowTitle(Controls::WindowControl* window, const char* str)
+	FFI_EXPORT void LUAFUNC_SetWindowTitle(Controls::WindowControl* window, const char* str)
 	{
 		window->SetTitle(str);
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_AddGwenCallback(Controls::Base* control, int offset, Event::Handler::Function callback)
+	FFI_EXPORT void LUAFUNC_AddGwenCallback(Controls::Base* control, int offset, Event::Handler::Function callback)
 	{
 		Event::Caller* eh = (Event::Caller*)((int)control + offset);
 		eh->Add(control, callback);
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_RemoveGwenCallback(Controls::Base* control, int offset, Event::Handler::Function callback)
+	FFI_EXPORT void LUAFUNC_RemoveGwenCallback(Controls::Base* control, int offset, Event::Handler::Function callback)
 	{
 		Event::Caller* eh = (Event::Caller*)((int)control + offset);
 		eh->RemoveHandler(control);
 	}
 
-	extern "C" __declspec(dllexport) void LUAFUNC_SetDestructorCallback(tGwenBaseDestructorHook callback)
+	FFI_EXPORT void LUAFUNC_SetDestructorCallback(tGwenBaseDestructorHook callback)
 	{
-		Logging::LogF("[Gwen] Destructor callback set to 0x%X\n", callback);
+		Logging::LogF("[Gwen] Destructor callback set to 0x%p\n", callback);
 		destructorHook = callback;
 	}
 
-	extern "C" __declspec(dllexport) int LUAFUNC_GetCanvasW()
+	FFI_EXPORT int LUAFUNC_GetCanvasW()
 	{
 		return pCanvas->GetSize().x;
 	}
 
-	extern "C" __declspec(dllexport) int LUAFUNC_GetCanvasH()
+	FFI_EXPORT int LUAFUNC_GetCanvasH()
 	{
 		return pCanvas->GetSize().y;
 	}

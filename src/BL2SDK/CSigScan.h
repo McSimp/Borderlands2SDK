@@ -4,17 +4,20 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+#include "GameSDK/MemorySignature.h"
+
 class CSigScan 
 {
 private:
-    unsigned char* m_pModuleBase;
+    char* m_pModuleBase;
     size_t m_moduleLen;
 	HMODULE m_moduleHandle;
 
 public:
-	CSigScan(wchar_t* moduleName);
+	CSigScan(const wchar_t* moduleName);
 
-	void* Scan(unsigned char* sig, char* mask, int sigLength);
-	void* Scan(unsigned char* sig, char* mask);
+	void* Scan(const MemorySignature& sigStruct);
+	void* Scan(const char* sig, const char* mask, int sigLength);
+	void* Scan(const char* sig, const char* mask);
 };
 #endif

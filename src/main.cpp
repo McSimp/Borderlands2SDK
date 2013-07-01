@@ -30,7 +30,7 @@ CON_COMMAND(CrashMe)
 CON_COMMAND(GetLocalPlayer)
 {
 	APlayerController* pc = UObject::FindObject<APlayerController>("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController");
-	Logging::LogF("pc = 0x%X\n", pc);
+	Logging::LogF("pc = 0x%p\n", pc);
 }
 
 CON_COMMAND(PrintSDKVersion)
@@ -69,7 +69,7 @@ CON_COMMAND(DumpObj)
 		UObject* Object = UObject::GObjObjects()->Data[i];
 		if(Object)
 		{
-			Logging::LogF("%d | 0x%X | %s\n", i, Object, Object->GetFullName());
+			Logging::LogF("%d | 0x%p | %s\n", i, Object, Object->GetFullName());
 		}
 		else
 		{
