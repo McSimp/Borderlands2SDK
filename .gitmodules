@@ -1,4 +1,3 @@
 [submodule "thirdparty/gwen"]
 	path = thirdparty/gwen
 	url = git://github.com/McSimp/GWEN.git
-	ignore = all
