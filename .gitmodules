@@ -1,3 +1,6 @@
 [submodule "thirdparty/gwen"]
 	path = thirdparty/gwen
 	url = git://github.com/McSimp/GWEN.git
+[submodule "thirdparty/LuaJIT"]
+	path = thirdparty/LuaJIT
+	url = http://luajit.org/git/luajit-2.0.git
