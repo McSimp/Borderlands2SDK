@@ -162,22 +162,35 @@ Log-Action "Moving built files to SDK..."
 Copy-Built-File "gwen\gwen\lib\windows\vs2010\gwen_staticd.lib" "..\lib\gwen_staticd.lib"
 Copy-Built-File "gwen\gwen\lib\windows\vs2010\gwen_static.lib" "..\lib\gwen_static.lib"
 
+if(!(Test-Path "cryptopp\c5\cryptlib.vcxproj"))
+{
+	Log-Action "Upgrading Crypto++ project..."
+	cmd /c "vcupgrade.exe cryptopp\c5\cryptlib.vcproj" 
+
+	Log-Action "Fixing runtime library in Crypto++ project file..."
+	(Get-Content "cryptopp\c5\cryptlib.vcxproj") | Foreach-Object {
+		$_ -replace '</RuntimeLibrary>', 'DLL</RuntimeLibrary>'
+	} | Set-Content "cryptopp\c5\cryptlib.vcxproj"
+
+	Write-Host "Upgrade completed"
+}
+
 Log-Action "Removing Crypto++ from SDK..."
 Cleanup-File "..\lib\cryptlibd.lib"
 Cleanup-File "..\lib\cryptlib.lib"
 
 Log-Action "Cleaning Crypto++ solution..."
-Run-MSBuild "cryptopp\cryptlib.vcxproj" "Debug" "/t:Clean /m"
-Run-MSBuild "cryptopp\cryptlib.vcxproj" "Release" "/t:Clean /m"
+Run-MSBuild "cryptopp\c5\cryptlib.vcxproj" "Debug" "/t:Clean /m"
+Run-MSBuild "cryptopp\c5\cryptlib.vcxproj" "Release" "/t:Clean /m"
 
 Log-Action "Building Crypto++ in Debug..."
-Run-MSBuild "cryptopp\cryptlib.vcxproj" "Debug" "/m"
+Run-MSBuild "cryptopp\c5\cryptlib.vcxproj" "Debug" "/m"
 
 Log-Action "Bulding Crypto++ in Release..."
-Run-MSBuild "cryptopp\cryptlib.vcxproj" "Release" "/m"
+Run-MSBuild "cryptopp\c5\cryptlib.vcxproj" "Release" "/m"
 
 Log-Action "Moving built files to SDK..."
-Copy-Built-File "cryptopp\Win32\Output\Debug\cryptlib.lib" "..\lib\cryptlibd.lib"
-Copy-Built-File "cryptopp\Win32\Output\Release\cryptlib.lib" "..\lib\cryptlib.lib"
+Copy-Built-File "cryptopp\c5\Win32\Output\Debug\cryptlib.lib" "..\lib\cryptlibd.lib"
+Copy-Built-File "cryptopp\c5\Win32\Output\Release\cryptlib.lib" "..\lib\cryptlib.lib"
 
 Write-Host "All thirdparty libraries successfully built and copied to SDK" -foregroundcolor green -backgroundcolor black

@@ -8,3 +8,7 @@
 	path = thirdparty/crashrpt
 	url = https://github.com/McSimp/crashrpt-mirror.git
 	ignore = untracked
+[submodule "thirdparty/cryptopp"]
+	path = thirdparty/cryptopp
+	url = https://github.com/McSimp/cryptopp-mirror.git
+	ignore = untracked

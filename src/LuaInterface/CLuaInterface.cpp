@@ -6,9 +6,9 @@
 #include <algorithm>
 
 #define CRYPTOPP_DEFAULT_NO_DLL
-#include "cryptopp/dll.h"
-#include "cryptopp/sha.h"
-#include "cryptopp/files.h"
+#include "cryptopp/c5/dll.h"
+#include "cryptopp/c5/sha.h"
+#include "cryptopp/c5/files.h"
 
 #include "generated/LuaHashes.h"
 
