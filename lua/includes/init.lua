@@ -1,5 +1,5 @@
-require("jit.v")
-jit.v.on("jitv.txt")
+--require("jit.v")
+--jit.v.on("jitv.txt")
 
 -- Load helper functions
 require("base")
@@ -32,8 +32,7 @@ include("gwen/gwen.lua")
 local function NeedsSDKGenerated()
 	local generateSDK = true
 
-	local versionFile = io.open("D:\\dev\\bl\\Borderlands2SDK\\bin\\Debug\\lua\\sdkgen\\version.lua", "r")
-	if versionFile ~= nil then
+	if file.Exists("sdkgen/version.lua") then
 		include("../sdkgen/version.lua")
 
 		if SDKGEN_ENGINE_VERSION == bl2sdk.engineVersion and
@@ -44,6 +43,11 @@ local function NeedsSDKGenerated()
 
 	return generateSDK
 end
+
+-- Security
+package.preload.ffi = nil
+package.loaders[3] = nil
+package.loaders[4] = nil
 
 if NeedsSDKGenerated() then
 	-- Log calls to the slow object index if we're generating the SDK
@@ -56,6 +60,8 @@ else
 
 	require("engineHook")
 	require("scriptHook")
+
+	package.loaded.ffi.cdef = nil -- No more defining
 end
 
-jit.v.off()
+--jit.v.off()

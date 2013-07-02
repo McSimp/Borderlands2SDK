@@ -5,6 +5,8 @@
 #include "BL2SDK/BL2SDK.h"
 #include <algorithm>
 
+#include "LuaInterface/LuaFileLib.h"
+
 #define CRYPTOPP_DEFAULT_NO_DLL
 #include "cryptopp/c5/dll.h"
 #include "cryptopp/c5/sha.h"
@@ -12,13 +14,20 @@
 
 #include "generated/LuaHashes.h"
 
+#define luaL_dofile_nobc(L, fn) \
+	(luaL_loadfilex(L, fn, "t") || lua_pcall(L, 0, LUA_MULTRET, 0))
+
+#define luaL_dostring_nobc(L, s) \
+	(luaL_loadbufferx(L, s, strlen(s), s, "t") || lua_pcall(L, 0, LUA_MULTRET, 0))
+
 #define SET_POINTER(L, k, v) lua_pushstring(L, k); lua_pushlightuserdata(L, (void*)v); lua_settable(L, -3);
 #define SET_NUMBER(L, k, v) lua_pushstring(L, k); lua_pushnumber(L, v); lua_settable(L, -3);
 #define SET_STRING(L, k, v) lua_pushstring(L, k); lua_pushstring(L, v); lua_settable(L, -3);
+#define SET_NIL(L, k) lua_pushstring(L, k); lua_pushnil(L); lua_settable(L, -3);
 
 static int luabl2_dofile(lua_State* L, const char* path)
 {
-	int status = luaL_dofile(L, path);
+	int status = luaL_dofile_nobc(L, path);
 	if(status != 0)
 	{
 		Logging::LogF("[Lua] ERROR: DoFile failed to run file - %s\n", lua_tostring(L, -1));
@@ -76,7 +85,6 @@ static const luaL_Reg base_funcs[] = {
 	{NULL, NULL}
 };
 
-
 static void StackDump(lua_State* L)
 {
 	int i = lua_gettop(L);
@@ -119,8 +127,42 @@ void CLuaInterface::InitializeState()
 
 	luaL_openlibs(m_pState);
 
-	luaL_register(m_pState, "_G", base_funcs);
-	lua_pop(m_pState, 1);
+	// Add the file library
+	luaopen_file(m_pState);
+
+	lua_pushvalue(m_pState, LUA_GLOBALSINDEX);
+	luaL_register(m_pState, NULL, base_funcs);
+
+	// Let's delete the things we don't want
+	SET_NIL(m_pState, "load");
+	SET_NIL(m_pState, "loadfile");
+	SET_NIL(m_pState, "loadstring");
+	SET_NIL(m_pState, "dofile");
+	lua_pop(m_pState, 1); // pop global table
+
+	// Cleanup os table
+	lua_getfield(m_pState, LUA_GLOBALSINDEX, LUA_OSLIBNAME);
+	SET_NIL(m_pState, "execute");
+	SET_NIL(m_pState, "rename");
+	SET_NIL(m_pState, "setlocale");
+	SET_NIL(m_pState, "getenv");
+	SET_NIL(m_pState, "remove");
+	SET_NIL(m_pState, "exit");
+	SET_NIL(m_pState, "tmpname");
+	lua_pop(m_pState, 1); // pop os table
+
+	// Cleanup package table
+	lua_getfield(m_pState, LUA_GLOBALSINDEX, LUA_LOADLIBNAME);
+	SET_NIL(m_pState, "loadlib");
+	SET_NIL(m_pState, "searchpath");
+	lua_pop(m_pState, 1); // pop package table
+
+	// Cleanup string table
+	lua_getfield(m_pState, LUA_GLOBALSINDEX, LUA_STRLIBNAME);
+	SET_NIL(m_pState, "dump");
+	lua_pop(m_pState, 1); // pop string table
+
+	StackDump(m_pState);
 
 	SetSDKValues();
 	SetPaths();
@@ -240,7 +282,7 @@ void CLuaInterface::SetPaths()
 
 int CLuaInterface::RunString(const char* string)
 {
-	int error = luaL_dostring(m_pState, string);
+	int error = luaL_dostring_nobc(m_pState, string);
 	if(error != 0)
 	{
 		Logging::LogF("[Lua] ERROR: RunString failed - %s\n", lua_tostring(m_pState, -1));

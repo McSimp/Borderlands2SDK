@@ -168,7 +168,7 @@ end
 
 function Package:CreateFile(folder)
 	local package_name = self.PackageObj:GetName()
-	self.File = io.open("D:\\dev\\bl\\Borderlands2SDK\\bin\\Debug\\lua\\sdkgen\\" .. folder .. "\\" .. package_name .. ".lua", "w+")
+	self.File = file.Open("sdkgen/" .. folder .. "/" .. package_name .. ".lua", "w+")
 end
 
 function Package:CloseFile()
@@ -276,7 +276,7 @@ local function CreateLoaderFile()
 		packageText = packageText .. "\t\"" .. pkg:GetName() .. "\",\n"
 	end
 
-	local file = io.open("D:\\dev\\bl\\Borderlands2SDK\\bin\\Debug\\lua\\sdkgen\\loader.lua", "w+")
+	local file = file.Open("sdkgen/loader.lua", "w+")
 	file:write(string.format(LOADER_TEMPLATE, packageText))
 	file:close()
 end
@@ -286,9 +286,23 @@ local VERSION_TEMPLATE =
 SDKGEN_CHANGELIST_NUMBER = %d
 ]]
 local function CreateVersionFile()
-	local file = io.open("D:\\dev\\bl\\Borderlands2SDK\\bin\\Debug\\lua\\sdkgen\\version.lua", "w+")
+	local file = file.Open("sdkgen/version.lua", "w+")
 	file:write(string.format(VERSION_TEMPLATE, bl2sdk.engineVersion, bl2sdk.changeListNumber))
 	file:close()
+end
+
+print("[SDKGen] Creating directory structure...")
+local dirs = {
+	"sdkgen",
+	"sdkgen/classes",
+	"sdkgen/consts",
+	"sdkgen/enums",
+	"sdkgen/funcs",
+	"sdkgen/structs"
+}
+
+for _,v in ipairs(dirs) do
+	if not file.IsDir(v) then file.CreateDir(v) end
 end
 
 print("[SDKGen] Generating SDK...")

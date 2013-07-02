@@ -124,6 +124,8 @@
     <ClCompile Include="..\..\src\GUI\DirectX9.cpp" />
     <ClCompile Include="..\..\src\GUI\GwenManager.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\CLuaInterface.cpp" />
+    <ClCompile Include="..\..\src\LuaInterface\lib_init.c" />
+    <ClCompile Include="..\..\src\LuaInterface\LuaFileLib.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +158,7 @@
     <ClInclude Include="..\..\src\GUI\GwenManager.h" />
     <ClInclude Include="..\..\src\LuaInterface\CLuaInterface.h" />
     <ClInclude Include="..\..\src\LuaInterface\Exports.h" />
+    <ClInclude Include="..\..\src\LuaInterface\LuaFileLib.h" />
     <ClInclude Include="..\..\thirdparty\crashrpt\include\CrashRpt.h" />
     <ClInclude Include="..\..\thirdparty\LuaJIT\src\lauxlib.h" />
     <ClInclude Include="..\..\thirdparty\LuaJIT\src\lua.h" />

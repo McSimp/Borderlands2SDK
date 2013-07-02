@@ -114,6 +114,12 @@
     <ClCompile Include="..\..\src\BL2SDK\GameHooks.cpp">
       <Filter>Source Files\BL2SDK</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\LuaInterface\lib_init.c">
+      <Filter>Source Files\LuaInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\LuaInterface\LuaFileLib.cpp">
+      <Filter>Source Files\LuaInterface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\GameSDK\Core_classes.h">
@@ -219,6 +225,9 @@
       <Filter>Header Files\GameSDK</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\LuaInterface\Exports.h">
+      <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LuaInterface\LuaFileLib.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
   </ItemGroup>
