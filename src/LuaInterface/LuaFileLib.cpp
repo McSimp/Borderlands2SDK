@@ -10,24 +10,40 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-#define LUA_WINFILEHANDLE "HANDLE"
-#define ToHandleP(L) ((HANDLE*)luaL_checkudata(L, 1, LUA_WINFILEHANDLE))
+#define ToFileP(L) ((FILE**)luaL_checkudata(L, 1, LUA_FILEHANDLE))
 
-static HANDLE* file_createhandleud(lua_State* L)
-{
-	HANDLE* ph = (HANDLE*)lua_newuserdata(L, sizeof(HANDLE));
-	*ph = NULL; // default invalid handle
-	luaL_getmetatable(L, LUA_WINFILEHANDLE);
-	lua_setmetatable(L, -2);
-	return ph;
+static int pushresult (lua_State *L, int i, const char *filename) {
+	int en = errno;  /* calls to Lua API may change this value */
+	if (i) {
+		lua_pushboolean(L, 1);
+		return 1;
+	}
+	else {
+		lua_pushnil(L);
+		if (filename)
+			lua_pushfstring(L, "%s: %s", filename, strerror(en));
+		else
+			lua_pushfstring(L, "%s", strerror(en));
+		lua_pushinteger(L, en);
+		return 3;
+	}
 }
 
-static HANDLE ToHandleSafe(lua_State* L)
+static FILE** file_createfileud(lua_State* L)
 {
-	HANDLE* ph = ToHandleP(L);
-	if(*ph == NULL)
+	FILE** pf = (FILE**)lua_newuserdata(L, sizeof(FILE*));
+	*pf = NULL; // default invalid handle
+	luaL_getmetatable(L, LUA_FILEHANDLE);
+	lua_setmetatable(L, -2);
+	return pf;
+}
+
+static FILE* ToFileSafe(lua_State* L)
+{
+	FILE** pf = ToFileP(L);
+	if(*pf == NULL)
 		luaL_error(L, "attempt to use a closed file");
-	return *ph;
+	return *pf;
 }
 
 static int file_createdir(lua_State* L)
@@ -102,85 +118,30 @@ static int file_open(lua_State* L)
 		return luaL_argerror(L, 1, "Path to file was invalid");
 	}
 
-	DWORD dwDesiredAccess = 0;
-	DWORD dwShareMode = 0;
-	DWORD dwCreationDisposition = 0;
-
-	if(strMode == "r")
-	{
-		dwDesiredAccess = GENERIC_READ;
-		dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
-		dwCreationDisposition = OPEN_EXISTING;
-	}
-	else if(strMode == "w")
-	{
-		dwDesiredAccess = GENERIC_WRITE;
-		dwShareMode = FILE_SHARE_READ;
-		dwCreationDisposition = CREATE_ALWAYS;
-	}
-	else if(strMode == "a")
-	{
-		dwDesiredAccess = GENERIC_WRITE;
-		dwShareMode = FILE_SHARE_READ;
-		dwCreationDisposition = OPEN_ALWAYS;
-	}
-	else if(strMode == "r+")
-	{
-		dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
-		dwShareMode = FILE_SHARE_READ;
-		dwCreationDisposition = OPEN_EXISTING;
-	}
-	else if(strMode == "w+")
-	{
-		dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
-		dwShareMode = FILE_SHARE_READ;
-		dwCreationDisposition = CREATE_ALWAYS;
-	}
-	else if(strMode == "a+")
-	{
-		dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
-		dwShareMode = FILE_SHARE_READ;
-		dwCreationDisposition = OPEN_ALWAYS;
-	}
-	else
-	{
-		return luaL_argerror(L, 2, "Invalid mode");
-	}
-	
 	std::wstring wideFile = Util::Widen(strFilename);
-	std::wstring absPath = Settings::GetLuaFile(wideFile);
+	std::wstring wAbsPath = Settings::GetLuaFile(wideFile);
+	std::string absPath = Util::Narrow(wAbsPath);
 
-	HANDLE hFile = CreateFile(absPath.c_str(), dwDesiredAccess, dwShareMode, NULL, dwCreationDisposition, FILE_ATTRIBUTE_NORMAL, NULL);
-	if(hFile == NULL)
-	{
-		return luaL_error(L, "Failed to get file handle (%d)", GetLastError());
-	}
-
-	if(strMode[0] == 'a')
-	{
-		SetFilePointer(hFile, 0, NULL, FILE_END); // Seek to end of file for append
-	}
-
-	HANDLE* ph = file_createhandleud(L);
-	*ph = hFile;
-	return 1;
+	FILE** pf = file_createfileud(L);
+	*pf = fopen(absPath.c_str(), mode);
+	return (*pf == NULL) ? pushresult(L, 0, filename) : 1;
 }
 
 static int file_close(lua_State* L)
 {
 	//Logging::Log("file_close called\n");
-	HANDLE* phFile = ToHandleP(L);
-	if(*phFile != NULL)
+	FILE** pFile = ToFileP(L);
+	if(*pFile != NULL)
 	{
-		CloseHandle(*phFile);
-		*phFile = NULL;
+		fclose(*pFile);
+		*pFile = NULL;
 	}
 	return 0;
 }
 
 static int file_write(lua_State* L)
 {
-	HANDLE hFile = ToHandleSafe(L);
+	FILE* file = ToFileSafe(L);
 
 	// If it's nil, just smile and wave
 	if(lua_isnoneornil(L, 2))
@@ -191,11 +152,7 @@ static int file_write(lua_State* L)
 
 	size_t len = 0;
 	const char* data = luaL_checklstring(L, 2, &len);
-
-	DWORD bytesWritten = 0;
-	lua_pushboolean(L, WriteFile(hFile, data, len, &bytesWritten, NULL));
-	
-	return 1;
+	return pushresult(L, fwrite(data, sizeof(char), len, file) == 1, NULL);
 }
 
 static int file_gc(lua_State* L)
@@ -206,14 +163,14 @@ static int file_gc(lua_State* L)
 
 static int file_tostring(lua_State* L)
 {
-	HANDLE hFile = *ToHandleP(L);
-	if(hFile == NULL)
+	FILE* file = *ToFileP(L);
+	if(file == NULL)
 	{
 		lua_pushliteral(L, "file (closed)");
 	}
 	else
 	{
-		lua_pushfstring(L, "file (%p)", hFile);
+		lua_pushfstring(L, "file (%p)", file);
 	}
 	return 1;
 }
@@ -229,7 +186,7 @@ static const luaL_Reg flib[] = {
 
 static void file_createmeta(lua_State* L)
 {
-	luaL_newmetatable(L, LUA_WINFILEHANDLE);
+	luaL_newmetatable(L, LUA_FILEHANDLE);
 	lua_pushvalue(L, -1);
 	lua_setfield(L, -2, "__index");
 	luaL_register(L, NULL, flib);
