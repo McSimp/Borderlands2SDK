@@ -1,9 +1,11 @@
 #include "BL2SDK/Settings.h"
 #include "BL2SDK/Exceptions.h"
+#include "BL2SDK/Logging.h"
 
 namespace Settings
 {
 	std::wstring binPath;
+	bool developerMode;
 
 	void Initialize(LauncherStruct* args)
 	{
@@ -13,6 +15,7 @@ namespace Settings
 		}
 
 		binPath = args->BinPath;
+		developerMode = args->DeveloperMode;
 	}
 
 	std::wstring GetLogFilePath()
@@ -39,5 +42,11 @@ namespace Settings
 		std::wstring newPath;
 		newPath = binPath + L"lua\\" + filename;
 		return newPath;
+	}
+
+	// If we are not launched in developer mode, enforce Lua hash checks
+	bool ShouldEnforceLuaHashes()
+	{
+		return !developerMode;
 	}
 }

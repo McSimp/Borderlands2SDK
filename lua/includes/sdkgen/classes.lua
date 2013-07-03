@@ -9,6 +9,8 @@ local CLASS_ALIGN = 4
 local PackageOrder = SDKGen.PackageOrder
 local ClassList = {} -- This is used for the metaclass information at the end of each package's file
 
+local CPF_Const = 0x0000000000000002
+
 -- Add the classes added manually to the generated list so they aren't generated again
 for _, v in pairs(engine.Classes) do
 	table.insert(GeneratedClasses, v.static)
@@ -190,12 +192,17 @@ function Class:FieldsToC()
 
 		-- If the type isn't one we recognize, add unknown data to the def.
 		if not typeof then
-			out = out .. string.format("\tunsigned char %s[0x%X]; // 0x%X (0x%X) UNKNOWN PROPERTY\n",
+			out = out .. string.format("\tconst unsigned char %s[0x%X]; // 0x%X (0x%X) UNKNOWN PROPERTY\n",
 				property:GetName(),
 				size,
 				property.UProperty.Offset,
 				size)
 		else
+			local constness = ""
+			if flags.IsSet(property.UProperty.PropertyFlags.A, CPF_Const) then
+				constness = "const "
+			end
+
 			local special = ""
 
 			if property.UProperty.ArrayDim > 1 then -- It's a C style array, so [x] needed
@@ -221,7 +228,8 @@ function Class:FieldsToC()
 				end
 			end
 
-			out = out .. string.format("\t%s %s%s; // 0x%X (0x%X)%s\n",
+			out = out .. string.format("\t%s%s %s%s; // 0x%X (0x%X)%s\n",
+				constness,
 				typeof,
 				property:GetName(),
 				special,
@@ -279,7 +287,7 @@ function Class:FixBitfields()
 	local out = ""
 	local neededPadding = band(rshift(band((32 - band(self.ConsecBools, 31)), bnot(7)), 3), 3)
 	if neededPadding > 0 then
-		out = out .. string.format("\tunsigned char Unknown%d[0x%X]; // BITFIELD FIX\n", 
+		out = out .. string.format("\tconst unsigned char Unknown%d[0x%X]; // BITFIELD FIX\n", 
 			self.UnknownDataIndex,
 			neededPadding)
 	end
@@ -297,7 +305,7 @@ function Class:MissedOffset(at, missedSize, reason)
 
 	SDKGen.AddError("Missed offset in " .. self.ClassObj:GetFullName() .. " (Reason = " .. reason .. ")")
 
-	return string.format("\tunsigned char Unknown%d[0x%X]; // 0x%X (0x%X) %s\n", 
+	return string.format("\tconst unsigned char Unknown%d[0x%X]; // 0x%X (0x%X) %s\n", 
 		self.UnknownDataIndex,
 		missedSize,
 		at,

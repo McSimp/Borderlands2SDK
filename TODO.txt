@@ -26,11 +26,8 @@ Lua
 * Allow for return values to be passed from a ProcessEvent hook back into the engine
 * FFrame.GetFuncArgsHex possible infinite loop
 * FFrameMT.GetTArray does not take into account TArray inner type
-* Enums in function definition tables and comments of data structures
 * Get the SDKGen to run on coroutines so maybe we can render something to tell the user about the sdk generating
 * Pass UObject caller to function hooks
-* SDKGen const-ness
-* Update bit.band usage to use flags.IsSet
 * Add FName __eq metamethod
 * Add __tostring for structs
 * Bind the rest of the gwen controls

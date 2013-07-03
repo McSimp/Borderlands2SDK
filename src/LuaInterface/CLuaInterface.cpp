@@ -176,6 +176,8 @@ bool CLuaInterface::InitializeModules()
 	if(!VerifyLuaFiles())
 	{
 		// TODO: Do something about this
+		Util::Popup(L"Hash check failed", L"A hash check failed oh no!"); 
+		return false;
 	}
 
 	if(DoFile("includes\\init.lua") != 0) // Means it failed, TODO: More obvious warning for this
@@ -201,6 +203,12 @@ bool CLuaInterface::InitializeModules()
 
 bool CLuaInterface::VerifyLuaFiles()
 {
+	if(!Settings::ShouldEnforceLuaHashes())
+	{
+		Logging::Log("[Lua] Developer mode enabled, hash checks skipped\n");
+		return true;
+	}
+
 	for(int i = 0; i < LuaHashes::Count; i++)
 	{
 		if(!CheckHash(LuaHashes::HashList + i))

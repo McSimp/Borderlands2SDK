@@ -66,7 +66,7 @@ local function ProcessArgument(field)
 	text = text .. string.format("\t\t\t\tname = %q,\n", field:GetName())
 
 	-- Optional or not
-	if bit.band(field.UProperty.PropertyFlags.A, CPF_OptionalParm) ~= 0 then
+	if flags.IsSet(field.UProperty.PropertyFlags.A, CPF_OptionalParm) then
 		text = text .. "\t\t\t\toptional = true,\n"
 	end
 
@@ -153,15 +153,15 @@ function Package:ProcessFunction(func)
 			end
 		end
 
-		local flags = field.UProperty.PropertyFlags.A
-		if bit.band(flags, CPF_OutParm) ~= 0 then
+		local funcflags = field.UProperty.PropertyFlags.A
+		if flags.IsSet(funcflags, CPF_OutParm) then
 			-- If it's the return value, we want that first in the retvals list
-			if bit.band(flags, CPF_ReturnParm) ~= 0 then
+			if flags.IsSet(funcflags, CPF_ReturnParm) then
 				retvals = ProcessRetval(field) .. retvals
 			else
 				retvals = retvals .. ProcessRetval(field)
 			end
-		elseif bit.band(flags, CPF_Parm) ~= 0 then
+		elseif flags.IsSet(funcflags, CPF_Parm) then
 			-- It's just a regular old arg
 			args = args .. ProcessArgument(field)
 		end

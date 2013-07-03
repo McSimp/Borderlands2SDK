@@ -296,6 +296,14 @@ namespace BL2SDK
 		Logging::InitializeFile(Settings::GetLogFilePath());
 		Logging::Log("[Internal] Launching SDK...\n");
 
+		Logging::LogF("[Internal] DisableAntiDebug = %d, LogAllProcessEventCalls = %d, LogAllUnrealScriptCalls = %d, DisableCrashRpt = %d, DeveloperMode = %d, BinPath = \"%ls\"\n", 
+			args->DisableAntiDebug,
+			args->LogAllProcessEventCalls,
+			args->LogAllUnrealScriptCalls,
+			args->DisableCrashRpt,
+			args->DeveloperMode,
+			args->BinPath);
+
 		if(!args->DisableCrashRpt)
 		{
 			CrashRptHelper::Initialize();

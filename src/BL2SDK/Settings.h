@@ -9,6 +9,7 @@ struct LauncherStruct {
 	bool LogAllProcessEventCalls;
 	bool LogAllUnrealScriptCalls;
 	bool DisableCrashRpt;
+	bool DeveloperMode;
 	const LPWSTR BinPath;
 };
 
@@ -19,6 +20,7 @@ namespace Settings
 	std::wstring GetBinFile(const std::wstring& filename);
 	std::wstring GetGwenFile(const std::wstring& filename);
 	std::wstring GetLuaFile(const std::wstring& filename);
+	bool ShouldEnforceLuaHashes();
 }
 
 #endif

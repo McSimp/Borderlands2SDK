@@ -119,6 +119,8 @@ namespace Launcher
             public bool LogAllUnrealScriptCalls;
             [MarshalAs(UnmanagedType.I1)]
             public bool DisableCrashRpt;
+            [MarshalAs(UnmanagedType.I1)]
+            public bool DeveloperMode;
             [CustomMarshalAs(CustomUnmanagedType.LPWStr)]
             public string BinPath;
         }
@@ -156,6 +158,7 @@ namespace Launcher
                         LogAllProcessEventCalls = logAllProcessEventCallsToolStripMenuItem.Checked,
                         LogAllUnrealScriptCalls = logAllUnrealScriptCallsToolStripMenuItem.Checked,
                         DisableCrashRpt = disableCrashReportingToolStripMenuItem.Checked,
+                        DeveloperMode = developerModeToolStripMenuItem.Checked,
                         BinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\"
                     };
                     syringe.CallExport("BL2SDKDLL.dll", "InitializeSDK", arg);
@@ -259,29 +262,15 @@ namespace Launcher
             txtGamePath.Text = GetAbsoluteGamePath();
         }
 
-        private void disableAntiDebugToolStripMenuItem_Click(object sender, EventArgs e)
+        private void optionMenuItem_Click(object sender, EventArgs e)
         {
-            disableAntiDebugToolStripMenuItem.Checked = !disableAntiDebugToolStripMenuItem.Checked;
-        }
-
-        private void logAllProcessEventCallsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            logAllProcessEventCallsToolStripMenuItem.Checked = !logAllProcessEventCallsToolStripMenuItem.Checked;
+            ToolStripMenuItem item = (ToolStripMenuItem)sender;
+            item.Checked = !item.Checked;
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Process.Start("http://mcsi.mp/bl2/about/");
-        }
-
-        private void disableCrashReportingToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            disableCrashReportingToolStripMenuItem.Checked = !disableCrashReportingToolStripMenuItem.Checked;
-        }
-
-        private void logAllUnrealScriptCallsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            logAllUnrealScriptCallsToolStripMenuItem.Checked = !logAllUnrealScriptCallsToolStripMenuItem.Checked;
         }
     }
 }
