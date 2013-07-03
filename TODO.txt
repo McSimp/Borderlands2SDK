@@ -5,7 +5,6 @@ C++
 * Fix hook system - use pointers to avoid map copies
 * Fix the MAJOR PROBLEM in hook system - probably can just search for the virtual function on deletion
 * Work out a way to intercept LuaJIT exiting during a failed callback
-* Remove Windows console and just use game/logfile
 * Benchmark and analyse Widen/Narrow functions
 * Oh my god what the fuck is going on in ConCmdManager.cpp
 * Could neaten commands in LuaCommands.cpp
@@ -27,10 +26,7 @@ Lua
 * Allow for return values to be passed from a ProcessEvent hook back into the engine
 * FFrame.GetFuncArgsHex possible infinite loop
 * FFrameMT.GetTArray does not take into account TArray inner type
-* A file reading/writing library
-* Remove static directory references in sdkgen code
 * Enums in function definition tables and comments of data structures
-* Create file structure for sdkgen automatically
 * Get the SDKGen to run on coroutines so maybe we can render something to tell the user about the sdk generating
 * Pass UObject caller to function hooks
 * SDKGen const-ness

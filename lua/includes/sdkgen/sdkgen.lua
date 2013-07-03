@@ -239,11 +239,11 @@ local function ProcessPackages()
 end
 
 local function PrintErrors()
-	print("====== SDK GENERATOR ERRORS ======")
+	print("====== SDK GENERATOR WARNINGS ======")
 	for _, err in ipairs(SDKGen.Errors) do
 		print(err)
 	end
-	print("====== END ERRORS ======")
+	print("====== END WARNINGS ======")
 end
 
 
@@ -291,22 +291,25 @@ local function CreateVersionFile()
 	file:close()
 end
 
-print("[SDKGen] Creating directory structure...")
-local dirs = {
-	"sdkgen",
-	"sdkgen/classes",
-	"sdkgen/consts",
-	"sdkgen/enums",
-	"sdkgen/funcs",
-	"sdkgen/structs"
-}
+local function CreateDirectoryStructure()
+	local dirs = {
+		"sdkgen",
+		"sdkgen/classes",
+		"sdkgen/consts",
+		"sdkgen/enums",
+		"sdkgen/funcs",
+		"sdkgen/structs"
+	}
 
-for _,v in ipairs(dirs) do
-	if not file.IsDir(v) then file.CreateDir(v) end
+	for _,v in ipairs(dirs) do
+		if not file.IsDir(v) then file.CreateDir(v) end
+	end
 end
 
-print("[SDKGen] Generating SDK...")
+print("[SDKGen] Creating directory structure...")
+CreateDirectoryStructure()
 
+print("[SDKGen] Generating SDK...")
 ProcessPackages()
 CreateLoaderFile()
 CreateVersionFile()

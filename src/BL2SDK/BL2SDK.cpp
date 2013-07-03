@@ -268,7 +268,9 @@ namespace BL2SDK
 	{
 		Logging::LogF("[GameReady] Thread: %i\n", GetCurrentThreadId());
 
+#ifdef _DEBUG
 		Logging::InitializeExtern();
+#endif
 		Logging::InitializeGameConsole();
 		Logging::PrintLogHeader();
 

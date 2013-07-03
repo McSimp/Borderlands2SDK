@@ -10,12 +10,14 @@ struct TArray_%s_ {
 };
 ]]
 
-local file = file.Open("sdkgen/TArrayTypes.lua", "w+")
+local defFile = false
 
 local TArrayTypes = {}
 
 function TArrayTypes.Init()
-	file:write(
+	if not defFile then defFile = file.Open("sdkgen/TArrayTypes.lua", "w+") end
+	
+	defFile:write(
 [[-- ###################################
 -- # Borderlands 2 SDK
 -- # File Contents: TArray definitions
@@ -48,17 +50,17 @@ function TArrayTypes.Generate(innerType)
 
 	SDKGen.DebugPrint("[SDKGen] TArray for " .. propType)
 
-	file:write(string.format(TARRAY_TEMPLATE, forwardDec, propTypeClean, propType))
+	defFile:write(string.format(TARRAY_TEMPLATE, forwardDec, propTypeClean, propType))
 end
 
 function TArrayTypes.Finalize()
-	file:write("]]\n\n")
+	defFile:write("]]\n\n")
 
 	for _,v in ipairs(GeneratedTArrays) do
-		file:write("table.insert(g_TArrayTypes, \"" .. v .. "\")\n")
+		defFile:write("table.insert(g_TArrayTypes, \"" .. v .. "\")\n")
 	end
 
-	file:close()
+	defFile:close()
 end
 
 SDKGen.TArrayTypes = TArrayTypes

@@ -55,6 +55,8 @@ if NeedsSDKGenerated() then
 	engine.Initialize()
 	include("sdkgen/sdkgen.lua")
 else
+	file = nil
+	
 	include("../sdkgen/loader.lua")
 	engine.Initialize()
 

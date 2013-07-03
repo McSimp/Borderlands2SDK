@@ -162,8 +162,6 @@ void CLuaInterface::InitializeState()
 	SET_NIL(m_pState, "dump");
 	lua_pop(m_pState, 1); // pop string table
 
-	StackDump(m_pState);
-
 	SetSDKValues();
 	SetPaths();
 }

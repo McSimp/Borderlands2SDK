@@ -190,12 +190,22 @@ function ScriptStruct:FieldsToC(lastOffset)
 				out = out .. self:FixBitfields()
  			end
 
-			out = out .. string.format("\t%s %s%s; // 0x%X (0x%X)\n",
+ 			-- Byte properties usually mean an enum, so list that
+ 			local enumName = ""
+			if property:IsA(engine.Classes.UByteProperty) then
+				property = ffi.cast("struct UByteProperty*", property)
+				if NotNull(property.UByteProperty.Enum) then
+					enumName = string.format(" (Enum = %s)", property.UByteProperty.Enum:GetName())
+				end
+			end
+
+			out = out .. string.format("\t%s %s%s; // 0x%X (0x%X)%s\n",
 				typeof,
 				property:GetName(),
 				special,
 				property.UProperty.Offset,
-				size)
+				size,
+				enumName)
 
 			-- It's possible that our C definition for this type is not correct
 			-- If that's the case, we need to ensure that the fields are still 
