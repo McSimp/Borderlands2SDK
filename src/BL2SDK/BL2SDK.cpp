@@ -278,7 +278,7 @@ namespace BL2SDK
 
 		// Set console key to Tilde if not already set
 		UConsole* console = UObject::FindObject<UConsole>("WillowConsole WillowGameEngine.WillowGameViewportClient.WillowConsole");
-		if(console && console->ConsoleKey == FName("None"))
+		if(console && (console->ConsoleKey == FName("None") || console->ConsoleKey == FName("Undefine")))
 		{
 			console->ConsoleKey = FName("Tilde");
 		}
