@@ -525,8 +525,13 @@ function Base:AlignBelow(belowControl, border)
 end
 
 Base.Events = {}
-Base.Events.OnHoverEnter = 44
-Base.Events.OnHoverLeave = 56
+if _DEBUG then
+	Base.Events.OnHoverEnter = 44
+	Base.Events.OnHoverLeave = 56
+else
+	Base.Events.OnHoverEnter = 36
+	Base.Events.OnHoverLeave = 44
+end
 
 Base.listeners = {}
 

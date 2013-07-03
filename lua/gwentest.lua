@@ -1,4 +1,5 @@
 -- gwen test
+local ffi = require("ffi")
 
 function GwenTest()
 	local window = gwen.CreateControl("WindowControl")
@@ -97,7 +98,31 @@ function ToggleNoclip()
 	else
 		pawn:CheatFly()
 		pc.bCheatFlying = true
-		pc:GotoState("PlayerFlying")
+		pc:ClientGotoState("PlayerFlying")
+
+		pawn.AccelRate = 20000
+		pawn.AirSpeed = 3000
+
+		pawn:CheatGhost()
+	end
+end
+
+function ToggleNoclipWithPC(pc)
+	print("Toggling Noclip")
+
+	local pawn = pc.AcknowledgedPawn
+	
+	if pc.bCheatFlying then
+		pc.bCheatFlying = false
+		pawn:CheatWalk()
+		pc:Restart(false)
+
+		pawn.AccelRate = 2048
+		pawn.AirSpeed = 440
+	else
+		pawn:CheatFly()
+		pc.bCheatFlying = true
+		pc:ClientGotoState("PlayerFlying")
 
 		pawn.AccelRate = 20000
 		pawn.AirSpeed = 3000
@@ -119,10 +144,29 @@ function RemoveKeyHook()
 end
 
 function Brap()
-	local boneName = LocalPlayer().Pawn.Mesh:GetBoneName(6)
+	local endTrace = LocalPlayer():GetAxes(LocalPlayer().Rotation)
 	local startTrace = LocalPlayer().Pawn.Mesh:GetBoneLocation("Head", 0)
 
-	print(boneName.Index, boneName.Number, boneName:GetName())
+	endTrace.X = (endTrace.X * 30000) + startTrace.X
+	endTrace.Y = (endTrace.Y * 30000) + startTrace.Y
+	endTrace.Z = (endTrace.Z * 30000) + startTrace.Z
 
-	print(startTrace.X, startTrace.Y, startTrace.Z)
+	local ret = LocalPlayer():Trace(endTrace, startTrace, true)
+	print(ret)
+
+	if NotNull(ret) then print(ret:GetFullName()) end
+
+	if ret == nil then return nil else return ret end
+end
+
+function SetKillDist()
+	for i=0,(engine.Objects.Count-1) do
+		local obj = engine.Objects:Get(i)
+		if IsNull(obj) then goto continue end
+		if not obj:IsA(engine.Classes.AWillowBoundaryTurret) then goto continue end
+
+		obj.KillDistance = 99999999
+
+		::continue::
+	end
 end

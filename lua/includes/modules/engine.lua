@@ -39,10 +39,10 @@ end
 
 local localPC = nil
 function LocalPlayer()
-	if localPC == nil then
+	if localPC == nil or localPC.UObject.Class ~= engine.Classes.AWillowPlayerController.static then
 		localPC = engine.FindObjectExactClass("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
 	end
-
+	
 	return localPC
 end
 

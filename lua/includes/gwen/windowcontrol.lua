@@ -36,7 +36,11 @@ function WindowControl:DestroyModal()
 	func(self.control)
 end
 
-WindowControl.Events.OnWindowClosed = 296
+if _DEBUG then
+	WindowControl.Events.OnWindowClosed = 296
+else
+	WindowControl.Events.OnWindowClosed = 264
+end
 
 gwen.meta.WindowControl = WindowControl
 

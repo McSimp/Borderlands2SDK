@@ -30,6 +30,21 @@ namespace Launcher
             this.InjectorThread.IsBackground = true;
         }
 
+        private bool IsVC11Installed()
+        {
+            RegistryKey vckey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\DevDiv\vc\Servicing\11.0\RuntimeMinimum");
+            if(vckey != null)
+            {
+                int installed = (int)vckey.GetValue("Install");
+                if(installed == 1)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private string GetStartPath()
         {
             if (txtGamePath.TextLength > 0)
@@ -259,6 +274,12 @@ namespace Launcher
 
         private void frmLauncher_Load(object sender, EventArgs e)
         {
+            if(!IsVC11Installed())
+            {
+                var process = Process.Start("vcredist_x86.exe", "/passive /norestart");
+                process.WaitForExit();
+            }
+
             txtGamePath.Text = GetAbsoluteGamePath();
         }
 

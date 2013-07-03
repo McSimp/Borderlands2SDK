@@ -31,7 +31,11 @@ function ResizableControl:DisableResizing()
 	func(self.control)
 end
 
-ResizableControl.Events.OnResize = 232
+if _DEBUG then
+	ResizableControl.Events.OnResize = 232
+else
+	ResizableControl.Events.OnResize = 204
+end
 
 gwen.meta.ResizableControl = ResizableControl
 

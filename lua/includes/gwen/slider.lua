@@ -61,7 +61,11 @@ function Slider:GetMax()
 	return func(self.control)
 end
 
-Slider.Events.OnValueChanged = 232
+if _DEBUG then
+	Slider.Events.OnValueChanged = 232
+else
+	Slider.Events.OnValueChanged = 204
+end
 
 gwen.meta.Slider = Slider
 

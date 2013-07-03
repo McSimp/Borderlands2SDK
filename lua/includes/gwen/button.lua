@@ -65,14 +65,25 @@ function Button:SetImageAlpha(multiply)
 	func(self.control, multiply)
 end
 
-Button.Events.OnPress = 244
-Button.Events.OnRightPress = 256
-Button.Events.OnDown = 268
-Button.Events.OnUp = 280
-Button.Events.OnDoubleClick = 292
-Button.Events.OnToggle = 304
-Button.Events.OnToggleOn = 316
-Button.Events.OnToggleOff = 328
+if _DEBUG then
+	Button.Events.OnPress = 244
+	Button.Events.OnRightPress = 256
+	Button.Events.OnDown = 268
+	Button.Events.OnUp = 280
+	Button.Events.OnDoubleClick = 292
+	Button.Events.OnToggle = 304
+	Button.Events.OnToggleOn = 316
+	Button.Events.OnToggleOff = 328
+else
+	Button.Events.OnPress = 216
+	Button.Events.OnRightPress = 224
+	Button.Events.OnDown = 232
+	Button.Events.OnUp = 240
+	Button.Events.OnDoubleClick = 248
+	Button.Events.OnToggle = 256
+	Button.Events.OnToggleOn = 264
+	Button.Events.OnToggleOff = 272
+end
 
 gwen.meta.Button = Button
 

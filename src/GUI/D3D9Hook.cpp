@@ -57,7 +57,15 @@ namespace D3D9Hook
 								   DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, 
 								   IDirect3DDevice9** ppReturnedDeviceInterface)
 	{
+		wchar_t windowName[128];
+		GetWindowText(hFocusWindow, windowName, 128);
+
+		Logging::LogF("[DirectX Hooking] CreateDevice called (Thread = %d, Window = %ls)\n", GetCurrentThreadId(), windowName);
+		Logging::LogF("[DirectX Hooking] 2: pCreateDevice = 0x%p, hkCreateDevice = 0x%p, D3DVTable = 0x%p\n", pCreateDevice, (DWORD)hkCreateDevice, D3DVTable);
+
 		HRESULT result = pCreateDevice(pD3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
+
+		Logging::LogF("[DirectX Hooking] pCreateDevice call completed\n");
 
 		if(result != D3D_OK)
 		{
@@ -123,8 +131,10 @@ namespace D3D9Hook
 			throw FatalSDKException(5001, Util::Format("VirtualProtect failed for adding CreateDevice hook (Error = %d)", GetLastError()));
 		}
 
-		pCreateDevice = (tCreateDevice)D3DVTable[CREATEDEVICE_IDX];
+		pCreateDevice = (tCreateDevice)(D3DVTable[CREATEDEVICE_IDX]);
 		D3DVTable[CREATEDEVICE_IDX] = (DWORD)hkCreateDevice;
+
+		Logging::LogF("[DirectX Hooking] 1: pCreateDevice = 0x%p, hkCreateDevice = 0x%p, D3DVTable = 0x%p\n", pCreateDevice, (DWORD)hkCreateDevice, D3DVTable);
 
 		if(VirtualProtect(&D3DVTable[CREATEDEVICE_IDX], sizeof(DWORD), dwProtect, &dwProtect) == 0)
 		{

@@ -177,10 +177,11 @@ namespace GwenManager
 
 	void InitializeRenderer(IDirect3DDevice9* pD3DDev)
 	{
-		if(pRenderer) delete pRenderer;
+		if(pCanvas) delete pCanvas;
 		if(pSkin) delete pSkin;
+		if(pRenderer) delete pRenderer;
 
-		Logging::Log("[Gwen] Initializing Renderer\n");
+		Logging::LogF("[Gwen] Initializing Renderer (Device = 0x%p)\n", pD3DDev);
 		pRenderer = new Renderer::DirectX9(pD3DDev);
 
 		pSkin = new Skin::TexturedBase(pRenderer);

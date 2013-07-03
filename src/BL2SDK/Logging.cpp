@@ -87,7 +87,8 @@ namespace Logging
 		logFile = CreateFile(fileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if(logFile == INVALID_HANDLE_VALUE)
 		{
-			throw FatalSDKException(1000, "Failed to initialize log file (INVALID_HANDLE_VALUE)");
+			std::string errMsg = Util::Format("Failed to initialize log file (INVALID_HANDLE_VALUE, LastError = %d)", GetLastError());
+			throw FatalSDKException(1000, errMsg);
 		}
 		
 		logToFile = true;

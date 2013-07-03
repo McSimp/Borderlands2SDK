@@ -24,6 +24,7 @@
 #define SET_NUMBER(L, k, v) lua_pushstring(L, k); lua_pushnumber(L, v); lua_settable(L, -3);
 #define SET_STRING(L, k, v) lua_pushstring(L, k); lua_pushstring(L, v); lua_settable(L, -3);
 #define SET_NIL(L, k) lua_pushstring(L, k); lua_pushnil(L); lua_settable(L, -3);
+#define SET_BOOL(L, k, v) lua_pushstring(L, k); lua_pushboolean(L, v); lua_settable(L, -3);
 
 static int luabl2_dofile(lua_State* L, const char* path)
 {
@@ -138,6 +139,12 @@ void CLuaInterface::InitializeState()
 	SET_NIL(m_pState, "loadfile");
 	SET_NIL(m_pState, "loadstring");
 	SET_NIL(m_pState, "dofile");
+
+#ifdef _DEBUG
+	// And set whether we're in debug mode or not
+	SET_BOOL(m_pState, "_DEBUG", true);
+#endif
+
 	lua_pop(m_pState, 1); // pop global table
 
 	// Cleanup os table
