@@ -36,8 +36,15 @@ function ProcessHooks(Object, Stack, Result, Function)
 
 	for _,v in pairs(hookTable) do
 		local codePtr = Stack.Code
-		--local ret = v(Object, Stack, Result, Function)
-		local status, ret = pcall(v, Object, Stack, Result, Function)
+
+		local hookFunc = v[1]
+		local isRaw = v[2]
+
+		local status, ret
+		if isRaw then
+			status, ret = pcall(hookFunc, Object, Stack, Result, Function)
+		end
+
 		if not status then
 			print("Error in ScriptHook: " .. ret)
 			ret = false
@@ -57,7 +64,7 @@ end
 
 local EngineCallback = ffi.cast("tCallFunctionHook", ProcessHooks)
 
-function Add(funcData, hookName, hookFunc)
+local function AddInternal(funcData, hookName, hookFunc, rawHook)
 	if type(funcData) ~= "table" then error("Function must be a function data table") end
 	if not funcData.ptr or funcData.ptr == nil then error("Function has no pointer") end
 	if type(hookName) ~= "string" then error("Hook name must be a string") end
@@ -69,9 +76,18 @@ function Add(funcData, hookName, hookFunc)
 		ffi.C.LUAFUNC_AddStaticScriptHook(funcData.ptr, EngineCallback)
 	end
 
-	RegisteredHooks[ptrNum][hookName] = hookFunc
+	RegisteredHooks[ptrNum][hookName] = { hookFunc, rawHook }
 
 	print(string.format("[Lua] UnrealScript Hook added for function at 0x%X", ptrNum))
+end
+
+function Add(funcData, hookName, hookFunc)
+	error("Adding normal script hooks is not yet implemented")
+	--return AddInternal(funcData, hookName, hookFunc, false)
+end
+
+function AddRaw(funcData, hookName, hookFunc)
+	return AddInternal(funcData, hookName, hookFunc, true)
 end
 
 function Remove(funcData, hookName)

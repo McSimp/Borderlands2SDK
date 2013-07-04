@@ -1,10 +1,18 @@
 local ffi = require("ffi")
 
-local FNameMT = {}
+local FNameMT = { __index = {} }
 
-function FNameMT.GetName(self)
+function FNameMT.__index.GetName(self)
 	return ffi.string(engine.Names:Get(self.Index).Name)
 end
 
-ffi.metatype("struct FName", { __index = FNameMT })
+function FNameMT.__eq(self, cmp)
+	if type(cmp) ~= "string" then 
+		return rawequal(self, cmp)
+	else
+		return (self:GetName() == cmp)
+	end
+end
+
+ffi.metatype("struct FName", FNameMT)
 

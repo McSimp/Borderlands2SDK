@@ -39,23 +39,38 @@ function ProcessHooks(pObject, pFunction, pParms, pResult)
 
 	local argData = {}
 	for i=1,#args do
-		table.insert(argData, GetArg(args[i], pParms))
+		argData[args[i].name] = GetArg(args[i], pParms)
 	end
 
 	for _,v in pairs(hookTable) do
-		local status, ret = pcall(v, unpack(argData))
+		local hookFunc = v[1]
+		local isRaw = v[2]
+
+		local status, ret
+		if not isRaw then
+			status, ret = pcall(hookFunc, pObject, argData)
+		else
+			status, ret = pcall(hookFunc, pObject, pFunction, pParms, pResult)
+		end
+
 		if not status then
 			print("Error in EngineHook: " .. ret)
 		end
-		--v(unpack(argData)) -- TODO: Return value
 	end
+
+	return true
+end
+
+function SafeProcessHooks(pObject, pFunction, pParms, pResult)
+	local status, ret = pcall(ProcessHooks, pObject, pFunction, pParms, pResult)
+	print(status, ret)
 
 	return true
 end
 
 local EngineCallback = ffi.cast("tProcessEventHook", ProcessHooks)
 
-function Add(funcData, hookName, hookFunc)
+local function AddInternal(funcData, hookName, hookFunc, rawHook)
 	if type(funcData) ~= "table" then error("Function must be a function data table") end
 	if not funcData.ptr or funcData.ptr == nil then error("Function has no pointer") end
 	if type(hookName) ~= "string" then error("Hook name must be a string") end
@@ -67,9 +82,17 @@ function Add(funcData, hookName, hookFunc)
 		ffi.C.LUAFUNC_AddStaticEngineHook(funcData.ptr, EngineCallback)
 	end
 
-	RegisteredHooks[ptrNum][hookName] = hookFunc
+	RegisteredHooks[ptrNum][hookName] = { hookFunc, rawHook }
 
 	print(string.format("[Lua] Engine Hook added for function at 0x%X", ptrNum))
+end
+
+function Add(funcData, hookName, hookFunc)
+	return AddInternal(funcData, hookName, hookFunc, false)
+end
+
+function AddRaw(funcData, hookName, hookFunc)
+	return AddInternal(funcData, hookName, hookFunc, true)
 end
 
 function Remove(funcData, hookName)

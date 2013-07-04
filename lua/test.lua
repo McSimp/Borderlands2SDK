@@ -190,7 +190,7 @@ end
 
 function AddHook()
 	--engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "Shazbot", MyHook2)
-	engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GiveMeBoxes", function(pCanvas)
+	engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GiveMeBoxes", function(caller, args)
 		local target = pc.Pawn.WorldInfo.PawnList
 		while NotNull(target) do
 			if not target.bDeleteMe and target ~= pc.Pawn then
@@ -205,7 +205,10 @@ function RemoveHook()
 	engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GiveMeBoxes")
 end
 
-function KeyHook(ControllerId, Key, Event, AmountDepressed, bGamePad)
+function KeyHook(caller, args)
+	local Key = args.Key
+	local Event = args.Event
+
 	print(Key:GetName(), Event, table.sfind(enums.EInputEvent, Event))
 end
 

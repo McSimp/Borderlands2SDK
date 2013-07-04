@@ -132,8 +132,11 @@ function ToggleNoclipWithPC(pc)
 end
 
 function AddKeyHook()
-	engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.InputKey, "NoclipKeyHook", function(cid, key, event)
-		if key:GetName() == "V" and event == enums.EInputEvent.IE_Pressed then
+	engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.InputKey, "NoclipKeyHook", function(caller, args)
+		local key = args.Key
+		local event = args.EventType
+
+		if key == "V" and event == enums.EInputEvent.IE_Pressed then
 			ToggleNoclip()
 		end
 	end)
@@ -169,4 +172,16 @@ function SetKillDist()
 
 		::continue::
 	end
+end
+
+function TestRawEngine()
+	engineHook.AddRaw(engine.Classes.UWillowGameViewportClient.funcs.InputKey, "TestRaw", function(object, func, parm, result)
+		print(object, func, parm, result)
+	end)
+end
+
+function TestRawScript()
+	scriptHook.AddRaw(engine.Classes.UConsole.funcs.ShippingConsoleCommand, "ConcmdHook", function(Object, Stack, Result, Function)
+		print("ShippingConsoleCommand called")
+	end)
 end
