@@ -233,6 +233,23 @@ namespace BL2SDK
 		detCallFunction.Attach();
 	}
 
+	bool DevInputKeyHook(UObject* caller, UFunction* function, void* parms, void* result)
+	{
+		UWillowGameViewportClient_execInputKey_Parms* realParms = reinterpret_cast<UWillowGameViewportClient_execInputKey_Parms*>(parms);
+
+		// If F11 is pressed
+		if(realParms->EventType == 0 && strcmp(realParms->Key.GetName(), "F11") == 0)
+		{
+			// Reset the lua state
+			delete Lua;
+			Lua = new CLuaInterface();
+			Lua->InitializeModules();
+			return false;
+		}
+
+		return true;
+	}
+
 	// This function is used to get the dimensions of the game window for Gwen's renderer
 	// It will also initialize Lua and the command system, so the SDK is essentially fully operational at this point
 	bool GetCanvasPostRender(UObject* caller, UFunction* function, void* parms, void* result)
@@ -243,7 +260,16 @@ namespace BL2SDK
 		GwenManager::UpdateCanvas(canvas->SizeX, canvas->SizeY);
 
 		Lua = new CLuaInterface();
-		Lua->InitializeModules();
+		if(!Lua->InitializeModules())
+		{
+			Util::Popup(L"Hash check failed", L"Hash check failed");
+		}
+
+		if(Settings::DeveloperModeEnabled())
+		{
+			GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient.InputKey", "DevInputKeyHook", &DevInputKeyHook);
+			Logging::LogF("[Internal] Developer mode key hook enabled\n");
+		}
 
 		ConCmdManager::Initialize();
 

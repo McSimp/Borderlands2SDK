@@ -182,8 +182,6 @@ bool CLuaInterface::InitializeModules()
 {
 	if(!VerifyLuaFiles())
 	{
-		// TODO: Do something about this
-		Util::Popup(L"Hash check failed", L"A hash check failed oh no!"); 
 		return false;
 	}
 
@@ -210,7 +208,7 @@ bool CLuaInterface::InitializeModules()
 
 bool CLuaInterface::VerifyLuaFiles()
 {
-	if(!Settings::ShouldEnforceLuaHashes())
+	if(Settings::DeveloperModeEnabled())
 	{
 		Logging::Log("[Lua] Developer mode enabled, hash checks skipped\n");
 		return true;

@@ -218,6 +218,11 @@ namespace GwenManager
 		}
 	}
 
+	void DisplayHashFailed()
+	{
+
+	}
+
 	enum GwenControls
 	{
 		GWEN_BUTTON,

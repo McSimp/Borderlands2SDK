@@ -63,6 +63,8 @@ else
 	require("engineHook")
 	require("scriptHook")
 
+	--require("command")
+
 	package.loaded.ffi.cdef = nil -- No more defining
 end
 

@@ -44,9 +44,8 @@ namespace Settings
 		return newPath;
 	}
 
-	// If we are not launched in developer mode, enforce Lua hash checks
-	bool ShouldEnforceLuaHashes()
+	bool DeveloperModeEnabled()
 	{
-		return !developerMode;
+		return developerMode;
 	}
 }

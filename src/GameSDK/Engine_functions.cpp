@@ -19,9 +19,7 @@
 # ========================================================================================= #
 */
 
-UClass* UConsole::pClassPointer = NULL;
 UClass* APlayerController::pClassPointer = NULL;
-UClass* UCanvas::pClassPointer = NULL;
 
 /*
 # ========================================================================================= #

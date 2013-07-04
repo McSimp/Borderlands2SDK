@@ -46,14 +46,9 @@ namespace GameHooks
 				// maps to std::string, void*, but we want to call a tProcessEventHook* instead
 				if(!((tProcessEventHook*)iterator->second)(caller, function, parms, result))
 				{
-					engineShouldRun = false; // Can't just do engineShouldRun = iterator->.. 
+					// As soon as one hook doesn't want it to fall through, we'll stop
+					return false;
 				}
-			}
-
-			if(!engineShouldRun)
-			{
-				// Tell the SDK not to run this function through the engine
-				return false;
 			}
 		}
 

@@ -73,18 +73,6 @@ public:
 	struct FAutoCompleteNode                           AutoCompleteTree;                                 		// 0x01A8 (0x001C) [0x0000000000003000]              ( CPF_Native | CPF_Transient )
 	TArray< int >                                      AutoCompleteIndices;                              		// 0x01C4 (0x000C) [0x0000000000402000]              ( CPF_Transient | CPF_NeedCtorLink )
 
-private:
-	static UClass* pClassPointer;
-
-public:
-	static UClass* StaticClass()
-	{
-		if ( ! pClassPointer )
-			pClassPointer = (UClass*) UObject::GObjObjects()->Data[ 2443 ];
-
-		return pClassPointer;
-	};
-
 	void UpdateCompleteIndices ( );
 	void BuildRuntimeAutoCompleteList ( unsigned long bForce );
 	void AppendInputText ( struct FString Text );
@@ -163,17 +151,8 @@ public:
 	struct FPlane                                      ColorModulate;                                    		// 0x0080 (0x0010) [0x0000000000000000]              
 	void*											   DefaultTexture;                                   		// 0x0090 (0x0004) [0x0000000000000000]              
 	struct FColor                                      BGColor;                                          		// 0x0094 (0x0004) [0x0000000000000000]              
-
-private:
-	static UClass* pClassPointer;
-
-public:
-	static UClass* StaticClass()
-	{
-		if ( ! pClassPointer )
-			pClassPointer = (UClass*) UObject::GObjObjects()->Data[ 477 ];
-
-		return pClassPointer;
-	};
-
 };
+
+#ifdef _MSC_VER
+	#pragma pack ( pop )
+#endif
