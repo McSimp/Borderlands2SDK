@@ -4,6 +4,7 @@
 #include "BL2SDK/Util.h"
 #include "BL2SDK/BL2SDK.h"
 #include <algorithm>
+#include <sstream>
 
 #include "LuaInterface/LuaFileLib.h"
 
@@ -26,7 +27,7 @@
 #define SET_NIL(L, k) lua_pushstring(L, k); lua_pushnil(L); lua_settable(L, -3);
 #define SET_BOOL(L, k, v) lua_pushstring(L, k); lua_pushboolean(L, v); lua_settable(L, -3);
 
-static int luabl2_dofile(lua_State* L, const char* path)
+static int dofile(lua_State* L, const char* path)
 {
 	int status = luaL_dofile_nobc(L, path);
 	if(status != 0)
@@ -35,6 +36,38 @@ static int luabl2_dofile(lua_State* L, const char* path)
 		lua_pop(L, 1);
 	}
 	return status;
+}
+
+static int load_aux(lua_State* L, int status) 
+{
+	if (status == 0)  /* OK? */
+		return 1;
+	else
+	{
+		lua_pushnil(L);
+		lua_insert(L, -2);  /* put before error message */
+		return 2;  /* return nil plus error message */
+	}
+}
+
+static int luabl2_loadstring(lua_State* L) 
+{
+	size_t len;
+	const char* code = luaL_checklstring(L, 1, &len);
+	const char* chunkname = luaL_optstring(L, 2, code);
+	return load_aux(L, luaL_loadbufferx(L, code, len, chunkname, "t")); // "t" as mode disables bytecode
+}
+
+static int luabl2_loadfile(lua_State* L)
+{
+	std::string fname = luaL_optstring(L, 1, NULL);
+	std::replace(fname.begin(), fname.end(), '/', '\\');
+
+	std::stringstream ss;
+	ss << Util::Narrow(Settings::GetBinFile(L"lua"));
+	ss << "\\" << fname;
+
+	return load_aux(L, luaL_loadfilex(L, ss.str().c_str(), "t"));
 }
 
 static int luabl2_print(lua_State* L) 
@@ -75,7 +108,7 @@ static int luabl2_include(lua_State* L)
 	std::replace(filename.begin(), filename.end(), '/', '\\');
 	std::string path = source.substr(1, source.find_last_of("\\/")) + filename; // Cuts off the @ at the start of the path and removes the filename
 	
-	luabl2_dofile(L, path.c_str());
+	dofile(L, path.c_str());
 
 	return 0;
 }
@@ -83,6 +116,8 @@ static int luabl2_include(lua_State* L)
 static const luaL_Reg base_funcs[] = {
 	{"print", luabl2_print},
 	{"include", luabl2_include},
+	{"loadstring", luabl2_loadstring},
+	{"loadfile", luabl2_loadfile},
 	{NULL, NULL}
 };
 
@@ -136,8 +171,6 @@ void CLuaInterface::InitializeState()
 
 	// Let's delete the things we don't want
 	SET_NIL(m_pState, "load");
-	SET_NIL(m_pState, "loadfile");
-	SET_NIL(m_pState, "loadstring");
 	SET_NIL(m_pState, "dofile");
 
 #ifdef _DEBUG
@@ -309,5 +342,5 @@ int CLuaInterface::DoFile(const std::string& filename)
 
 int CLuaInterface::DoFileAbsolute(const std::string& path)
 {
-	return luabl2_dofile(m_pState, path.c_str());
+	return dofile(m_pState, path.c_str());
 }

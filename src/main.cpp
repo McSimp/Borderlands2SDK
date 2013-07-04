@@ -2,12 +2,10 @@
 #include <Windows.h>
 #include "BL2SDK/BL2SDK.h"
 #include "BL2SDK/Logging.h"
-#include "Commands/ConCommand.h"
 #include "BL2SDK/CrashRptHelper.h"
 #include "BL2SDK/Util.h"
 #include "BL2SDK/Exceptions.h"
 #include "BL2SDK/Settings.h"
-#include "generated/SDKVersion.h"
 
 extern "C" __declspec(dllexport) DWORD InitializeSDK(LPVOID lpParameter)
 {

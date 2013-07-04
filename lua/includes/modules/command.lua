@@ -4,16 +4,47 @@ local ffi = require("ffi")
 
 local LuaCommands = {}
 
+local function ParseCommand(cmdString)
+	-- trim string
+	cmdString = string.Trim(cmdString)
+
+	-- if length is zero, fail
+	if #cmdString == 0 then return nil end
+
+	-- find the first space, and extract string from start to that
+	-- otherwise just get the whole string if no space found
+	local loc = string.find(cmdString, " ")
+	if loc == nil then 
+		return cmdString, {} -- no args
+	end
+
+	local cmd = string.sub(cmdString, 1, loc - 1)
+
+	-- for the args, we want to extract the part after the first space
+	local argString = string.sub(cmdString, loc + 1)
+	local argT = string.Explode(argString, " ")
+
+	return cmd, argT
+end
+
 local function CommandHook(Object, Stack, Result, Function)
 	local code = Stack.Code
-	local cmd = Stack:GetString()
-	local cmdString = cmd:GetLuaString()
-	local cmdLower = string.lower(cmdString)
+	local cmdStringObject = Stack:GetString()
+	local fullCmdString = cmdStringObject:GetLuaString()
+
+	local cmd, args = ParseCommand(fullCmdString)
+	if not cmd then
+		Stack:SkipFunction()
+		return true
+	end
+
+	local cmdLower = string.lower(cmd)
 
 	if LuaCommands[cmdLower] ~= nil then
-		print("\n>>> " .. cmdString .. " <<<")
+		print("\n>>> " .. fullCmdString .. " <<<")
 
-		LuaCommands[cmdLower](cmdString)
+		local status, ret = pcall(LuaCommands[cmdLower], cmd, args)
+		if not status then print("Error in command: " .. ret) end
 
 		local console = ffi.cast("struct UConsole*", Object)
 
@@ -24,10 +55,10 @@ local function CommandHook(Object, Stack, Result, Function)
 			cmp = console.UConsole.History[console.UConsole.HistoryTop - 1]
 		end
 
-		if cmp:IsValid() and cmdLower ~= string.lower(cmp:GetLuaString()) then
-			console:PurgeCommandFromHistory(cmd)
+		if cmp:IsValid() and cmdStringObject ~= cmp then
+			console:PurgeCommandFromHistory(cmdStringObject)
 
-			console.UConsole.History[console.UConsole.HistoryTop] = cmd
+			console.UConsole.History[console.UConsole.HistoryTop] = cmdStringObject
 			console.UConsole.HistoryTop = (console.UConsole.HistoryTop + 1) % 16
 		end
 

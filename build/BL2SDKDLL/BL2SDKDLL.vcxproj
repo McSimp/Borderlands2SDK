@@ -114,9 +114,6 @@
     <ClCompile Include="..\..\src\BL2SDK\Logging.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Settings.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Util.cpp" />
-    <ClCompile Include="..\..\src\Commands\ConCommand.cpp" />
-    <ClCompile Include="..\..\src\Commands\ConCmdManager.cpp" />
-    <ClCompile Include="..\..\src\Commands\LuaCommands.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\CSimpleDetour.cpp" />
     <ClCompile Include="..\..\src\GameSDK\Core_functions.cpp" />
     <ClCompile Include="..\..\src\GameSDK\Engine_functions.cpp" />
@@ -139,8 +136,6 @@
     <ClInclude Include="..\..\src\BL2SDK\Logging.h" />
     <ClInclude Include="..\..\src\BL2SDK\Settings.h" />
     <ClInclude Include="..\..\src\BL2SDK\Util.h" />
-    <ClInclude Include="..\..\src\Commands\ConCommand.h" />
-    <ClInclude Include="..\..\src\Commands\ConCmdManager.h" />
     <ClInclude Include="..\..\src\BL2SDK\CSimpleDetour.h" />
     <ClInclude Include="..\..\src\BL2SDK\detours.h" />
     <ClInclude Include="..\..\src\GameSDK\Core_classes.h" />

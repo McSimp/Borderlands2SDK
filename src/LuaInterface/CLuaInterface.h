@@ -19,8 +19,6 @@ public:
 	bool			InitializeModules();
 	lua_State*		GetLuaState();
 	int				RunString(const char* string);
-	int				DoFile(const std::string& filename);
-	int				DoFileAbsolute(const std::string& path);
 
 private:
 	void			InitializeState();
@@ -29,6 +27,8 @@ private:
 	void			SetPaths();
 	bool			VerifyLuaFiles();
 	bool			CheckHash(FileHash* fileHash);
+	int				DoFile(const std::string& filename);
+	int				DoFileAbsolute(const std::string& path);
 
 	lua_State*		m_pState;
 	std::string		m_luaPath;

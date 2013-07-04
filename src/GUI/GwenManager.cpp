@@ -6,7 +6,6 @@
 #include "Gwen/Input/Windows.h"
 #include "GUI/DirectX9.h"
 #include "BL2SDK/Settings.h"
-#include "Commands/ConCommand.h"
 #include "BL2SDK/Util.h"
 #include "BL2SDK/CSimpleDetour.h"
 #include "BL2SDK/GameHooks.h"
@@ -309,8 +308,10 @@ namespace GwenManager
 		return pCanvas->GetSize().y;
 	}
 
+	/*
 	CON_COMMAND(CleanupCanvas)
 	{
 		pCanvas->RemoveAllChildren();
 	}
+	*/
 }

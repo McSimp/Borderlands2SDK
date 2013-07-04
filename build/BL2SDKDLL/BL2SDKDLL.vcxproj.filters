@@ -25,12 +25,6 @@
     <Filter Include="Source Files\BL2SDK">
       <UniqueIdentifier>{da269939-0333-476f-92e3-dbf65fe9a915}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Commands">
-      <UniqueIdentifier>{518a96d6-e003-4212-b919-2f3097ca9c77}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Commands">
-      <UniqueIdentifier>{8c397606-a0dc-4679-9f1d-6346f1b1cf59}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\LuaInterface">
       <UniqueIdentifier>{f6928239-3ce2-4f55-bd11-210421270cba}</UniqueIdentifier>
     </Filter>
@@ -66,17 +60,8 @@
     <ClCompile Include="..\..\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Commands\ConCmdManager.cpp">
-      <Filter>Source Files\Commands</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Commands\ConCommand.cpp">
-      <Filter>Source Files\Commands</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\BL2SDK\CSigScan.cpp">
       <Filter>Source Files\BL2SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Commands\LuaCommands.cpp">
-      <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\BL2SDK\CrashRptHelper.cpp">
       <Filter>Source Files\BL2SDK</Filter>
@@ -148,12 +133,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\BL2SDK\BL2SDK.h">
       <Filter>Header Files\BL2SDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Commands\ConCmdManager.h">
-      <Filter>Header Files\Commands</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Commands\ConCommand.h">
-      <Filter>Header Files\Commands</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\BL2SDK\CSigScan.h">
       <Filter>Header Files\BL2SDK</Filter>

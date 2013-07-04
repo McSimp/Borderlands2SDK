@@ -4,7 +4,7 @@ local string = string
 ffi.cdef[[
 size_t wcstombs(char* dest, const wchar_t* src, size_t max);
 size_t mbstowcs(wchar_t* dest, const char* src, size_t max);
-int wcsncmp(const wchar_t* wcs1, const wchar_t* wcs2, size_t num);
+int _wcsnicmp(const wchar_t* wcs1, const wchar_t* wcs2, size_t num);
 ]]
 
 local FStringMT = { __index = {} }
@@ -24,7 +24,7 @@ FStringMT.__tostring = FStringMT.__index.GetLuaString
 function FStringMT.__eq(self, cmp)
 	if ffi.istype("struct FString", cmp) then
 		if self.Data ~= nil and cmp.Data ~= nil then
-			return (ffi.C.wcsncmp(self.Data, cmp.Data, self.Count) == 0)
+			return (ffi.C._wcsnicmp(self.Data, cmp.Data, self.Count) == 0)
 		end
 	end
 

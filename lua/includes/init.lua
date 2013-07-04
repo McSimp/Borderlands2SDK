@@ -63,7 +63,8 @@ else
 	require("engineHook")
 	require("scriptHook")
 
-	--require("command")
+	require("command")
+	include("luacommands.lua")
 
 	package.loaded.ffi.cdef = nil -- No more defining
 end

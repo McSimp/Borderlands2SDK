@@ -6,7 +6,6 @@
 #include "BL2SDK/GameHooks.h"
 #include "BL2SDK/Settings.h"
 #include "BL2SDK/Util.h"
-#include "Commands/ConCmdManager.h"
 #include "GUI/D3D9Hook.h"
 #include "BL2SDK/Exceptions.h"
 #include "BL2SDK/AntiDebug.h"
@@ -240,6 +239,8 @@ namespace BL2SDK
 		// If F11 is pressed
 		if(realParms->EventType == 0 && strcmp(realParms->Key.GetName(), "F11") == 0)
 		{
+			// TODO: Delete all hooks from Lua
+
 			// Reset the lua state
 			delete Lua;
 			Lua = new CLuaInterface();
@@ -270,8 +271,6 @@ namespace BL2SDK
 			GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient.InputKey", "DevInputKeyHook", &DevInputKeyHook);
 			Logging::LogF("[Internal] Developer mode key hook enabled\n");
 		}
-
-		ConCmdManager::Initialize();
 
 		GameHooks::EngineHookManager->RemoveStaticHook(function, "GetCanvas");
 		return true;
