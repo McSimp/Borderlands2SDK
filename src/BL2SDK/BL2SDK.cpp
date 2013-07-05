@@ -239,8 +239,6 @@ namespace BL2SDK
 		// If F11 is pressed
 		if(realParms->EventType == 0 && strcmp(realParms->Key.GetName(), "F11") == 0)
 		{
-			// TODO: Delete all hooks from Lua
-
 			// Reset the lua state
 			delete Lua;
 			Lua = new CLuaInterface();

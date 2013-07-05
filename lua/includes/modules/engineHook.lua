@@ -95,6 +95,18 @@ function AddRaw(funcData, hookName, hookFunc)
 	return AddInternal(funcData, hookName, hookFunc, true)
 end
 
+function RemoveAll()
+	-- Foreach function
+	for ptrNum,_ in pairs(RegisteredHooks) do
+		-- Remove the hook inside the engine
+		local ptr = ffi.cast("struct UFunction*", ptrNum)
+		ffi.C.LUAFUNC_RemoveStaticEngineHook(ptr)
+
+		-- nil it
+		RegisteredHooks[ptrNum] = nil
+	end
+end
+
 function Remove(funcData, hookName)
 	if type(funcData) ~= "table" then error("Function must be a function data table") end
 	if not funcData.ptr then error("Function has no pointer") end

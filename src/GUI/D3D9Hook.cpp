@@ -6,13 +6,13 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 
-#define CREATEDEVICE_IDX 16
-#define ENDSCENE_IDX 42
-#define BEGINSTATEBLOCK_IDX 60
-#define ENDSTATEBLOCK_IDX 61
-
 namespace D3D9Hook
 {
+	const int CREATEDEVICE_IDX = 16;
+	const int ENDSCENE_IDX = 42; 
+	const int BEGINSTATEBLOCK_IDX = 60;
+	const int ENDSTATEBLOCK_IDX = 61;
+
 	typedef HRESULT (WINAPI* tCreateDevice)(IDirect3D9*, UINT, D3DDEVTYPE, HWND, DWORD, D3DPRESENT_PARAMETERS*, IDirect3DDevice9**);
 	typedef HRESULT (WINAPI* tEndScene)(IDirect3DDevice9*);
 	typedef HRESULT (WINAPI* tBeginStateBlock)(IDirect3DDevice9*);

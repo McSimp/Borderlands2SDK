@@ -67,6 +67,11 @@ else
 	include("luacommands.lua")
 
 	package.loaded.ffi.cdef = nil -- No more defining
+
+	function OnShutdown()
+		scriptHook.RemoveAll()
+		engineHook.RemoveAll()
+	end
 end
 
 --jit.v.off()

@@ -19,6 +19,7 @@ public:
 	bool			InitializeModules();
 	lua_State*		GetLuaState();
 	int				RunString(const char* string);
+	void			CallShutdownFuncs();
 
 private:
 	void			InitializeState();
@@ -32,6 +33,7 @@ private:
 
 	lua_State*		m_pState;
 	std::string		m_luaPath;
+	bool			m_modulesInitialized;
 };
 
 #endif

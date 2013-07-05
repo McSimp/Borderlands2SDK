@@ -23,8 +23,6 @@ namespace GameHooks
 
 		delete UnrealScriptHookManager;
 		UnrealScriptHookManager = NULL;
-
-		// TODO: Would it be best to do the detours in this?
 	}
 
 	bool ProcessEngineHooks(UObject* caller, UFunction* function, void* parms, void* result)
@@ -38,8 +36,6 @@ namespace GameHooks
 		{
 			CHookManager::tHookMap hooks = iHooks->second;
 
-			// TODO: Still not sure on best implementation here. Would it be better
-			// just to stop every single next hook if one returns false?
 			bool engineShouldRun = true;
 			for(CHookManager::tiHookMap iterator = hooks.begin(); iterator != hooks.end(); iterator++)
 			{
@@ -67,8 +63,6 @@ namespace GameHooks
 		{
 			CHookManager::tHookMap hooks = iHooks->second;
 
-			// TODO: Still not sure on best implementation here. Would it be better
-			// just to stop every single next hook if one returns false?
 			bool engineShouldRun = true;
 			for(CHookManager::tiHookMap iterator = hooks.begin(); iterator != hooks.end(); iterator++)
 			{

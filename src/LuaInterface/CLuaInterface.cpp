@@ -149,11 +149,17 @@ static void StackDump(lua_State* L)
 
 CLuaInterface::CLuaInterface()
 {
+	m_modulesInitialized = false;
 	InitializeState();
 }
 
 CLuaInterface::~CLuaInterface()
 {
+	if(m_modulesInitialized)
+	{
+		CallShutdownFuncs();
+	}
+
 	CleanupState();
 }
 
@@ -213,6 +219,8 @@ void CLuaInterface::CleanupState()
 
 bool CLuaInterface::InitializeModules()
 {
+	m_modulesInitialized = false;
+
 	if(!VerifyLuaFiles())
 	{
 		return false;
@@ -235,6 +243,7 @@ bool CLuaInterface::InitializeModules()
 	else
 	{
 		Logging::Log("[Lua] Lua initialized (" LUA_VERSION ")\n");
+		m_modulesInitialized = true;
 		return true;
 	}
 }
@@ -343,4 +352,10 @@ int CLuaInterface::DoFile(const std::string& filename)
 int CLuaInterface::DoFileAbsolute(const std::string& path)
 {
 	return dofile(m_pState, path.c_str());
+}
+
+void CLuaInterface::CallShutdownFuncs()
+{
+	lua_getfield(m_pState, LUA_GLOBALSINDEX, "OnShutdown");
+	lua_call(m_pState, 0, 0);
 }

@@ -13,5 +13,3 @@ end)
 command.Add("lo", function(cmd, args)
 	assert(loadfile(table.concat(args, " "), "LuaCommand"))()
 end)
-
--- scriptHook.Remove(engine.Classes.UConsole.funcs.ShippingConsoleCommand, "CommandHook")

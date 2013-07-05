@@ -1,18 +1,15 @@
 C++
 * Detach detours? Is this even worth doing?
 * Cleanup VirtualProtects in DirectX hooking
-* Get rid of macro indexes in DirectX hooking
 * Fix hook system - use pointers to avoid map copies
 * Fix the MAJOR PROBLEM in hook system - probably can just search for the virtual function on deletion
 * Benchmark and analyse Widen/Narrow functions
-* Oh my god what the fuck is going on in ConCmdManager.cpp
 * Delete SlotMachines commands when done with them
 * Replace slow DirectX font rendering with something faster
 * Remake GetFullName() to match the engine's GetFullName function
 * Remake object searching to use the hash table
 * The whole namespace thing is getting a bit messy, might need to think about using a class
 * If Lua hash check fails, do something about it
-* Delete all hooks from Lua when tearing down state
 
 Lua
 * Cursor enum for SetCursor
@@ -32,7 +29,6 @@ Other
 * CrashRpt privacy policy
 * Lua/C++: Get the function flags right for ProcessEvent
 * Add launcher facility to decompress upk files for opening in UE Explorer
-* Lua/C++: Add hook in Lua for when ResetLua is happening
 * Organise the SDK folder a bit better -subfolder for gwen textures etc.
 * Find some way to move Launcher source code out of the build folder
 * Decide whether to release source code (If so, hide some Unreal structs that I really shouldn't know)
