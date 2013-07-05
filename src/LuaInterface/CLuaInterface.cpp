@@ -217,19 +217,20 @@ void CLuaInterface::CleanupState()
 	lua_close(m_pState);
 }
 
-bool CLuaInterface::InitializeModules()
+LuaStatus CLuaInterface::InitializeModules()
 {
 	m_modulesInitialized = false;
 
 	if(!VerifyLuaFiles())
 	{
-		return false;
+		Logging::Log("[Lua] Hash check failed, aborting\n");
+		return LUA_HASH_FAILED;
 	}
 
 	if(DoFile("includes\\init.lua") != 0) // Means it failed, TODO: More obvious warning for this
 	{
 		Logging::Log("[Lua] Failed to initialize Lua modules\n");
-		return false;
+		return LUA_MODULE_ERROR;
 	}
 
 	// Check to see if we set the global flag to reset the Lua state
@@ -244,7 +245,7 @@ bool CLuaInterface::InitializeModules()
 	{
 		Logging::Log("[Lua] Lua initialized (" LUA_VERSION ")\n");
 		m_modulesInitialized = true;
-		return true;
+		return LUA_OK;
 	}
 }
 

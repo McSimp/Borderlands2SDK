@@ -217,9 +217,65 @@ namespace GwenManager
 		}
 	}
 
-	void DisplayHashFailed()
+	class CloseHandler : public Event::Handler
 	{
+	public:
+		void OnMessageBoxOK(Controls::Base* pControl) 
+		{
+			if(pControl->GetParent() != NULL)
+			{
+				pControl->GetParent()->DelayedDelete();
+				ToggleGwenActive();
+			}
+		}
 
+		void OnMessageBoxOKCloseGame(Controls::Base* pControl) 
+		{
+			Util::CloseGame();
+		}
+	};
+
+	void DisplayMessageBox(const std::string& title, const std::string& message, bool exitOnOK)
+	{
+		Controls::WindowControl* pWindow = new Controls::WindowControl(pCanvas);
+		pWindow->SetTitle(title);
+		pWindow->SetSize(300, 170);
+		pWindow->DisableResizing();
+		pWindow->SetPadding(Padding(6, 0, 6, 6));
+		pWindow->MakeModal(true);
+		pWindow->Position(Pos::Center);
+		pWindow->SetDeleteOnClose(true);
+		pWindow->SetClosable(false);
+
+		Controls::ImagePanel* img = new Controls::ImagePanel(pWindow);
+		img->SetImage(L"exclamation.png");
+		img->SetSize(32, 32);
+		img->SetPos(10, 20);
+
+		Controls::Label* label = new Controls::Label(pWindow);
+		label->SetText(message);
+		label->SetWrap(true);
+		label->SetSize(220, 100);
+		label->SetPos(60, 10);
+		
+		Controls::Button* button = new Controls::Button(pWindow);
+		button->SetHeight(30);
+		button->Dock(Pos::Bottom);
+		button->SetText("OK");
+
+		if(exitOnOK)
+		{
+			button->onPress.Add(button, &CloseHandler::OnMessageBoxOKCloseGame);
+		}
+		else
+		{
+			button->onPress.Add(button, &CloseHandler::OnMessageBoxOK);
+		}
+
+		if(!gwenEnabled)
+		{
+			ToggleGwenActive();
+		}
 	}
 
 	enum GwenControls

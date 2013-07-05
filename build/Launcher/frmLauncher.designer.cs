@@ -150,7 +150,7 @@
             this.developerModeToolStripMenuItem.Name = "developerModeToolStripMenuItem";
             this.developerModeToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
             this.developerModeToolStripMenuItem.Text = "Developer Mode";
-            this.developerModeToolStripMenuItem.Click += new System.EventHandler(this.optionMenuItem_Click);
+            this.developerModeToolStripMenuItem.Click += new System.EventHandler(this.developerModeToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 

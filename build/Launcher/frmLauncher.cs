@@ -293,5 +293,24 @@ namespace Launcher
         {
             Process.Start("http://mcsi.mp/bl2/about/");
         }
+
+        private void developerModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(developerModeToolStripMenuItem.Checked)
+            {
+                developerModeToolStripMenuItem.Checked = false;
+                return;
+            }
+
+            DialogResult result = MessageBox.Show("WARNING: DO NOT ENABLE THIS UNLESS YOU ARE A DEVELOPER.\n\nDeveloper mode can allow malicious scripts to do damage to your computer - are you sure you want to enable it?", 
+                "Developer Mode Warning", 
+                MessageBoxButtons.YesNo, 
+                MessageBoxIcon.Exclamation);
+
+            if(result == DialogResult.Yes)
+            {
+                developerModeToolStripMenuItem.Checked = true;
+            }
+        }
     }
 }

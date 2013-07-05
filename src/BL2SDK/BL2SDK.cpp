@@ -232,6 +232,29 @@ namespace BL2SDK
 		detCallFunction.Attach();
 	}
 
+	void InitializeLua()
+	{
+		Lua = new CLuaInterface();
+		LuaStatus status = Lua->InitializeModules();
+		if(status == LUA_HASH_FAILED)
+		{
+			GwenManager::DisplayMessageBox("Lua Hash Check Failed",
+				"A file in the 'lua/includes' folder has been modified. Please enable developer mode if you wish to modify these files. Otherwise, re-extract the SDK and replace the modified files with the orignal files.", 
+				true);
+		}
+		else if(status == LUA_MODULE_ERROR && !Settings::DeveloperModeEnabled())
+		{
+			GwenManager::DisplayMessageBox("Lua Module Error",
+				"A core Lua module failed to load correctly, and the SDK cannot continue to run.\n\nThis may indicate that BL2 has been patched and the SDK needs updating.",
+				true);
+		}
+		else if(status == LUA_MODULE_ERROR && Settings::DeveloperModeEnabled())
+		{
+			GwenManager::DisplayMessageBox("Lua Module Error", 
+				"An error occurred while loading the Lua modules.\n\nPlease check your console for the exact error. Once you've fixed the error, press F11 to reload the Lua state.");
+		}
+	}
+
 	bool DevInputKeyHook(UObject* caller, UFunction* function, void* parms, void* result)
 	{
 		UWillowGameViewportClient_execInputKey_Parms* realParms = reinterpret_cast<UWillowGameViewportClient_execInputKey_Parms*>(parms);
@@ -241,8 +264,7 @@ namespace BL2SDK
 		{
 			// Reset the lua state
 			delete Lua;
-			Lua = new CLuaInterface();
-			Lua->InitializeModules();
+			InitializeLua();
 			return false;
 		}
 
@@ -258,11 +280,7 @@ namespace BL2SDK
 
 		GwenManager::UpdateCanvas(canvas->SizeX, canvas->SizeY);
 
-		Lua = new CLuaInterface();
-		if(!Lua->InitializeModules())
-		{
-			Util::Popup(L"Hash check failed", L"Hash check failed");
-		}
+		InitializeLua();
 
 		if(Settings::DeveloperModeEnabled())
 		{

@@ -10,13 +10,20 @@ struct FileHash
 	const char* hash;
 };
 
+enum LuaStatus
+{
+	LUA_OK,
+	LUA_HASH_FAILED,
+	LUA_MODULE_ERROR
+};
+
 class CLuaInterface
 {
 public:
 	CLuaInterface();
 	~CLuaInterface();
 
-	bool			InitializeModules();
+	LuaStatus		InitializeModules();
 	lua_State*		GetLuaState();
 	int				RunString(const char* string);
 	void			CallShutdownFuncs();
