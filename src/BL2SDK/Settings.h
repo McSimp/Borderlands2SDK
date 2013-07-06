@@ -18,7 +18,7 @@ namespace Settings
 	void Initialize(LauncherStruct* args);
 	std::wstring GetLogFilePath();
 	std::wstring GetBinFile(const std::wstring& filename);
-	std::wstring GetGwenFile(const std::wstring& filename);
+	std::wstring GetTextureFile(const std::wstring& filename);
 	std::wstring GetLuaFile(const std::wstring& filename);
 	bool DeveloperModeEnabled();
 }

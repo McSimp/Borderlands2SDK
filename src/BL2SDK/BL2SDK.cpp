@@ -260,12 +260,24 @@ namespace BL2SDK
 		UWillowGameViewportClient_execInputKey_Parms* realParms = reinterpret_cast<UWillowGameViewportClient_execInputKey_Parms*>(parms);
 
 		// If F11 is pressed
-		if(realParms->EventType == 0 && strcmp(realParms->Key.GetName(), "F11") == 0)
+		if(realParms->EventType == 0)
 		{
-			// Reset the lua state
-			delete Lua;
-			InitializeLua();
-			return false;
+			const char* name = realParms->Key.GetName();
+			if(strcmp(name, "F11") == 0)
+			{
+				// Reset the lua state
+				delete Lua;
+				InitializeLua();
+				return false;
+			}
+			else if(strcmp(name, "F10") == 0)
+			{
+				LogAllProcessEventCalls(!logAllProcessEvent);
+			}
+			else if(strcmp(name, "F9") == 0)
+			{
+				LogAllUnrealScriptCalls(!logAllUnrealScriptCalls);
+			}
 		}
 
 		return true;

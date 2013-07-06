@@ -14,5 +14,9 @@ function FNameMT.__eq(self, cmp)
 	end
 end
 
+function FNameMT.__tostring(self)
+	return self:GetName()
+end
+
 ffi.metatype("struct FName", FNameMT)
 

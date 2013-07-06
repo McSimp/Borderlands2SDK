@@ -75,7 +75,7 @@ function FuncMT.__call(funcData, obj, ...)
 		elseif flags.IsSet(v.flags, FUNCPARM_CLASS) then
 			if type(luaArg) == "table" then
 				if luaArg.static ~= nil then
-					luaArg = luaArg.static
+					luaArg = ffi.cast("struct UClass*", luaArg.static)
 				else
 					error(string.format("Arg #%d (%s) did not contain a valid class table", k, v.name))
 				end
@@ -122,8 +122,12 @@ function FuncMT.__call(funcData, obj, ...)
 			error(string.format("Arg #%d (%s) expects a %q", k, v.name, tostring(v.type)))
 		
 
-		elseif flags.IsSet(v.flags, FUNCPARM_OBJPOINTER) and (luaArg.IsA == nil or not luaArg:IsA(v.class)) then
-			error(string.format("Arg #%d (%s) expects an object pointer for %s", k, v.name, v.class.name))
+		elseif flags.IsSet(v.flags, FUNCPARM_OBJPOINTER) then
+			if luaArg.IsA == nil or not luaArg:IsA(v.class) then
+				error(string.format("Arg #%d (%s) expects an object pointer for %s", k, v.name, v.class.name))
+			else
+				luaArg = ffi.cast("struct UObject*", luaArg)
+			end
 		end
 
 		-- Finally set the actual field

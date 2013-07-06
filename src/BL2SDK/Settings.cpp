@@ -30,10 +30,10 @@ namespace Settings
 		return newPath;
 	}
 
-	std::wstring GetGwenFile(const std::wstring& filename)
+	std::wstring GetTextureFile(const std::wstring& filename)
 	{
 		std::wstring newPath;
-		newPath = binPath + L"gwen\\" + filename;
+		newPath = binPath + L"textures\\" + filename;
 		return newPath;
 	}
 

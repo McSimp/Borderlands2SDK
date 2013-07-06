@@ -174,14 +174,107 @@ function SetKillDist()
 	end
 end
 
-function TestRawEngine()
-	engineHook.AddRaw(engine.Classes.UWillowGameViewportClient.funcs.InputKey, "TestRaw", function(object, func, parm, result)
-		print(object, func, parm, result)
+function GetStackTrace(frame)
+	local currentFrame = frame
+	while currentFrame ~= nil do
+		if currentFrame.Node ~= nil then
+			print(currentFrame.Node:GetFullName())
+		else
+			print("Node was nil!")
+		end
+		currentFrame = currentFrame.PreviousFrame
+	end
+end
+
+function GetSlotChanceBehavior(slot)
+	local sequences = slot.InteractiveObjectDefinition.BehaviorProviderDefinition.BehaviorSequences
+	for _,seq in pairs(sequences) do
+		local behavdata = seq.BehaviorData2
+		for _,v in pairs(behavdata) do
+			local behav = v.Behavior
+			if behav:IsA(engine.Classes.UBehavior_RandomBranch) then
+				if behav.Conditions.Count == 12 then
+					return behav
+				end
+			end
+		end
+	end
+
+	return nil
+end
+
+function PullData(obj)
+	--[[
+	0	40 COMMON
+	1	30 UNCOMMON
+	2	3 RARE
+	3	0.30000001192093 VERYRARE
+	4	0.029999999329448 LEGENDARY
+	5	5 ERID1
+	6	1.5 ERID2
+	7	0.44999998807907 ERID3
+	8	50 CASH
+	9	15 GRENADE
+	10	10 SKIN
+	11	40 NOTHING
+	]]
+
+	local randBehav = GetSlotChanceBehavior(obj)
+	if randBehav == nil then return end
+
+	for k,v in pairs(randBehav.Conditions) do
+		print(k, v)
+	end
+end
+
+
+function AddSpawnHook()
+	scriptHook.Remove(engine.Classes.AActor.funcs.Spawn, "SpawnHook")
+	scriptHook.AddRaw(engine.Classes.AActor.funcs.Spawn, "SpawnHook", function(Object, Stack, Result, Function)
+		print("==================")
+		print(Object:GetFullName())
+		print("==================")
+		GetStackTrace(Stack)
+	end)
+
+	engineHook.Remove(engine.Classes.AActor.funcs.Spawn, "SpawnHook")
+	engineHook.Add(engine.Classes.AActor.funcs.Spawn, "SpawnHook", function(caller, args)
+		print(caller:GetFullName())
 	end)
 end
 
-function TestRawScript()
-	scriptHook.AddRaw(engine.Classes.UConsole.funcs.ShippingConsoleCommand, "ConcmdHook", function(Object, Stack, Result, Function)
-		print("ShippingConsoleCommand called")
+function CanEnterVehicleHook()
+	engineHook.Remove(engine.Classes.AWillowVehicle.funcs.CanDrive, "CEVHook")
+	engineHook.Add(engine.Classes.AWillowVehicle.funcs.CanDrive, "CEVHook", function(caller, args)
+		print("Engine hook called, god damn")
 	end)
+
+	scriptHook.Remove(engine.Classes.AWillowVehicle.funcs.CanDrive, "CEVHook")
+	scriptHook.AddRaw(engine.Classes.AWillowVehicle.funcs.CanDrive, "CEVHook", function(Object, Stack, Result, Function)
+		Result = ffi.cast("unsigned long*", Result)
+		Result[0] = 1
+		Stack:SkipFunction()
+
+		print("Result modified")
+		return true
+	end)
+end
+
+function SpawnTest()
+	--[[
+	local endTrace = LocalPlayer():GetAxes(LocalPlayer().Rotation)
+	local startTrace = LocalPlayer().Pawn.Mesh:GetBoneLocation("Head", 0)
+
+	endTrace.X = (endTrace.X * 30000) + startTrace.X
+	endTrace.Y = (endTrace.Y * 30000) + startTrace.Y
+	endTrace.Z = (endTrace.Z * 30000) + startTrace.Z
+
+	local ret, HitLocation = LocalPlayer():Trace(endTrace, startTrace, true)
+	]]
+
+	spawned = LocalPlayer():Spawn(engine.Classes.AWillowVehicle_WheeledVehicle, nil, nil, LocalPlayer().Pawn.Mesh:GetBoneLocation("Head", 0), nil, engine.Objects:Get(202747), nil)
+
+	print(spawned)
+	print(spawned.Mesh)
+
 end

@@ -358,5 +358,8 @@ int CLuaInterface::DoFileAbsolute(const std::string& path)
 void CLuaInterface::CallShutdownFuncs()
 {
 	lua_getfield(m_pState, LUA_GLOBALSINDEX, "OnShutdown");
-	lua_call(m_pState, 0, 0);
+	if(!lua_isnoneornil(m_pState, -1))
+	{
+		lua_call(m_pState, 0, 0);
+	}
 }

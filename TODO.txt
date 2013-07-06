@@ -4,12 +4,10 @@ C++
 * Fix hook system - use pointers to avoid map copies
 * Fix the MAJOR PROBLEM in hook system - probably can just search for the virtual function on deletion
 * Benchmark and analyse Widen/Narrow functions
-* Delete SlotMachines commands when done with them
 * Replace slow DirectX font rendering with something faster
 * Remake GetFullName() to match the engine's GetFullName function
 * Remake object searching to use the hash table
 * The whole namespace thing is getting a bit messy, might need to think about using a class
-* If Lua hash check fails, do something about it
 
 Lua
 * Cursor enum for SetCursor
@@ -33,7 +31,6 @@ Other
 * Find some way to move Launcher source code out of the build folder
 * Decide whether to release source code (If so, hide some Unreal structs that I really shouldn't know)
 * Look into a build server and symbol server for crash reporting
-* If Lua modules fail to initialize, give a more prominent warning
 
 Bugs:
 * Gwen canvas will resize, but game will lock up completely if resize and there has been a Gwen window on the screen at any point
