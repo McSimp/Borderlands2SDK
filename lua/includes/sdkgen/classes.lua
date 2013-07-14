@@ -111,11 +111,17 @@ end
 function Class:GenerateDefinition()
 	local class = self.ClassObj
 	local cname = class:GetCName()
+	CURRENT_CLASS_NAME = cname
 
 	SDKGen.DebugPrint("[SDKGen] Class " .. class:GetFullName())
 
+	local classText = string.format("// 0x%X\n", self:GetFieldsSize())
+	if class.UStruct.MinAlignment ~= 4 then 
+		classText = classText .. "__declspec(align(" .. class.UStruct.MinAlignment .. ")) "
+	end
+
 	-- Start by defining the class with name_Data and put the fields in there
-	local classText = "struct " .. cname .. "_Data {\n"
+	classText = classText .. "struct " .. cname .. "_Data {\n"
 
 	-- Add the fields of this class into the struct
 	classText = classText .. self:FieldsToC()
@@ -138,6 +144,8 @@ function Class:GenerateDefinition()
 	-- At the end, make sure we have the actual class
 	inheritText = inheritText .. string.format("\tstruct %s_Data %s;\n};\n\n", cname, cname)
 	classText = classText .. inheritText
+
+	debugFile:write("assert(ffi.sizeof(\"struct " .. cname .. "\") == " .. tostring(self:GetFieldsSize()) .. ")\n" )
 
 	table.insert(GeneratedClasses, class)
 	table.insert(ClassList, class)
@@ -172,18 +180,23 @@ function Class:FieldsToC()
 	local lastOffset = 0
 
 	local base = ffi.cast("struct UClass*", class.UStruct.SuperField)
-	while NotNull(base) do
-		lastOffset = lastOffset + base.UStruct.PropertySize
-		base = ffi.cast("struct UClass*", base.UStruct.SuperField)
+	if NotNull(base) then
+		lastOffset = base.UStruct.PropertySize
 	end
 
-	local out = ""
+	local firstOffset = lastOffset
+
+	local out = string.format("\t// Last Offset: 0x%X\n", lastOffset)
 	for _,property in ipairs(properties) do
 
 		-- If the offset for this property is ahead of the end of the last property,
 		-- add some unknown data into the struct def.
 		if lastOffset < property.UProperty.Offset then
-			out = out .. self:MissedOffset(lastOffset, (property.UProperty.Offset - lastOffset))
+			if self.ConsecBools > 0 then
+				out = out .. self:FixBitfields()
+			end
+
+			out = out .. self:MissedOffset(lastOffset, (property.UProperty.Offset - lastOffset), "> LAST OFFSET")
 		end
 
 		-- Get the type and size of the property
@@ -192,11 +205,7 @@ function Class:FieldsToC()
 
 		-- If the type isn't one we recognize, add unknown data to the def.
 		if not typeof then
-			out = out .. string.format("\tconst unsigned char %s[0x%X]; // 0x%X (0x%X) UNKNOWN PROPERTY\n",
-				property:GetName(),
-				size,
-				property.UProperty.Offset,
-				size)
+			out = out .. self:MissedOffset(property.UProperty.Offset, size, "UNKNOWN PROPERTY")
 		else
 			local constness = ""
 			if flags.IsSet(property.UProperty.PropertyFlags.A, CPF_Const) then
@@ -237,6 +246,8 @@ function Class:FieldsToC()
 				size,
 				enumName)
 
+			debugFile:write("assert(ffi.offsetof(\"struct " .. CURRENT_CLASS_NAME .. "_Data\", \"" .. property:GetName() .. "\") == " .. tostring(property.UProperty.Offset - firstOffset) .. ")\n")
+
 			-- It's possible that our C definition for this type is not correct
 			-- If that's the case, we need to ensure that the fields are still 
 			-- at their correct offsets. So here we'll add some data to fix our 
@@ -260,7 +271,7 @@ function Class:FieldsToC()
 
 	-- If there is additional data after the last property we have, add it to the end
 	if lastOffset < self:GetFieldsSize() then
-		out = out .. self:MissedOffset(lastOffset, (self:GetFieldsSize() - lastOffset))
+		out = out .. self:MissedOffset(lastOffset, (self:GetFieldsSize() - lastOffset), "MISSING END DATA")
 	end
 
 	return out
@@ -287,6 +298,7 @@ function Class:FixBitfields()
 	local out = ""
 	local neededPadding = band(rshift(band((32 - band(self.ConsecBools, 31)), bnot(7)), 3), 3)
 	if neededPadding > 0 then
+		self.UnknownDataIndex = self.UnknownDataIndex + 1
 		out = out .. string.format("\tconst unsigned char Unknown%d[0x%X]; // BITFIELD FIX\n", 
 			self.UnknownDataIndex,
 			neededPadding)
@@ -298,7 +310,6 @@ function Class:FixBitfields()
 end
 
 function Class:MissedOffset(at, missedSize, reason)
-	if missedSize < CLASS_ALIGN then return "" end
 	if reason == nil then reason = "MISSED OFFSET" end
 
 	self.UnknownDataIndex = self.UnknownDataIndex + 1
@@ -332,6 +343,8 @@ function Package:WriteClassMetaData()
 end
 
 function Package:ProcessClasses()
+	debugFile = file.Open("classtest/" .. self.PackageObj:GetName() .. ".lua", "w+")
+	debugFile:write("local ffi = require(\"ffi\")\n\n")
 
 	self:CreateFile("classes")
 	self:WriteFileHeader("Class definitions")
@@ -359,4 +372,7 @@ function Package:ProcessClasses()
 	self:WriteCDefWrapperEnd()
 	self:WriteClassMetaData()
 	self:CloseFile()
+
+	debugFile:write("print(\"Done\")\n")
+	debugFile:close()
 end

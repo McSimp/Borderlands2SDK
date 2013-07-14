@@ -72,7 +72,8 @@ ffi.cdef[[
 		struct UField* 	SuperField;
 		struct UField* 	Children;
 		unsigned short 	PropertySize;
-		unsigned short 	Unknown2;
+		unsigned char 	Unknown2;
+		unsigned char 	MinAlignment;
 		struct TArray_char_ Script;
 		unsigned char 	Unknown3[0x2C];
 	};

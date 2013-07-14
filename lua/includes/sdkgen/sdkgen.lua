@@ -39,7 +39,7 @@ local types = {
 	IntAttributeProperty = { c = "int", basic = true, lua = "number" },
 	FloatProperty = { c = "float", basic = true, lua ="number" },
 	FloatAttributeProperty = { c = "float", basic = true, lua = "number" },
-	BoolProperty = { c = "bool", basic = true, lua = "boolean" }, -- bool is added by LuaJIT's implementation
+	BoolProperty = { c = "unsigned long", basic = true, lua = "boolean" }, -- bool is added by LuaJIT's implementation
 	StrProperty = { c = "struct FString" },
 	NameProperty = { c = "struct FName" },
 	DelegateProperty = { c = "struct FScriptDelegate" },

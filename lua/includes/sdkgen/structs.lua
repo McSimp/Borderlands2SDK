@@ -111,12 +111,18 @@ function ScriptStruct:GenerateDefinition()
 
 	-- Start by defining the struct with its name
 	local count = SDKGen.CountObject(scriptStruct.UObject.Name, engine.Classes.UScriptStruct)
-	local structText
+	local structName
 	if count == 1 then
-		structText = "struct " .. scriptStruct:GetCName() .. " {\n"
+		structName = scriptStruct:GetCName()
 	else
-		structText = "struct " .. scriptStruct.UObject.Outer:GetCName() .. "_" .. scriptStruct:GetCName() .. " {\n"
+		structName = scriptStruct.UObject.Outer:GetCName() .. "_" .. scriptStruct:GetCName()
 	end
+
+	local structText = string.format("// 0x%X\n", self:GetFieldsSize())
+	if scriptStruct.UStruct.MinAlignment ~= 4 then 
+		structText = structText .. "__declspec(align(" .. scriptStruct.UStruct.MinAlignment .. ")) "
+	end
+	structText = structText .. "struct " .. structName .. " {\n"
 
 	-- Check if this struct has a base which it inherits from. If it does, instead of doing
 	-- some hacky C struct inheritance, just put all the base fields straight into the def
@@ -161,6 +167,10 @@ function ScriptStruct:FieldsToC(lastOffset)
 		-- If the offset for this property is ahead of the end of the last property,
 		-- add some unknown data into the struct def.
 		if lastOffset < property.UProperty.Offset then
+			if self.ConsecBools > 0 then
+				out = out .. self:FixBitfields()
+			end
+
 			out = out .. self:MissedOffset(lastOffset, (property.UProperty.Offset - lastOffset))
 		end
 
@@ -238,7 +248,8 @@ function ScriptStruct:FieldsToC(lastOffset)
 
 	-- If there is additional data after the last property we have, add it to the end
 	if lastOffset < self:GetFieldsSize() then
-		out = out .. self:MissedOffset(lastOffset, (self:GetFieldsSize() - lastOffset))
+		local missedSize = self:GetFieldsSize() - lastOffset
+		out = out .. self:MissedOffset(lastOffset, missedSize)
 	end
 
 	return out
@@ -249,6 +260,7 @@ function ScriptStruct:FixBitfields()
 	local out = ""
 	local neededPadding = band(rshift(band((32 - band(self.ConsecBools, 31)), bnot(7)), 3), 3)
 	if neededPadding > 0 then
+		self.UnknownDataIndex = self.UnknownDataIndex + 1
 		out = out .. string.format("\tconst unsigned char Unknown%d[0x%X]; // BITFIELD FIX\n", 
 			self.UnknownDataIndex,
 			neededPadding)
@@ -260,7 +272,6 @@ function ScriptStruct:FixBitfields()
 end
 
 function ScriptStruct:MissedOffset(at, missedSize, reason)
-	if missedSize < STRUCT_ALIGN then return "" end
 	if reason == nil then reason = "MISSED OFFSET" end
 
 	self.UnknownDataIndex = self.UnknownDataIndex + 1
