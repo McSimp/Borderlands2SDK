@@ -283,7 +283,8 @@ namespace GwenManager
 		GWEN_BUTTON,
 		GWEN_WINDOW,
 		GWEN_HORIZONTALSLIDER,
-		GWEN_COMBOBOX
+		GWEN_COMBOBOX,
+		GWEN_LABEL
 	};
 
 	FFI_EXPORT Controls::Base* LUAFUNC_CreateNewControl(GwenControls controlNum, Controls::Base* parent)
@@ -311,6 +312,10 @@ namespace GwenManager
 		else if(controlNum == GWEN_COMBOBOX)
 		{
 			control = new Controls::ComboBox(parent);
+		}
+		else if(controlNum == GWEN_LABEL)
+		{
+			control = new Controls::Label(parent);
 		}
 		
 		return control;
@@ -362,6 +367,18 @@ namespace GwenManager
 	FFI_EXPORT int LUAFUNC_GetCanvasH()
 	{
 		return pCanvas->GetSize().y;
+	}
+
+	FFI_EXPORT Controls::MenuItem* LUAFUNC_AddComboItem(Controls::ComboBox* control, const char* label, const char* name)
+	{
+		if(name == NULL)
+		{
+			return control->AddItem(Util::Widen(label));
+		}
+		else
+		{
+			return control->AddItem(Util::Widen(label), name);
+		}
 	}
 
 	/*

@@ -42,9 +42,17 @@ int LUAFUNC_GetCanvasH();
 ]]
 
 gwen = {}
-gwen.ControlTypes = { Button = 0, WindowControl = 1, HorizontalSlider = 2 }
+gwen.ControlTypes = { 
+	Button = 0,
+	WindowControl = 1,
+	HorizontalSlider = 2,
+	ComboBox = 3,
+	Label = 4
+}
+
 gwen.meta = {}
 gwen._ActiveControls = {} -- TODO: Prevent use after free
+gwen._UserCreatedControls = {}
 
 POS_NONE = 0
 POS_LEFT = 2
@@ -71,7 +79,7 @@ function gwen.ControlFromPointer(cdata)
 
 	local tbl = { control = cdata }
 	local luaControl = setmetatable(tbl, gwen.meta[gwen.meta.Base.GetTypeName(tbl)] or "Base")
-	gwen._ActiveControls[PtrToNum(control)] = luaControl
+	gwen._ActiveControls[PtrToNum(cdata)] = luaControl
 
 	return luaControl
 end
@@ -107,6 +115,7 @@ function gwen.CreateControl(controlType, parent)
 
 	local luaControl = setmetatable({ control = control }, gwen.meta[controlType])
 	gwen._ActiveControls[PtrToNum(control)] = luaControl
+	gwen._UserCreatedControls[PtrToNum(control)] = luaControl
 
 	return luaControl
 end
@@ -117,6 +126,15 @@ end
 
 function gwen.ScrH()
 	return ffi.C.LUAFUNC_GetCanvasH()
+end
+
+function gwen.CleanupControls()
+	for _,v in pairs(gwen._UserCreatedControls) do
+		v:DelayedDelete()
+	end
+
+	gwen._UserCreatedControls = {}
+	gwen._ActiveControls = {}
 end
 
 function Color(r, g, b, a)
@@ -138,3 +156,5 @@ include("resizablecontrol.lua")
 include("windowcontrol.lua")
 include("slider.lua")
 include("horizontalslider.lua")
+include("menuitem.lua")
+include("combobox.lua")

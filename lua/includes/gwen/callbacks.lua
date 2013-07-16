@@ -13,6 +13,7 @@ local RegisteredCallbacks = {}
 local CallbackFFIFuncs = {}
 
 function gwen.ExecCallbacks(cbTable, this, pFromPanel)
+	print("ExecCallbacks called")
 	local ptrNum = PtrToNum(pFromPanel)
 
 	local hook = cbTable[ptrNum]
@@ -26,7 +27,6 @@ function gwen.ExecCallbacks(cbTable, this, pFromPanel)
 	if not status then
 		print("Error in Gwen callback: " .. err)
 	end
-	--v(gwen.ControlFromPointer(pFromPanel))
 end
 
 function gwen.SetCallback(control, offset, name, func)
@@ -69,12 +69,16 @@ function gwen.SetCallback(control, offset, name, func)
 end
 
 local function OnDestructorCalled(control)
+	print("Destructor called")
+	
 	local ptrNum = PtrToNum(control)
 	for name,cbTable in pairs(RegisteredCallbacks) do
 		if cbTable[ptrNum] ~= nil then
 			cbTable[ptrNum] = nil
 		end
 	end
+
+	gwen._ActiveControls[ptrNum] = nil
 end
 
 local destructorCB = ffi.cast("tGwenBaseDestructorHook", OnDestructorCalled)

@@ -103,7 +103,7 @@ end
 
 function Base:SetParent(parent)
 	local func = gwen.GetVFunc(self.control, 4, "tGwen_Controls_Base_SetParent")
-	func(self.control, rawget(parent, control))
+	func(self.control, rawget(parent, "control"))
 end
 
 function Base:GetParent()
@@ -115,7 +115,7 @@ end
 
 function Base:IsChild(testControl)
 	local func = gwen.GetVFunc(self.control, 8, "tGwen_Controls_Base_IsChild")
-	return func(self.control, rawget(testControl, control))
+	return func(self.control, rawget(testControl, "control"))
 end
 
 function Base:NumChildren()
