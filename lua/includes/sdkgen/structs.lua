@@ -117,12 +117,14 @@ function ScriptStruct:GenerateDefinition()
 	else
 		structName = scriptStruct.UObject.Outer:GetCName() .. "_" .. scriptStruct:GetCName()
 	end
+	CURRENT_STRUCT_NAME = structName
 
-	local structText = string.format("// 0x%X\n", self:GetFieldsSize())
+	local structText = string.format("// 0x%X ", self:GetFieldsSize())
 	if scriptStruct.UStruct.MinAlignment ~= 4 then 
-		structText = structText .. "__declspec(align(" .. scriptStruct.UStruct.MinAlignment .. ")) "
+		structText = structText .. string.format("(Alignment = %d)", scriptStruct.UStruct.MinAlignment)
 	end
-	structText = structText .. "struct " .. structName .. " {\n"
+
+	structText = structText .. "\nstruct " .. structName .. " {\n"
 
 	-- Check if this struct has a base which it inherits from. If it does, instead of doing
 	-- some hacky C struct inheritance, just put all the base fields straight into the def
@@ -171,7 +173,7 @@ function ScriptStruct:FieldsToC(lastOffset)
 				out = out .. self:FixBitfields()
 			end
 
-			out = out .. self:MissedOffset(lastOffset, (property.UProperty.Offset - lastOffset))
+			out = out .. self:MissedOffset(lastOffset, (property.UProperty.Offset - lastOffset), "> LAST OFFSET")
 		end
 
 		-- Get the type and size of the property
@@ -186,6 +188,16 @@ function ScriptStruct:FieldsToC(lastOffset)
 				property.UProperty.Offset,
 				size)
 		else
+			-- property.UProperty.ElementSize includes the padding of structs, but we don't want
+			-- that, because we're going to align things ourselves. Accessing
+			-- the PropertySize of the actual struct definition will give us the raw size,
+			-- without the extra bytes for alignment
+			if property:IsA(engine.Classes.UStructProperty) then
+				property = ffi.cast("struct UStructProperty*", property)
+				local newSize = SDKGen.Align(property.UStructProperty.Struct.UStruct.PropertySize, 4) * property.UProperty.ArrayDim
+				size = newSize
+			end
+
 			local constness = ""
 			if flags.IsSet(property.UProperty.PropertyFlags.A, CPF_Const) then
 				constness = "const "
@@ -225,6 +237,8 @@ function ScriptStruct:FieldsToC(lastOffset)
 				size,
 				enumName)
 
+			debugFile:write("assert(ffi.offsetof(\"struct " .. CURRENT_STRUCT_NAME .. "\", \"" .. property:GetName() .. "\") == " .. tostring(property.UProperty.Offset) .. ")\n")
+
 			-- It's possible that our C definition for this type is not correct
 			-- If that's the case, we need to ensure that the fields are still 
 			-- at their correct offsets. So here we'll add some data to fix our 
@@ -238,7 +252,7 @@ function ScriptStruct:FieldsToC(lastOffset)
 			end
 		end
 
-		lastOffset = property.UProperty.Offset + (property.UProperty.ElementSize * property.UProperty.ArrayDim)
+		lastOffset = property.UProperty.Offset + size
 	end
 
 	-- Make sure that if the last property was a bitfield, the appropriate padding is added
@@ -249,7 +263,7 @@ function ScriptStruct:FieldsToC(lastOffset)
 	-- If there is additional data after the last property we have, add it to the end
 	if lastOffset < self:GetFieldsSize() then
 		local missedSize = self:GetFieldsSize() - lastOffset
-		out = out .. self:MissedOffset(lastOffset, missedSize)
+		out = out .. self:MissedOffset(lastOffset, missedSize, "MISSING END DATA")
 	end
 
 	return out
@@ -257,18 +271,8 @@ end
 
 -- See classes.lua for a rant on this
 function ScriptStruct:FixBitfields()
-	local out = ""
-	local neededPadding = band(rshift(band((32 - band(self.ConsecBools, 31)), bnot(7)), 3), 3)
-	if neededPadding > 0 then
-		self.UnknownDataIndex = self.UnknownDataIndex + 1
-		out = out .. string.format("\tconst unsigned char Unknown%d[0x%X]; // BITFIELD FIX\n", 
-			self.UnknownDataIndex,
-			neededPadding)
-	end
-
 	self.ConsecBools = 0
-
-	return out
+	return "\tconst unsigned long: 0;\n"
 end
 
 function ScriptStruct:MissedOffset(at, missedSize, reason)
@@ -287,6 +291,9 @@ function ScriptStruct:MissedOffset(at, missedSize, reason)
 end
 
 function Package:ProcessScriptStructs()
+	debugFile = file.Open("structtest/" .. self.PackageObj:GetName() .. ".lua", "w+")
+	debugFile:write("local ffi = require(\"ffi\")\n\n")
+
 	self:CreateFile("structs")
 	self:WriteFileHeader("Script Structs")
 
@@ -312,4 +319,7 @@ function Package:ProcessScriptStructs()
 
 	self:WriteCDefWrapperEnd()
 	self:CloseFile()
+
+	debugFile:write("print(\"Done\")\n")
+	debugFile:close()
 end

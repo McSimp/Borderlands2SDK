@@ -119,7 +119,8 @@ end
 
 function SDKGen.GetCPropertySize(prop)
 	if prop:IsA(engine.Classes.UStructProperty) then
-		return prop.UProperty.ElementSize
+		prop = ffi.cast("struct UStructProperty*", prop)
+		return SDKGen.Align(prop.UStructProperty.Struct.UStruct.PropertySize, 4)
 	end
 
 	local propType = types[prop.UObject.Class:GetName()]
@@ -157,6 +158,10 @@ end
 
 function SDKGen.AddError(errorText)
 	table.insert(SDKGen.Errors, errorText)
+end
+
+function SDKGen.Align(size, alignment)
+	return bit.band((size + alignment - 1), bit.bnot(alignment - 1))
 end
 
 local Package = SDKGen.Package

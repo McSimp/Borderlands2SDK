@@ -77,7 +77,7 @@ local function InitializeClasses()
 			name = class[1],
 			base = engine.Classes[class[3]],
 			ptrType = ffi.typeof("struct " .. class[1] .. "*"),
-			funcs = g_classFuncs[class[1]]
+			funcs = g_classFuncs[class[1]] or {}
 		}
 
 		-- If it's a string, it's a full name and we need to search.

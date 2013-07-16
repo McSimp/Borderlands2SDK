@@ -21,6 +21,7 @@ Lua
 * Add __tostring for structs
 * Bind the rest of the gwen controls
 * Complete file library (unload for the moment)
+* Figure out what's going on with FTurnData
 
 Other
 * CrashRpt endpoint on mcsi.mp

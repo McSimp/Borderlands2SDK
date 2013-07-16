@@ -115,13 +115,13 @@ function Class:GenerateDefinition()
 
 	SDKGen.DebugPrint("[SDKGen] Class " .. class:GetFullName())
 
-	local classText = string.format("// 0x%X\n", self:GetFieldsSize())
+	local classText = string.format("// 0x%X ", self:GetFieldsSize())
 	if class.UStruct.MinAlignment ~= 4 then 
-		classText = classText .. "__declspec(align(" .. class.UStruct.MinAlignment .. ")) "
+		classText = classText .. " (Alignment = " .. class.UStruct.MinAlignment .. ")"
 	end
 
 	-- Start by defining the class with name_Data and put the fields in there
-	classText = classText .. "struct " .. cname .. "_Data {\n"
+	classText = classText .. "\nstruct " .. cname .. "_Data {\n"
 
 	-- Add the fields of this class into the struct
 	classText = classText .. self:FieldsToC()
@@ -135,17 +135,27 @@ function Class:GenerateDefinition()
 	-- that we can prepend to.
 	local inheritText = ""
 	local base = ffi.cast("struct UClass*", class.UStruct.SuperField)
+	local lastOffset = 0
 	while NotNull(base) do
 		local name = base:GetCName()
 		inheritText = string.format("\tstruct %s_Data %s;\n", name, name) .. inheritText
+		
 		base = ffi.cast("struct UClass*", base.UStruct.SuperField)
+
+		if NotNull(base) then
+			lastOffset = SDKGen.Align(base.UStruct.PropertySize, 4)
+		else
+			lastOffset = 0
+		end
+
+		debugFile:write("assert(ffi.offsetof(\"struct " .. cname .. "\", \"" .. name .. "\") == " .. lastOffset .. ")\n")
 	end
 
 	-- At the end, make sure we have the actual class
 	inheritText = inheritText .. string.format("\tstruct %s_Data %s;\n};\n\n", cname, cname)
 	classText = classText .. inheritText
 
-	debugFile:write("assert(ffi.sizeof(\"struct " .. cname .. "\") == " .. tostring(self:GetFieldsSize()) .. ")\n" )
+	--debugFile:write("assert(ffi.sizeof(\"struct " .. cname .. "\") == " .. tostring(self:GetFieldsSize()) .. ")\n" )
 
 	table.insert(GeneratedClasses, class)
 	table.insert(ClassList, class)
@@ -181,13 +191,13 @@ function Class:FieldsToC()
 
 	local base = ffi.cast("struct UClass*", class.UStruct.SuperField)
 	if NotNull(base) then
-		lastOffset = base.UStruct.PropertySize
+		lastOffset = SDKGen.Align(base.UStruct.PropertySize, 4)
 	end
 
 	local firstOffset = lastOffset
 
 	local out = string.format("\t// Last Offset: 0x%X\n", lastOffset)
-	for _,property in ipairs(properties) do
+	for k,property in ipairs(properties) do
 
 		-- If the offset for this property is ahead of the end of the last property,
 		-- add some unknown data into the struct def.
@@ -207,6 +217,13 @@ function Class:FieldsToC()
 		if not typeof then
 			out = out .. self:MissedOffset(property.UProperty.Offset, size, "UNKNOWN PROPERTY")
 		else
+			if property:IsA(engine.Classes.UStructProperty) then
+				property = ffi.cast("struct UStructProperty*", property)
+				local newSize = SDKGen.Align(property.UStructProperty.Struct.UStruct.PropertySize, 4) * property.UProperty.ArrayDim
+				if newSize ~= size then print(CURRENT_CLASS_NAME .. ": " .. property:GetName() .. " " .. newSize .. " != " .. size) end
+				size = newSize
+			end
+
 			local constness = ""
 			if flags.IsSet(property.UProperty.PropertyFlags.A, CPF_Const) then
 				constness = "const "
@@ -219,8 +236,28 @@ function Class:FieldsToC()
 			end
 
 			if property:IsA(engine.Classes.UBoolProperty) then
-				special = special .. " : 1" -- A bool is defined as a 1 bit unsigned long
-				self.ConsecBools = self.ConsecBools + 1
+				property = ffi.cast("struct UBoolProperty*", property)
+				local isBitfield = true
+
+				-- There's a case where sometimes bool properties _aren't_ bitfields.
+				-- Sigh. Get your shit straight Epic. There's no flag that's actually
+				-- set afaik, so we'll just have to see what the next field is doing
+				-- to see if we want to skip the bitfield part.
+				local nextProp = properties[k + 1]
+				if nextProp ~= nil and nextProp:IsA(engine.Classes.UBoolProperty) then
+					nextProp = ffi.cast("struct UBoolProperty*", nextProp)
+
+					if property.UBoolProperty.BitMask == 1
+					and nextProp.UProperty.Offset == property.UProperty.Offset + 4
+					and nextProp.UBoolProperty.BitMask == 1 then
+						isBitfield = false
+					end
+				end
+
+				if isBitfield then
+					self.ConsecBools = self.ConsecBools + 1
+					special = special .. " :1 "
+				end
 
 			-- If this property is not a bool, but the previous properties (or property)
 			-- have been, then padding might be needed, see FixBitfields()
@@ -261,7 +298,7 @@ function Class:FieldsToC()
 			end
 		end
 
-		lastOffset = property.UProperty.Offset + (property.UProperty.ElementSize * property.UProperty.ArrayDim)
+		lastOffset = property.UProperty.Offset + size
 	end
 
 	-- Make sure that if the last property was a bitfield, the appropriate padding is added
@@ -286,27 +323,10 @@ end
 -- This is a problem for us, since we need the struct sizes and offsets
 -- to match MSVC (since that's what BL2 is compiled with), so we have to 
 -- add the extra data defs onto the end of series of bitfields to make sure
--- it's aligned to 32 bit boundaries. Perhaps there is some kind of alingment 
--- pragma or attribute for this, but I've been unable to find one. 
--- I figured out a cool way to get the number of bytes needed using some
--- bit twiddling trickery: 
---    band(rshift(band((32 - band(numBitFields, 31)), bnot(7)), 3), 3)
--- This does the same job as:
---    math.floor((32 - (numBitFields % 32)) / 8)
--- but faster.
+-- it's aligned to 32 bit boundaries. The 0 length bitfield ensures this.
 function Class:FixBitfields()
-	local out = ""
-	local neededPadding = band(rshift(band((32 - band(self.ConsecBools, 31)), bnot(7)), 3), 3)
-	if neededPadding > 0 then
-		self.UnknownDataIndex = self.UnknownDataIndex + 1
-		out = out .. string.format("\tconst unsigned char Unknown%d[0x%X]; // BITFIELD FIX\n", 
-			self.UnknownDataIndex,
-			neededPadding)
-	end
-
 	self.ConsecBools = 0
-
-	return out
+	return "\tconst unsigned long: 0;\n"
 end
 
 function Class:MissedOffset(at, missedSize, reason)
