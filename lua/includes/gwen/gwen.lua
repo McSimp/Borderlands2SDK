@@ -65,6 +65,7 @@ POS_FILL = 128
 POS_CENTER = 96 -- (CenterV | CenterH)
 
 function gwen.GetVFunc(control, idx, typedef)
+	if control == nil then print(debug.traceback()) error("Control was nil") end
 	return ffi.cast(typedef, control.VMT[idx])
 end
 
@@ -90,10 +91,12 @@ function gwen.GetTextObject(str)
 end
 
 function gwen.FreeTextObject(obj)
+	if obj == nil then print("ERROR: Text object was nil") return end
 	ffi.C.LUAFUNC_DestroyTextObject(obj)
 end
 
 function gwen.GetStringFromTextObject(obj)
+	if obj == nil then print("ERROR: Text object was nil") return "" end
 	return ffi.string(ffi.C.LUAFUNC_GetTextObjectString(obj))
 end
 

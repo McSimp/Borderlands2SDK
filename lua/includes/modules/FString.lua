@@ -37,8 +37,8 @@ module("FString")
 
 function GetFromLuaString(str)
 	-- TODO: What about GC?
-	local buff = ffi.new("wchar_t[?]", string.len(str))
-	local size = ffi.C.mbstowcs(buff, str, string.len(str))
-	local struct = ffi.new("struct FString", buff, size, size)
-	return struct
+	local len = string.len(str) + 1
+	local buff = ffi.new("wchar_t[?]", len)
+	ffi.C.mbstowcs(buff, str, len)
+	return ffi.new("struct FString", buff, len, len)
 end

@@ -21,6 +21,10 @@ FUNCPARM_OBJPOINTER = 16
 FUNCPARM_LUATYPE = 32
 FUNCPARM_STRUCT = 64
 
+FUNC_Native = 0x00000400
+FUNC_Defined = 0x00000002
+FUNC_HasOptionalParms = 0x00004000
+
 -- ProcessEvent - basically lets us call any engine function
 ffi.cdef[[
 typedef void (__thiscall *tProcessEvent) (struct UObject*, struct UFunction*, void*, void*);
@@ -152,8 +156,10 @@ function FuncMT.__call(funcData, obj, ...)
 
 	-- Call func
 	local func = funcData.ptr
+	local funcFlags = func.UFunction.FunctionFlags
+
 	-- TODO: This is not the right approach, do some RE of ProcessEvent in the engine
-	func.UFunction.FunctionFlags = bit.bor(func.UFunction.FunctionFlags, bit.bnot(0x400))
+	func.UFunction.FunctionFlags = bit.bor(funcFlags, bit.bnot(0x400))
 	
 	local native = func.UFunction.iNative
 	func.UFunction.iNative = 0
@@ -161,6 +167,7 @@ function FuncMT.__call(funcData, obj, ...)
 	pProcessEvent(ffi.cast("struct UObject*", obj), func, paramBlock, nil)
 
 	func.UFunction.iNative = native
+	func.UFunction.FunctionFlags = funcFlags
 
 	-- This is a fairly common occurrence, usually just a bool, so we can just handle
 	-- this without having to fallback to the interpreter with unpack()

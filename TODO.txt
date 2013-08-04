@@ -37,6 +37,3 @@ Bugs:
 * Gwen canvas will resize, but game will lock up completely if resize and there has been a Gwen window on the screen at any point
 * Gwen cursor does not work correctly in full screen - I think it's fine in borderless windowed though
 * Tabs in Unreal console are fucked
-
-http://b9.eu.icdn.ru/d/derpsey/1/32970561JHD.gif
-http://i.imgur.com/RhL4ZV0.gif

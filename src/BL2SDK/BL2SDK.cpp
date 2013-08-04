@@ -106,13 +106,13 @@ namespace BL2SDK
 
 	int UnrealExceptionHandler(unsigned int code, struct _EXCEPTION_POINTERS* ep)
 	{
-		if(CrashRptHelper::GenerateReport(code, ep))
+		if(IsDebuggerPresent())
+		{
+			DebugBreak();
+		}
+		else if(CrashRptHelper::GenerateReport(code, ep))
 		{
 			Util::CloseGame();
-		}
-		else
-		{
-			// TODO: Maybe have it call the original Engine func here
 		}
 
 		return EXCEPTION_EXECUTE_HANDLER;

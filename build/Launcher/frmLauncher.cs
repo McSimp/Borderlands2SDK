@@ -246,7 +246,7 @@ namespace Launcher
 
             bool result = Imports.CreateProcess(
                 gamePath,
-                "-nolauncher",
+                "-NoLauncher",
                 IntPtr.Zero,
                 IntPtr.Zero,
                 false,
