@@ -40,12 +40,6 @@
     <Filter Include="Header Files\Third Party\Crashrpt">
       <UniqueIdentifier>{c23ea6ef-c8de-40f8-873b-903173f61285}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\GUI">
-      <UniqueIdentifier>{55774d1c-95c3-4f69-a059-bd50b32fdf0c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\GUI">
-      <UniqueIdentifier>{de52e3cf-a5e0-4a44-bda6-ddaa9973971c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\GameSDK\Core_functions.cpp">
@@ -74,15 +68,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\BL2SDK\CSimpleDetour.cpp">
       <Filter>Source Files\BL2SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GUI\D3D9Hook.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GUI\GwenManager.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GUI\DirectX9.cpp">
-      <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\LuaInterface\CLuaInterface.cpp">
       <Filter>Source Files\LuaInterface</Filter>
@@ -155,12 +140,6 @@
     <ClInclude Include="..\..\src\BL2SDK\detours.h">
       <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\GUI\GwenManager.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GUI\D3D9Hook.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\LuaInterface\CLuaInterface.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
@@ -193,9 +172,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\BL2SDK\GameHooks.h">
       <Filter>Header Files\BL2SDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\GUI\DirectX9.h">
-      <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\GameSDK\Signatues.h">
       <Filter>Header Files\GameSDK</Filter>

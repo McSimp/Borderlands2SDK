@@ -6,10 +6,8 @@
 #include "BL2SDK/GameHooks.h"
 #include "BL2SDK/Settings.h"
 #include "BL2SDK/Util.h"
-#include "GUI/D3D9Hook.h"
 #include "BL2SDK/Exceptions.h"
 #include "BL2SDK/AntiDebug.h"
-#include "GUI/GwenManager.h"
 #include "GameSDK/Signatues.h"
 #include "LuaInterface/Exports.h"
 
@@ -27,9 +25,8 @@ namespace BL2SDK
 	tProcessEvent pProcessEvent;
 	tCallFunction pCallFunction;
 	tFrameStep pFrameStep;
-	tProcessDeferredMessage pProcessDeferredMessage;
-	tViewportResize pViewportResize;
-	void* pGwenDestructor;
+	tStaticConstructObject pStaticConstructObject;
+	tLoadPackage pLoadPackage;
 
 	CLuaInterface* Lua;
 
@@ -205,19 +202,13 @@ namespace BL2SDK
 		pFrameStep = reinterpret_cast<tFrameStep>(sigscan.Scan(Signatures::FrameStep));
 		Logging::LogF("[Internal] FFrame::Step() = 0x%p\n", pFrameStep);
 
-		// Sigscan for FWindowsViewport::ProcessDeferredMessage
-		pProcessDeferredMessage = reinterpret_cast<tProcessDeferredMessage>(sigscan.Scan(Signatures::ProcessDeferredMessage));
-		Logging::LogF("[Internal] FWindowsViewport::ProcessDeferredMessage() = 0x%p\n", pProcessDeferredMessage);
+		// Sigscan for UObject::StaticConstructObject
+		pStaticConstructObject = reinterpret_cast<tStaticConstructObject>(sigscan.Scan(Signatures::StaticConstructor));
+		Logging::LogF("[Internal] UObject::StaticConstructObject() = 0x%p\n", pStaticConstructObject);
 
-		// Sigscan for FWindowsViewport::Resize
-		pViewportResize = reinterpret_cast<tViewportResize>(sigscan.Scan(Signatures::ViewportResize));
-		Logging::LogF("[Internal] FWindowsViewport::Resize() = 0x%p\n", pViewportResize);
-
-		// Sigscan for Gwen::Controls::Base::~Base()
-		CSigScan sdkSigscan(L"BL2SDKDLL.dll");
-
-		pGwenDestructor = reinterpret_cast<void*>(sdkSigscan.Scan(Signatures::GwenDestructor));
-		Logging::LogF("[Internal] Gwen::Controls::Base::~Base() = 0x%p\n", pGwenDestructor);
+		// Sigscan for UObject::LoadPackage
+		pLoadPackage = reinterpret_cast<tLoadPackage>(sigscan.Scan(Signatures::LoadPackage));
+		Logging::LogF("[Internal] UObject::LoadPackage() = 0x%p\n", pLoadPackage);
 
 		// Detour UObject::ProcessEvent()
 		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkProcessEvent);
@@ -238,20 +229,20 @@ namespace BL2SDK
 		LuaStatus status = Lua->InitializeModules();
 		if(status == LUA_HASH_FAILED)
 		{
-			GwenManager::DisplayMessageBox("Lua Hash Check Failed",
-				"A file in the 'lua/includes' folder has been modified. Please enable developer mode if you wish to modify these files. Otherwise, re-extract the SDK and replace the modified files with the orignal files.", 
-				true);
+			Util::Popup(L"Lua Hash Check Failed",
+				L"A file in the 'lua/includes' folder has been modified. Please enable developer mode if you wish to modify these files. Otherwise, re-extract the SDK and replace the modified files with the orignal files.");
+			Util::CloseGame();
 		}
 		else if(status == LUA_MODULE_ERROR && !Settings::DeveloperModeEnabled())
 		{
-			GwenManager::DisplayMessageBox("Lua Module Error",
-				"A core Lua module failed to load correctly, and the SDK cannot continue to run.\n\nThis may indicate that BL2 has been patched and the SDK needs updating.",
-				true);
+			Util::Popup(L"Lua Module Error",
+				L"A core Lua module failed to load correctly, and the SDK cannot continue to run.\n\nThis may indicate that BL2 has been patched and the SDK needs updating.");
+			Util::CloseGame();
 		}
 		else if(status == LUA_MODULE_ERROR && Settings::DeveloperModeEnabled())
 		{
-			GwenManager::DisplayMessageBox("Lua Module Error", 
-				"An error occurred while loading the Lua modules.\n\nPlease check your console for the exact error. Once you've fixed the error, press F11 to reload the Lua state.");
+			Util::Popup(L"Lua Module Error", 
+				L"An error occurred while loading the Lua modules.\n\nPlease check your console for the exact error. Once you've fixed the error, press F11 to reload the Lua state.");
 		}
 	}
 
@@ -288,10 +279,6 @@ namespace BL2SDK
 	bool GetCanvasPostRender(UObject* caller, UFunction* function, void* parms, void* result)
 	{
 		UGameViewportClient_eventPostRender_Parms* realParms = reinterpret_cast<UGameViewportClient_eventPostRender_Parms*>(parms);
-		UCanvas* canvas = realParms->Canvas;
-
-		GwenManager::UpdateCanvas(canvas->SizeX, canvas->SizeY);
-
 		InitializeLua();
 
 		if(Settings::DeveloperModeEnabled())
@@ -374,8 +361,6 @@ namespace BL2SDK
 		LogAllProcessEventCalls(args->LogAllProcessEventCalls);
 		LogAllUnrealScriptCalls(args->LogAllUnrealScriptCalls);
 
-		D3D9Hook::Initialize();
-
 		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameInfo.InitGame", "StartupSDK", &GameReady);	
 	}
 
@@ -401,5 +386,15 @@ namespace BL2SDK
 	FFI_EXPORT char* LUAFUNC_UObjectGetFullName(UObject* obj)
 	{
 		return obj->GetFullName();
+	}
+
+	FFI_EXPORT UObject* LUAFUNC_StaticConstructObject(UClass* inClass, UObject* outer, FName name, unsigned int flags)
+	{
+		return pStaticConstructObject(inClass, outer, name, flags, NULL, NULL, NULL, NULL);
+	}
+
+	FFI_EXPORT UPackage* LUAFUNC_LoadPackage(UPackage* outer, const wchar_t* filename, DWORD flags)
+	{
+		return pLoadPackage(outer, filename, flags);
 	}
 }

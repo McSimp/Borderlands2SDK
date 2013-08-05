@@ -26,9 +26,6 @@ require("enums")
 -- Load engine functions
 require("engine")
 
--- Load Gwen
-include("gwen/gwen.lua")
-
 local function NeedsSDKGenerated()
 	local generateSDK = true
 
@@ -60,13 +57,16 @@ else
 	include("../sdkgen/loader.lua")
 	engine.Initialize()
 
+	-- Some convenience MTs for engine types
+	require("FColor")
+
 	require("engineHook")
 	require("scriptHook")
 
 	require("command")
 	include("luacommands.lua")
 
-	package.loaded.ffi.cdef = nil -- No more defining
+	-- package.loaded.ffi.cdef = nil -- No more defining
 
 	function OnShutdown()
 		scriptHook.RemoveAll()

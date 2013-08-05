@@ -13,15 +13,14 @@ namespace BL2SDK
 	//typedef int (tUnrealEH) (unsigned int, struct _EXCEPTION_POINTERS*);
 	typedef void (__thiscall *tCallFunction) (UObject*, FFrame&, void* const, UFunction*);
 	typedef void (__thiscall *tFrameStep) (FFrame*, UObject*, void* const);
-	typedef void (__thiscall *tProcessDeferredMessage) (FWindowsViewport*, const FDeferredMessage&);
-	typedef void (__thiscall *tViewportResize) (FWindowsViewport*, unsigned int, unsigned int, bool, bool, int, int);
+	typedef UObject* (*tStaticConstructObject) (UClass* inClass, UObject* outer, FName name, unsigned int flags, UObject* inTemplate, FOutputDevice* error, UObject* root, void* unk);
+	typedef UPackage* (*tLoadPackage) (UPackage* outer, const wchar_t* filename, DWORD flags);
 
 	extern tProcessEvent pProcessEvent;
 	extern tCallFunction pCallFunction;
 	extern tFrameStep pFrameStep;
-	extern tProcessDeferredMessage pProcessDeferredMessage;
-	extern tViewportResize pViewportResize;
-	extern void* pGwenDestructor;
+	extern tStaticConstructObject pStaticConstructObject;
+	extern tLoadPackage pLoadPackage;
 
 	extern CLuaInterface* Lua;
 

@@ -117,9 +117,6 @@
     <ClCompile Include="..\..\src\BL2SDK\CSimpleDetour.cpp" />
     <ClCompile Include="..\..\src\GameSDK\Core_functions.cpp" />
     <ClCompile Include="..\..\src\GameSDK\Engine_functions.cpp" />
-    <ClCompile Include="..\..\src\GUI\D3D9Hook.cpp" />
-    <ClCompile Include="..\..\src\GUI\DirectX9.cpp" />
-    <ClCompile Include="..\..\src\GUI\GwenManager.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\CLuaInterface.cpp" />
     <ClCompile Include="..\..\src\LuaInterface\lib_init.c" />
     <ClCompile Include="..\..\src\LuaInterface\LuaFileLib.cpp" />
@@ -148,9 +145,6 @@
     <ClInclude Include="..\..\src\GameSDK\GameSDK.h" />
     <ClInclude Include="..\..\src\GameSDK\MemorySignature.h" />
     <ClInclude Include="..\..\src\GameSDK\Signatues.h" />
-    <ClInclude Include="..\..\src\GUI\D3D9Hook.h" />
-    <ClInclude Include="..\..\src\GUI\DirectX9.h" />
-    <ClInclude Include="..\..\src\GUI\GwenManager.h" />
     <ClInclude Include="..\..\src\LuaInterface\CLuaInterface.h" />
     <ClInclude Include="..\..\src\LuaInterface\Exports.h" />
     <ClInclude Include="..\..\src\LuaInterface\LuaFileLib.h" />

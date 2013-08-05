@@ -276,6 +276,14 @@ public:
 
 };
 
+// Class Core.Package
+// 0x00BC (0x00F8 - 0x003C)
+class UPackage : public UObject
+{
+public:
+	unsigned char                                      UnknownData00[ 0xBC ];                            		// 0x003C (0x00BC) MISSED OFFSET
+};
+
 #ifdef _MSC_VER
 	#pragma pack ( pop )
 #endif
