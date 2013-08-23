@@ -90,6 +90,9 @@
     <ClCompile Include="..\..\src\LuaInterface\LuaFileLib.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\BL2SDK\PackageFix.cpp">
+      <Filter>Source Files\BL2SDK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\GameSDK\Core_classes.h">
@@ -184,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\LuaInterface\LuaFileLib.h">
       <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BL2SDK\PackageFix.h">
+      <Filter>Header Files\BL2SDK</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

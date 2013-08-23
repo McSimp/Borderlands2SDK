@@ -45,7 +45,7 @@ local function CommandHook(Object, Stack, Result, Function)
 
 		local status, ret = pcall(LuaCommands[cmdLower], cmd, args)
 		if not status then print("Error in command: " .. ret) end
-
+--[[
 		local console = ffi.cast("struct UConsole*", Object)
 
 		local cmp
@@ -63,7 +63,7 @@ local function CommandHook(Object, Stack, Result, Function)
 		end
 
 		console.UConsole.HistoryCur = console.UConsole.HistoryTop
-
+]]
 		Stack:SkipFunction()
 		return true
 	end

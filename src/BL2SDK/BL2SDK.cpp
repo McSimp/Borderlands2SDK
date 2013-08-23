@@ -10,6 +10,7 @@
 #include "BL2SDK/AntiDebug.h"
 #include "GameSDK/Signatues.h"
 #include "LuaInterface/Exports.h"
+#include "BL2SDK/PackageFix.h"
 
 namespace BL2SDK
 {
@@ -22,11 +23,13 @@ namespace BL2SDK
 	void* pGObjHash;
 	void* pGCRCTable;
 	void* pNameHash;
+	void* pTextureFixLocation;
 	tProcessEvent pProcessEvent;
 	tCallFunction pCallFunction;
 	tFrameStep pFrameStep;
 	tStaticConstructObject pStaticConstructObject;
 	tLoadPackage pLoadPackage;
+	tByteOrderSerialize pByteOrderSerialize;
 
 	CLuaInterface* Lua;
 
@@ -210,6 +213,14 @@ namespace BL2SDK
 		pLoadPackage = reinterpret_cast<tLoadPackage>(sigscan.Scan(Signatures::LoadPackage));
 		Logging::LogF("[Internal] UObject::LoadPackage() = 0x%p\n", pLoadPackage);
 
+		// Sigscan for FArchive::ByteOrderSerialize
+		pByteOrderSerialize = reinterpret_cast<tByteOrderSerialize>(sigscan.Scan(Signatures::ByteOrderSerialize));
+		Logging::LogF("[Internal] FArchive::ByteOrderSerialize() = 0x%p\n", pByteOrderSerialize);
+
+		// Sigscan for texture load fix location
+		pTextureFixLocation = sigscan.Scan(Signatures::TextureFixLocation);
+		Logging::LogF("[Internal] Texture Fix Location = 0x%p\n", pTextureFixLocation);
+
 		// Detour UObject::ProcessEvent()
 		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkProcessEvent);
 		detProcessEvent.Attach();
@@ -357,6 +368,7 @@ namespace BL2SDK
 		GameHooks::Initialize();
 
 		HookGame();
+		InitializePackageFix();
 
 		LogAllProcessEventCalls(args->LogAllProcessEventCalls);
 		LogAllUnrealScriptCalls(args->LogAllUnrealScriptCalls);
@@ -395,6 +407,9 @@ namespace BL2SDK
 
 	FFI_EXPORT UPackage* LUAFUNC_LoadPackage(UPackage* outer, const wchar_t* filename, DWORD flags)
 	{
-		return pLoadPackage(outer, filename, flags);
+		SetIsLoadingUDKPackage(true);
+		UPackage* result = pLoadPackage(outer, filename, flags);
+		SetIsLoadingUDKPackage(false);
+		return result;
 	}
 }

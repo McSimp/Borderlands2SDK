@@ -6,11 +6,14 @@ local TArrayMT = { __index = {} }
 
 function TArrayMT.__index.Get(self, idx)
 	if idx < self.Count and idx >= 0 then
-		return self.Data[idx]
+		if self.Data[idx] ~= nil then
+			return self.Data[idx]
+		end
 	else
 		print("[TArray] Warning: Index out of range")
-		return nil
 	end
+
+	return nil
 end
 
 -- Using pairs is probably slower than a normal for loop, but it's a tad more convenient

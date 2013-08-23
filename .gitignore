@@ -107,3 +107,5 @@ thirdparty/LuaJIT/src/*.dll
 lua/sdkgen/*
 src/generated/*
 lua/includes/modules/jit/*
+lua/classtest/*
+lua/structtest/*

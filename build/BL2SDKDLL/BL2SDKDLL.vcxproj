@@ -112,6 +112,7 @@
     <ClCompile Include="..\..\src\BL2SDK\CSigScan.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\GameHooks.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Logging.cpp" />
+    <ClCompile Include="..\..\src\BL2SDK\PackageFix.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Settings.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\Util.cpp" />
     <ClCompile Include="..\..\src\BL2SDK\CSimpleDetour.cpp" />
@@ -131,6 +132,7 @@
     <ClInclude Include="..\..\src\BL2SDK\GameHooks.h" />
     <ClInclude Include="..\..\src\BL2SDK\Exceptions.h" />
     <ClInclude Include="..\..\src\BL2SDK\Logging.h" />
+    <ClInclude Include="..\..\src\BL2SDK\PackageFix.h" />
     <ClInclude Include="..\..\src\BL2SDK\Settings.h" />
     <ClInclude Include="..\..\src\BL2SDK\Util.h" />
     <ClInclude Include="..\..\src\BL2SDK\CSimpleDetour.h" />

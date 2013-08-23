@@ -203,6 +203,25 @@ struct FDeferredMessage
 	}	KeyStates;
 };
 
+struct FArchive
+{
+
+};
+
+struct FArchiveAsync : FArchive
+{
+	unsigned char Unknown[0x9C];
+	INT CurrentPos;
+};
+
+struct ULinkerLoad : FArchive
+{
+	void* VfTable;
+	unsigned char Unknown[0x498];
+	FArchiveAsync* Loader;
+};
+
+
 /*
 # ========================================================================================= #
 # Includes

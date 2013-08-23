@@ -72,6 +72,18 @@ namespace BL2SDK
 			"xxxxxx????xx????xxxxx????xxxxx",
 			30
 		};
+
+		MemorySignature ByteOrderSerialize = {
+			"\x55\x8B\xEC\x56\x8B\xF1\x83\x7E\x4C\x00\x74\x26",
+			"xxxxxxxxxxxx",
+			12
+		};
+
+		MemorySignature TextureFixLocation = {
+			"\x8B\x46\x10\x85\xC0\x0F\x84\x00\x00\x00\x00\x8B\x16",
+			"xxxxxxx????xx",
+			13
+		};
 	}
 }
 

@@ -16,6 +16,8 @@ end
 
 canvas = {}
 local engineCanvas = nil -- make sure it's a struct UCanvas*
+local currentTexture = nil
+local whiteColor = ffi.new("struct FLinearColor", 1, 1, 1, 1)
 
 function canvas._SetPos(x, y)
 	engineCanvas.UCanvas.CurX = x
@@ -65,14 +67,28 @@ function canvas.GetTextSize(text)
 	return engineCanvas:TextSize(text)
 end
 
+function canvas.SetTexture(tex)
+	if scale == nil then scale = 1 end
+	currentTexture = ffi.cast("struct UTexture2D*", tex)
+end
+
+function canvas.DrawTexturedRect(x, y, w, h)
+	if currentTexture == nil then error("Current texture is nil") end
+	canvas._SetPos(x, y)
+	engineCanvas:DrawTile(currentTexture, w, h, 0, 0, currentTexture.UTexture2D.SizeX, currentTexture.UTexture2D.SizeY, whiteColor, false, enums.EBlendMode.BLEND_Translucent)
+end
+
 engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GetCanvas", function(caller, args)
 	engineCanvas = ffi.cast("struct UCanvas*", args.Canvas)
 	print("Got canvas", engineCanvas)
 	engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GetCanvas")
 end)
 
+local testTexture = engine.FindObject("Texture2D GwenTexturePkg.DefaultSkin")
+
 engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "DrawTest")
 engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "DrawTest", function(caller, args)
+	--[[
 	canvas.SetDrawColor(Color(0,125,0, 100))
 	canvas.DrawRect(400, 100, 200, 200)
 
@@ -81,4 +97,7 @@ engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "DrawT
 
 	canvas.SetDrawColor(Color(255,255,255, 255))
 	canvas.DrawText(450, 150, "Hello")
+	]]
+	canvas.SetTexture(testTexture)
+	canvas.DrawTexturedRect(100, 100, 512, 512)
 end)
