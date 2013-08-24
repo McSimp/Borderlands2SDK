@@ -9,7 +9,7 @@ ffi.cdef[[
 	struct UObject_Data { 
 		const struct FPointer 	VfTableObject;
 		const struct UObject*	HashNext;
-		const struct FQWord 	ObjectFlags;
+		struct FQWord 			ObjectFlags;
 		const struct UObject* 	HashOuterNext;
 		const struct FPointer 	StateFrame;
 		const struct UObject* 	Linker;

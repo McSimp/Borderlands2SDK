@@ -8,9 +8,26 @@ function TestLoad(name)
 	local buff = ffi.new("wchar_t[?]", len)
 	ffi.C.mbstowcs(buff, name, len)
 
-	local ret = ffi.C.LUAFUNC_LoadPackage(nil, buff, 0)
-	print(ret)
-	return ret
+	local loadedPackage = ffi.C.LUAFUNC_LoadPackage(nil, buff, 0)
+	print(loadedPackage)
+
+	-- Set the RF_RootSet flag on all the objects we loaded
+	-- so they don't get garbage collected. TODO: This sucks.
+	for i=0,(engine.Objects.Count-1) do
+		local obj = engine.Objects:Get(i)
+		if IsNull(obj) then goto continue end
+
+		local pkg = obj:GetPackageObject()
+		if pkg == loadedPackage then
+			print("Setting GC flag on " .. obj:GetFullName())
+			print(obj)
+			obj.UObject.ObjectFlags.A = bit.bor(obj.UObject.ObjectFlags.A, 0x4000)
+		end
+		
+		::continue::
+	end
+
+	return loadedPackage
 end
 
 function TestPlay()
