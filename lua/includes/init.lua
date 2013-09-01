@@ -66,6 +66,8 @@ else
 	require("command")
 	include("luacommands.lua")
 
+	require("canvas")
+
 	-- package.loaded.ffi.cdef = nil -- No more defining
 
 	function OnShutdown()

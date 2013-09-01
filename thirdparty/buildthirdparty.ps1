@@ -132,36 +132,6 @@ Copy-Built-File "crashrpt\bin\CrashSender1402.exe" "..\bin\Release\CrashSender14
 Copy-Built-File "crashrpt\lib\CrashRpt1402d.lib" "..\lib\CrashRpt1402d.lib"
 Copy-Built-File "crashrpt\lib\CrashRpt1402.lib" "..\lib\CrashRpt1402.lib"
 
-if(Test-Path "gwen\gwen\Projects\windows")
-{
-	Log-Action "Removing old GWEN project files..."
-	Remove-Item -Recurse -Force "gwen\gwen\Projects\windows"
-	Write-Host "GWEN project files removed"
-}
-
-Log-Action "Creating GWEN project files..."
-Push-Location gwen\gwen\Projects
-cmd /c Build.bat
-Pop-Location
-
-Log-Action "Removing GWEN from SDK..."
-Cleanup-File "..\lib\gwen_staticd.lib"
-Cleanup-File "..\lib\gwen_static.lib"
-
-Log-Action "Cleaning GWEN solution..."
-Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "Debug" "/t:Clean /m"
-Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "Release" "/t:Clean /m"
-
-Log-Action "Building GWEN in Debug..."
-Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "Debug" "/m"
-
-Log-Action "Bulding GWEN in Release..."
-Run-MSBuild "gwen\gwen\Projects\windows\vs2010\GWEN-Static.vcxproj" "Release" "/m"
-
-Log-Action "Moving built files to SDK..."
-Copy-Built-File "gwen\gwen\lib\windows\vs2010\gwen_staticd.lib" "..\lib\gwen_staticd.lib"
-Copy-Built-File "gwen\gwen\lib\windows\vs2010\gwen_static.lib" "..\lib\gwen_static.lib"
-
 if(!(Test-Path "cryptopp\c5\cryptlib.vcxproj"))
 {
 	Log-Action "Upgrading Crypto++ project..."

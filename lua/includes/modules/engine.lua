@@ -23,6 +23,7 @@ include("engine/hash.lua")
 include("engine/find.lua")
 include("engine/funcmt.lua")
 include("engine/objectmt.lua")
+include("engine/package.lua")
 
 ffi.cdef[[
 void LUAFUNC_LogAllProcessEventCalls(bool enabled);

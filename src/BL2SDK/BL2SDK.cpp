@@ -405,10 +405,11 @@ namespace BL2SDK
 		return pStaticConstructObject(inClass, outer, name, flags, NULL, NULL, NULL, NULL);
 	}
 
-	FFI_EXPORT UPackage* LUAFUNC_LoadPackage(UPackage* outer, const wchar_t* filename, DWORD flags)
+	FFI_EXPORT UPackage* LUAFUNC_LoadPackage(UPackage* outer, const char* filename, DWORD flags)
 	{
+		std::wstring wideFilename = Util::Widen(filename);
 		SetIsLoadingUDKPackage(true);
-		UPackage* result = pLoadPackage(outer, filename, flags);
+		UPackage* result = pLoadPackage(outer, wideFilename.c_str(), flags);
 		SetIsLoadingUDKPackage(false);
 		return result;
 	}

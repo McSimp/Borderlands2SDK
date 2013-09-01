@@ -127,7 +127,7 @@ function FuncMT.__call(funcData, obj, ...)
 		
 
 		elseif flags.IsSet(v.flags, FUNCPARM_OBJPOINTER) then
-			if luaArg.IsA == nil or not luaArg:IsA(v.class) then
+			if type(luaArg) ~= "cdata" or luaArg.IsA == nil or not luaArg:IsA(v.class) then
 				error(string.format("Arg #%d (%s) expects an object pointer for %s", k, v.name, v.class.name))
 			else
 				luaArg = ffi.cast("struct UObject*", luaArg)
