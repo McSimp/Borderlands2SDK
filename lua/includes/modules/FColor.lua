@@ -21,6 +21,14 @@ function FColorMT.__tostring(self)
 	return string.format("FColor: R=%d, G=%d, B=%d, A=%d", self.R, self.G, self.B, self.A)
 end
 
+function FColorMT.__index.ToLinear(self)
+	return ffi.new("struct FLinearColor", 
+		self.R/255,
+		self.G/255,
+		self.B/255,
+		self.A/255)
+end
+
 ffi.metatype("struct FColor", FColorMT)
 
 function Color(r, g, b, a)
@@ -34,3 +42,4 @@ function Color(r, g, b, a)
 
 	return col
 end
+

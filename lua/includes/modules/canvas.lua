@@ -5,9 +5,11 @@ local engineHook = engineHook
 local engine = engine
 
 local EBlendMode = enums.EBlendMode
+local whiteLinearColor = ffi.new("struct FLinearColor", 1, 1, 1, 1)
+
 local engineCanvas = nil -- make sure it's a struct UCanvas*
 local currentTexture = nil
-local whiteColor = ffi.new("struct FLinearColor", 1, 1, 1, 1)
+local currentLinearColor = whiteLinearColor
 
 module("canvas")
 
@@ -18,21 +20,14 @@ end
 
 function SetDrawColor(color)
 	engineCanvas.UCanvas.DrawColor = color
+	currentLinearColor = color:ToLinear()
 end
 
 function DrawRect(x, y, w, h)
 	_SetPos(x, y)
 
 	local tex = engineCanvas.UCanvas.DefaultTexture
-
-	local drawCol = engineCanvas.UCanvas.DrawColor
-	local col = ffi.new("struct FLinearColor", 
-		drawCol.R/255,
-		drawCol.G/255,
-		drawCol.B/255,
-		drawCol.A/255)
-
-	engineCanvas:DrawTile(tex, w, h, 0, 0, tex.UTexture2D.SizeX, tex.UTexture2D.SizeY, col, false, EBlendMode.BLEND_Translucent)
+	engineCanvas:DrawTile(tex, w, h, 0, 0, tex.UTexture2D.SizeX, tex.UTexture2D.SizeY, currentLinearColor, false, EBlendMode.BLEND_Translucent)
 end
 
 function DrawBorderedRect(x, y, w, h)
@@ -60,13 +55,13 @@ function GetTextSize(text)
 end
 
 function SetTexture(tex)
-	if scale == nil then scale = 1 end
+	--if scale == nil then scale = 1 end
 	currentTexture = ffi.cast("struct UTexture2D*", tex)
 end
 
 function _InternalDrawTexturedRectUV(x, y, w, h, u, v, ul, vl)
 	_SetPos(x, y)
-	engineCanvas:DrawTile(currentTexture, w, h, u, v, ul, vl, whiteColor, true, EBlendMode.BLEND_Translucent)
+	engineCanvas:DrawTile(currentTexture, w, h, u, v, ul, vl, currentLinearColor, true, EBlendMode.BLEND_Translucent)
 end
 
 function DrawTexturedRect(x, y, w, h)
@@ -79,6 +74,7 @@ function DrawTexturedRectUV(x, y, w, h, u, v, ul, vl)
 	_InternalDrawTexturedRectUV(x, y, w, h, u, v, ul, vl)
 end
 
+-- TODO: Grab this from the object structure rather than a hook - creates a race condition
 engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GetCanvas", function(caller, args)
 	engineCanvas = ffi.cast("struct UCanvas*", args.Canvas)
 	engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GetCanvas")
