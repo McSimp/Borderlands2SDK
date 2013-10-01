@@ -1,8 +1,8 @@
 local oo = oo
-local SingleTexture = require("texturing.single")
-local BorderedTexture = require("texturing.bordered")
+local SingleTexture = require("gwen.skins.texturing.single")
+local BorderedTexture = require("gwen.skins.texturing.bordered")
 
-local SkinBase = require("base")
+local SkinBase = require("gwen.skins.base")
 local TexturedSkin = oo.InheritClass(SkinBase, "Gwen.Skin.Textured")
 
 local function NewBordered(...)
@@ -216,13 +216,13 @@ function TexturedSkin:InitializeTextures()
 	self.Textures.Scroller.DownButton_Down = NewBordered(tex, 464, 272 + 48, 15, 15, GwenMargin(2, 2, 2, 2))
 	self.Textures.Scroller.DownButton_Disabled = NewBordered(tex, 480 + 48, 272 + 48, 15, 15, GwenMargin(2, 2, 2, 2))
 
-	self.Textures.Scroller.TrackV = NewBordered(tex, 384, 208, 15, 127, GwenMargin(4, 4, 4, 4)
+	self.Textures.Scroller.TrackV = NewBordered(tex, 384, 208, 15, 127, GwenMargin(4, 4, 4, 4))
 	self.Textures.Scroller.ButtonV_Normal = NewBordered(tex, 384 + 16, 208, 15, 127, GwenMargin(4, 4, 4, 4))
 	self.Textures.Scroller.ButtonV_Hover = NewBordered(tex, 384 + 32, 208, 15, 127, GwenMargin(4, 4, 4, 4))
 	self.Textures.Scroller.ButtonV_Down = NewBordered(tex, 384 + 48, 208, 15, 127, GwenMargin(4, 4, 4, 4))
 	self.Textures.Scroller.ButtonV_Disabled = NewBordered(tex, 384 + 64, 208, 15, 127, GwenMargin(4, 4, 4, 4))
 
-	self.Textures.Scroller.TrackH = NewBordered(tex, 384, 128, 127, 15, GwenMargin(4, 4, 4, 4)
+	self.Textures.Scroller.TrackH = NewBordered(tex, 384, 128, 127, 15, GwenMargin(4, 4, 4, 4))
 	self.Textures.Scroller.ButtonH_Normal = NewBordered(tex, 384, 128 + 16, 127, 15, GwenMargin(4, 4, 4, 4))
 	self.Textures.Scroller.ButtonH_Hover = NewBordered(tex, 384, 128 + 32, 127, 15, GwenMargin(4, 4, 4, 4))
 	self.Textures.Scroller.ButtonH_Down = NewBordered(tex, 384, 128 + 48, 127, 15, GwenMargin(4, 4, 4, 4))

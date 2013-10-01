@@ -10,6 +10,9 @@ require("profiling")
 -- Flags
 require("flags")
 
+-- OO Helpers
+oo = require("oo")
+
 -- Import data structures
 include("structs/base.lua")
 include("classes/base.lua")

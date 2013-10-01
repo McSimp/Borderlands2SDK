@@ -1,4 +1,6 @@
-local RendererBase = require("base")
+local ffi = require("ffi")
+
+local RendererBase = require("gwen.renderers.base")
 local BL2Renderer = oo.InheritClass(RendererBase, "Gwen.Renderer.BL2")
 
 local engine = engine
@@ -28,7 +30,7 @@ function BL2Renderer:LoadTexture(texName)
 		error("Texture could not be found")
 	end
 
-	return tex
+	return ffi.cast("struct UTexture2D*", tex)
 end
 
 function BL2Renderer:LoadFont(fontName)
@@ -37,7 +39,7 @@ function BL2Renderer:LoadFont(fontName)
 		error("Font could not be found")
 	end
 
-	return font
+	return ffi.cast("struct UFont*", font)
 end
 
 return BL2Renderer

@@ -10,9 +10,18 @@ function oo.NotImplemented(class, name, ...)
 end
 
 function oo.InheritClass(baseClass, newName)
-	local newClass = table.copy(class)
+	if baseClass == nil then
+		error("Base class was nil!")
+	end
+	
+	local newClass = table.copy(baseClass)
 	newClass._ClassName = newName
 	newClass._BaseClass = baseClass
+	newClass.New = function()
+		local obj = setmetatable({}, { __index = newClass })
+		return obj
+	end
+	
 	return newClass
 end
 
@@ -26,3 +35,5 @@ function oo.CreateClass(name)
 
 	return class
 end
+
+return oo
