@@ -40,7 +40,7 @@ function UObjectMT.__index(self, k)
 	-- This seems to be working now. If problems come back, just flip this
 	-- Also remember to jit.on() on ALL returns!
 	-- 1/07/2013 - Scratch that, still seems to break after lots of calls
-	jit.off()
+	--jit.off()
 
 	-- Since we have casted, check the actual class type first
 	-- Then while this class has a base class, check that.
@@ -48,13 +48,13 @@ function UObjectMT.__index(self, k)
 	while baseClass do
 		local v = obj[baseClass.name][k]
 		if v ~= nil then
-			jit.on()
+			--jit.on()
 			return v
 		elseif v == nil and type(v) == "cdata" then -- null pointer
-			jit.on()
+			--jit.on()
 			return nil
 		elseif baseClass.funcs[k] ~= nil then
-			jit.on()
+			--jit.on()
 			return setmetatable(baseClass.funcs[k], FuncMT)
 		else
 			baseClass = baseClass.base
@@ -63,7 +63,7 @@ function UObjectMT.__index(self, k)
 	
 	print("[Lua] Warning: Object index not found for __index", k)
 
-	jit.on()
+	--jit.on()
 	return nil
 end
 

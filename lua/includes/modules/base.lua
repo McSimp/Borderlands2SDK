@@ -55,8 +55,8 @@ function table.copy(t, lookup_table)
 end
 
 -- Returns whether or not the specified table (numerically indexed) contains "element"
-function table.contains(table, element)
-	for _,v in ipairs(table) do
+function table.contains(t, element)
+	for _,v in ipairs(t) do
 		if v == element then
 			return true
 		end
@@ -65,8 +65,8 @@ function table.contains(table, element)
 end
 
 -- Returns the first index of value in the specified table (numerically indexed) or nil
-function table.find(table, value)
-	for k,v in ipairs(table) do
+function table.find(t, value)
+	for k,v in ipairs(t) do
 		if v == value then
 			return k
 		end
@@ -76,8 +76,8 @@ function table.find(table, value)
 end
 
 -- Returns the first index of value in the specified table (with string indexs) or nil
-function table.sfind(table, value)
-	for k,v in pairs(table) do
+function table.sfind(t, value)
+	for k,v in pairs(t) do
 		if v == value then
 			return k
 		end
@@ -87,13 +87,22 @@ function table.sfind(table, value)
 end
 
 -- Returns the number of elements in a table with any type of key
-function table.count(table)
+function table.count(t)
 	local count = 0
-	for k,v in pairs(table) do
+	for k,v in pairs(t) do
 		count = count + 1
 	end
 
 	return count
+end
+
+-- Removes the first instance of value in a numerically indexed table
+function table.removeValue(t, value)
+	local key = table.find(t, value)
+	if not key then return false end
+	
+	table.remove(t, key)
+	return key
 end
 
 function math.clamp(value, min, max)

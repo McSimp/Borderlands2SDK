@@ -20,3 +20,14 @@ function GwenMargin(left, top, right, bottom)
 	margin.bottom = bottom
 	return margin
 end
+
+function GwenPadding(left, top, right, bottom)
+	return GwenMargin(left, top, right, bottom)
+end
+
+function GwenPoint(x, y)
+	local point = {}
+	point.x = x or 0
+	point.y = y or 0
+	return point
+end
