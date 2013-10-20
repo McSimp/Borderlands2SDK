@@ -215,7 +215,7 @@ local function ProcessPackages()
 
 	for i=0,(engine.Objects.Count-1) do
 
-		local obj = engine.Objects:Get(i)
+		local obj = engine.Objects[i]
 		if IsNull(obj) then goto continue end
 		if not obj:IsA(engine.Classes.UClass) then goto continue end
 		

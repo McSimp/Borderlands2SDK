@@ -191,7 +191,7 @@ function Package:ProcessFunctions()
 	-- Foreach object, check if it's a class, then check if it's in the package.
 	-- If it is, then process the class, in turn processing all the functions in it.
 	for i=0,(engine.Objects.Count-1) do
-		local obj = engine.Objects:Get(i)
+		local obj = engine.Objects[i]
 		if IsNull(obj) then goto continue end
 
 		local package_object = obj:GetPackageObject()

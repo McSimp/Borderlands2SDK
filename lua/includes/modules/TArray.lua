@@ -2,18 +2,23 @@ local ffi = require("ffi")
 local setmetatable = setmetatable
 local error = error
 
-local TArrayMT = { __index = {} }
+local TArrayMT = {}
 
-function TArrayMT.__index.Get(self, idx)
-	if idx < self.Count and idx >= 0 then
-		if self.Data[idx] ~= nil then
-			return self.Data[idx]
+function TArrayMT.__index(self, idx)
+	if type(idx) == "number" then
+		if idx < self.Count and idx >= 0 then
+			if self.Data[idx] ~= nil then
+				return self.Data[idx]
+			end
+		else
+			print("[TArray] Warning: Index out of range")
 		end
-	else
-		print("[TArray] Warning: Index out of range")
+
+		return nil
 	end
 
-	return nil
+	return rawget(self, idx)
+	--error("TArray must be indexed by number")
 end
 
 -- Using pairs is probably slower than a normal for loop, but it's a tad more convenient
@@ -58,6 +63,7 @@ function Create(innerType, cdata)
 
 	local data = ffi.cast(type_ptr, cdata)
 
+	--[[
 	local mt = {
 		__index = data,
 		__newindex = function(self, k, v)
@@ -65,7 +71,15 @@ function Create(innerType, cdata)
 		end,
 		--__pairs = TArrayMT.__pairs,
 	}
+	]]
+	--local mt = TArrayMT
 
+	--return setmetatable({}, mt)
+	local mt = {}
+	function mt.__index(self, idx)
+		return data[0][idx]
+	end
+	
 	return setmetatable({}, mt)
 end
 

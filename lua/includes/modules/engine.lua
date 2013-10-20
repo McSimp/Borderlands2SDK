@@ -53,7 +53,7 @@ local function InitializeFunctions(funcsTable)
 	-- Foreach function, get its pointer and add it to the _FuncsInternal map
 	local count = 0
 	for _,funcData in pairs(funcsTable) do -- NOOO NOT PAIRS
-		funcData.ptr = ffi.cast("struct UFunction*", engine.Objects:Get(funcData.index))
+		funcData.ptr = ffi.cast("struct UFunction*", engine.Objects[funcData.index])
 		funcData.index = nil
 
 		engine._FuncsInternal[PtrToNum(funcData.ptr)] = funcData
@@ -85,7 +85,7 @@ local function InitializeClasses()
 		if type(class[2]) == "string" then
 			members.static = engine.FindClass(class[2])
 		else -- Otherwise it's just an offset and we can just get it out of the array
-			members.static = engine.Objects:Get(class[2])
+			members.static = engine.Objects[class[2]]
 		end
 
 		if members.static == nil then

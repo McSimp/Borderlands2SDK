@@ -3,7 +3,7 @@ local ffi = require("ffi")
 local FNameMT = { __index = {} }
 
 function FNameMT.__index.GetName(self)
-	return ffi.string(engine.Names:Get(self.Index).Name)
+	return ffi.string(engine.Names[self.Index].Name)
 end
 
 function FNameMT.__eq(self, cmp)

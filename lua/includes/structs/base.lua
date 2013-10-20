@@ -49,23 +49,20 @@ ffi.cdef[[
 		void* InterfacePointer; 
 	};
 
-	struct FOutputDevice
-	{
+	struct FOutputDevice {
 		void* VfTable;
 		unsigned long bAllowSuppression;
 		unsigned long bSuppressEventTag;
 		unsigned long bAutoEmitLineTerminator;
 	};
 
-	struct FOutParmRec
-	{
+	struct FOutParmRec {
 		struct UProperty* Property;
 		unsigned char* PropAddr;
 		struct FOutParmRec* NextOutParm;
 	};
 	
-	struct FFrame
-	{
+	struct FFrame {
 		void* VfTable;
 		unsigned long bAllowSuppression;
 		unsigned long bSuppressEventTag;

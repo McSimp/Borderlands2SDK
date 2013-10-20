@@ -74,7 +74,18 @@ function DrawTexturedRectUV(x, y, w, h, u, v, ul, vl)
 	_InternalDrawTexturedRectUV(x, y, w, h, u, v, ul, vl)
 end
 
+function SetClipRect(x, y, w, h)
+	engineCanvas:SetOrigin(x, y)
+	engineCanvas:SetClip(x + w, y + h)
+end
+
+function ResetClip()
+	engineCanvas:SetOrigin(0, 0)
+	engineCanvas:SetClip(engineCanvas.UCanvas.SizeX, engineCanvas.UCanvas.SizeY)
+end
+
 -- TODO: Grab this from the object structure rather than a hook - creates a race condition
+-- and may actually be incorrect if the UDN is anything to go by.
 engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GetCanvas", function(caller, args)
 	engineCanvas = ffi.cast("struct UCanvas*", args.Canvas)
 	engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GetCanvas")

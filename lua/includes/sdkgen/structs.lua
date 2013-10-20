@@ -303,7 +303,7 @@ function Package:ProcessScriptStructs()
 	-- If it is, then process the struct
 	for i=0,(engine.Objects.Count-1) do
 
-		local obj = engine.Objects:Get(i)
+		local obj = engine.Objects[i]
 		if IsNull(obj) then goto continue end
 
 		local package_object = obj:GetPackageObject()

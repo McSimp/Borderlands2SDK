@@ -11,7 +11,7 @@ local bit = require("bit")
 
 local function FindObjectWithClass(objectName, class)
 	for i=0,(Objects.Count-1) do
-		local obj = Objects:Get(i)
+		local obj = Objects[i]
 		if obj == nil then goto continue end
 		if not obj:IsA(class) then goto continue end
 
@@ -31,7 +31,7 @@ local function FindObject(objectName, class)
 	end
 
 	for i=0,(Objects.Count-1) do
-		local obj = Objects:Get(i)
+		local obj = Objects[i]
 		if obj == nil then goto continue end
 
 		if obj:GetFullName() == objectName then
@@ -46,7 +46,7 @@ end
 
 local function FindObjectExactClass(objectName, class)
 	for i=0,(Objects.Count-1) do
-		local obj = Objects:Get(i)
+		local obj = Objects[i]
 		if obj == nil then goto continue end
 		if obj.UObject.Class ~= class.static then goto continue end
 

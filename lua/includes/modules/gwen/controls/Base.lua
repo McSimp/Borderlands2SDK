@@ -1,5 +1,6 @@
 local oo = oo
 local table = table
+local keys = require("gwen.keys")
 
 local BaseControl = oo.CreateClass("Gwen.Control.Base")
 
@@ -319,3 +320,349 @@ function BaseControl:SetMargin(margin)
 	self:InvalidateParent()
 end
 
+function BaseControl:MoveTo(x, y)
+	local parent = self:GetParent()
+	if self.restrictToParent and parent then
+		if (x - self.padding.left) < parent.margin.left then 
+			x = parent.margin.left + self.padding.left
+		end
+
+		if (y - self.padding.top) < parent.margin.top then 
+			y = parent.margin.top + self.padding.top
+		end
+
+		if (w + self:Width() + self.padding.right > parent:Width() - parent.margin.right) then
+			x = parent:Width() - parent.margin.right - self:Width() - self.padding.right
+		end
+
+		if (y + self:Height() + self.padding.bottom > parent:Height() - parent.margin.bottom) then
+			y = parent:Height() - parent.margin.bottom - self:Height() - self.padding.bottom
+		end
+	end
+
+	self:SetBounds(x, y, self:Width(), self:Height())
+end
+
+function BaseControl:MoveBy(x, y)
+	self:MoveTo(self:X() + x, self:Y() + y)
+end
+
+function BaseControl:GetBounds()
+	return self.bounds
+end
+
+function BaseControl:GetControlAt(x, y, onlyIfMouseEnabled)
+	if onlyIfMouseEnabled == nil then onlyIfMouseEnabled = true end
+
+	if self:Hidden() then return nil end
+	if x < 0 or y < 0 or x >= self:Width() or y >= self:Height() then return nil end
+
+	-- Iterate backwards over children
+	for i=#self.children,1,-1 do
+		local child = self.children[i]
+		local found = child:GetControlAt(x - child:X(), y - child:Y(), onlyIfMouseEnabled)
+		if found ~= nil then return found end
+	end
+
+	if onlyIfMouseEnabled and not self:GetMouseInputEnabled() then
+		return nil
+	end
+
+	return self
+end
+
+function BaseControl:OnBoundsChanged(oldBounds)
+	if self:GetParent() then
+		self:GetParent():OnChildBoundsChanged(oldBounds, self)
+	end
+
+	if self.bounds.w ~= oldBounds.w or self.bounds.h ~= oldBounds.h then
+		self:Invalidate()
+	end
+
+	self:Redraw()
+	self:UpdateRenderBounds()
+end
+
+function BaseControl:OnChildBoundsChanged(oldChildBounds, child)
+	return
+end
+
+function BaseControl:OnScaleChanged()
+	for _,child in self.children do
+		child:OnScaleChanged()
+	end
+end
+
+function BaseControl:GetInnerBounds()
+	return self.innerBounds
+end
+
+function BaseControl:GetRenderBounds()
+	return self.renderBounds
+end
+
+function BaseControl:UpdateRenderBounds()
+	self.renderBounds.x = 0
+	self.renderBounds.y = 0
+	self.renderBounds.w = self.bounds.w
+	self.renderBounds.h = self.bounds.h
+end
+
+function BaseControl:DoRender(skin)
+	if self.skin then
+		skin = self.skin
+	end
+
+	self:Think()
+	self:RenderRecursive(skin, self:GetBounds())
+end
+
+function BaseControl:RenderRecursive(skin, clipRect)
+	local renderer = skin:GetRender()
+	local oldRenderOffset = table.copy(renderer:GetRenderOffset())
+	renderer:AddRenderOffset(clipRect)
+
+	self:RenderUnder(skin)
+
+	local oldRegion = table.copy(renderer:ClipRegion())
+
+	-- If this control is clipping, change the clip rect to ourselves
+	-- (if not then we still clip using our parents clip rect)
+	if self:ShouldClip() then
+		renderer:AddClipRegion(clipRect)
+
+		if not renderer:ClipRegionVisible() then
+			renderer:SetRenderOffset(oldRenderOffset)
+			renderer:SetClipRegion(oldRegion)
+			return
+		end
+	end
+
+	-- Render this control and children controls
+	renderer:StartClip()
+	
+	self:Render(skin)
+
+	if #self.children ~= 0 then
+		-- Render children
+		for _,child in ipairs(self.children) do
+			if not child:Hidden() then
+				child:DoRender(skin)
+			end
+		end
+	end
+
+	renderer:EndClip()
+
+	-- Render overlay/focus
+	renderer:SetClipRegion(oldRegion)
+	renderer:StartClip()
+
+	self:RenderOver(skin)
+	self:RenderFocus(skin)
+
+	renderer:EndClip()
+	renderer:SetRenderOffset(oldRenderOffset)
+end
+
+function BaseControl:ShouldClip()
+	return true
+end
+
+function BaseControl:Render(skin)
+	return
+end
+
+function BaseControl:RenderUnder(skin)
+	return
+end
+
+function BaseControl:RenderOver(skin)
+	return
+end
+
+function BaseControl:RenderFocus(skin)
+	return
+end
+
+function BaseControl:SetHidden(hidden)
+	if self.hidden == hidden then return end
+
+	self.hidden = hidden
+	self:Invalidate()
+	self:Redraw()
+end
+
+function BaseControl:Hidden()
+	return self.hidden
+end
+
+function BaseControl:Visible()
+	if self.hidden then return false end
+
+	if self:GetParent() then
+		return self:GetParent():Visible()
+	end
+
+	return true
+end
+
+function BaseControl:Hide()
+	self:SetHidden(true)
+end
+
+function BaseControl:Show()
+	self:SetHidden(false)
+end
+
+function BaseControl:SetSkin(skin, doChildren)
+	if doChildren == nil then doChildren = false end
+
+	if self.skin == skin then return end
+
+	self.skin = skin
+	self:Invalidate()
+	self:Redraw()
+	self:OnSkinChanged(skin)
+
+	if doChildren then
+		for _,child in self.children do
+			child:SetSkin(skin, true)
+		end
+	end
+end
+
+function BaseControl:GetSkin()
+	return self.skin
+end
+
+function BaseControl:ShouldDrawBackground()
+	return self.shouldDrawBackground
+end
+
+function BaseControl:SetShouldDrawBackground(b)
+	self.shouldDrawBackground = b
+end
+
+function BaseControl:OnSkinChanged(newSkin)
+	return
+end
+
+function BaseControl:OnMouseMoved(x, y, deltaX, deltaY)
+	return
+end
+
+function BaseControl:OnMouseWheeled(delta)
+	if self.actualParent then
+		return self.actualParent:OnMouseWheeled(delta)
+	end
+
+	return false
+end
+
+function BaseControl:OnMouseClickLeft(x, y, down)
+	return
+end
+
+function BaseControl:OnMouseClickRight(x, y, down)
+	return
+end
+
+function BaseControl:OnMouseDoubleClickLeft(x, y)
+	self:OnMouseClickLeft(x, y true)
+end
+
+function BaseControl:OnMouseDoubleClickRight(x, y)
+	self:OnMouseClickRight(x, y, true)
+end
+
+function BaseControl:OnLostKeyboardFocus()
+	return
+end
+
+function BaseControl:OnKeyboardFocus()
+	return
+end
+
+function BaseControl:SetMouseInputEnabled(b)
+	self.mouseInputEnabled = b
+end
+
+function BaseControl:GetMouseInputEnabled()
+	return self.mouseInputEnabled
+end
+
+function BaseControl:NeedsInputChars()
+	return false
+end
+
+function BaseControl:OnChar(c)
+	return false
+end
+
+local keyFuncMap = {}
+local function AddKeysToMap(keys)
+	for _,keyName in ipairs(keys) do
+		keyFuncMap[keys[keyName]] = "OnKey" .. keyName
+	end
+end
+
+AddKeysToMap({
+	"Tab", "Space", "Return", "Backspace", "Delete", "Right", "Left",
+	"Home", "End", "Up", "Down", "Escape"
+})
+
+function BaseControl:OnKeyPress(key, press)
+	if press == nil then press = true end
+
+	local handled = false
+	if keyFuncMap[key] ~= nil then
+		handled = self[keyFuncMap[key]](self, press)
+	end
+
+	if not handled and self:GetParent() then
+		self:GetParent():OnKeyPress(key, press)
+	end
+
+	return handled
+end
+
+function BaseControl:OnKeyRelease(key)
+	return self:OnKeyPress(key, false)
+end
+
+function BaseControl:OnPaste(from)
+	return
+end
+
+function BaseControl:OnCopy(from)
+	return
+end
+
+function BaseControl:OnCut(from)
+	return
+end
+
+function BaseControl:OnSelectAll(from)
+	return
+end
+
+function BaseControl:OnKeyTab(down)
+	if not down then return true end
+
+	if self:GetCanvas().NextTab then
+		self:GetCanvas().NextTab:Focus()
+		self:Redraw()
+	end
+
+	return true
+end
+
+-- TODO: Could fill in all the other OnKey events here
+
+function BaseControl:OnMouseEnter()
+	
+end
+
+return BaseControl

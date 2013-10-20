@@ -6,6 +6,14 @@ local SkinBase = oo.CreateClass("Gwen.Skin.Base")
 oo.NotImplemented(SkinBase, "DrawGenericPanel", "control")
 oo.NotImplemented(SkinBase, "DrawButton", "control")
 
+function SkinBase:GetRender()
+	return self.renderer
+end
+
+function SkinBase:SetRender(renderer)
+	self.renderer = renderer
+end
+
 return SkinBase
 
 --[[
