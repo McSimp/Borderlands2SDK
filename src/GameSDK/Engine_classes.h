@@ -120,9 +120,6 @@ public:
 		return pClassPointer;
 	};
 
-	void IgnoreButtonInput ( unsigned long bNewButtonInput );
-	void IgnoreLookInput ( unsigned long bNewLookInput );
-	void IgnoreMoveInput ( unsigned long bNewMoveInput );
 	bool IsLocalPlayerController ( );
 };
 

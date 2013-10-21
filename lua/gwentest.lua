@@ -35,6 +35,7 @@ function GwenTest()
 end
 
 function TimeControllerUI()
+	-- WillowSeqAct_DayNightCycle Interlude_Light.TheWorld:PersistentLevel.Main_Sequence.WillowSeqAct_DayNightCycle_1
 	local dnc = engine.FindObjectExactClass("WillowSeqAct_DayNightCycle PersistentLevel.Main_Sequence.WillowSeqAct_DayNightCycle", engine.Classes.UWillowSeqAct_DayNightCycle)
 	if dnc == nil then error("DNC was null") end
 
@@ -72,10 +73,12 @@ function SetDNCycleRate(rate)
 	local gd = engine.FindObjectExactClass("GlobalsDefinition GD_Globals.General.Globals", engine.Classes.UGlobalsDefinition)
 	gd.DayNightCycleRate = rate
 
+	-- WillowGameReplicationInfo Loader.TheWorld:PersistentLevel.WillowGameReplicationInfo_3
 	local ri = engine.FindObjectExactClass("WillowGameReplicationInfo TheWorld.PersistentLevel.WillowGameReplicationInfo", engine.Classes.AWillowGameReplicationInfo)
 	ri.DayNightCycleRate = rate
 	ri.DayNightCycleRateBaseValue = rate
 
+	-- WillowSeqAct_DayNightCycle Interlude_Light.TheWorld:PersistentLevel.Main_Sequence.WillowSeqAct_DayNightCycle_1
 	local dnc = engine.FindObjectExactClass("WillowSeqAct_DayNightCycle PersistentLevel.Main_Sequence.WillowSeqAct_DayNightCycle", engine.Classes.UWillowSeqAct_DayNightCycle)
 	dnc.PlayRate = rate
 

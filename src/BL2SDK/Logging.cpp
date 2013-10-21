@@ -98,7 +98,7 @@ namespace Logging
 	void InitializeGameConsole()
 	{
 		// There should only be 1 instance so we should be right to just use it in this way
-		UConsole* console = UObject::FindObject<UConsole>("WillowConsole WillowGameEngine.WillowGameViewportClient.WillowConsole");
+		UConsole* console = UObject::FindObject<UConsole>("WillowConsole Transient.WillowGameEngine_0:WillowGameViewportClient_0.WillowConsole_0");
 
 		if(console != NULL)
 		{
@@ -107,7 +107,7 @@ namespace Logging
 		}
 		else
 		{
-			Log("[Logging] ERROR: Attempted to hook game console but 'WillowConsole WillowGameEngine.WillowGameViewportClient.WillowConsole' was not found.\n");
+			Log("[Logging] ERROR: Attempted to hook game console but 'WillowConsole Transient.WillowGameEngine_0:WillowGameViewportClient_0.WillowConsole_0' was not found.\n");
 		}
 	}
 

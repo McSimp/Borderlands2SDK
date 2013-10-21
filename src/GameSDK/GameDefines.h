@@ -1,23 +1,8 @@
-/*
-#############################################################################################
-# Borderlands 2 (1.0.35.4705) SDK
-# Generated with TheFeckless UE3 SDK Generator v1.4_Beta-Rev.51
-# Credits: uNrEaL, Tamimego, SystemFiles, R00T88, _silencer, the1domo, K@N@VEL
-# Thanks: HOOAH07, lowHertz
-# Forums: www.uc-forum.com, www.gamedeception.net
-#############################################################################################
-*/
-
-/*
-# ========================================================================================= #
-# Global Includes
-# ========================================================================================= #
-*/
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <string>
 
 /*
 # ========================================================================================= #
@@ -25,114 +10,103 @@
 # ========================================================================================= #
 */
 
-template< class T > struct TArray 
+template<class T> struct TArray 
 { 
 public: 
-	T* Data; 
+	T* Data;
 	int Count; 
-	int Max; 
+	int Max;
 
-public: 
-	TArray() 
-	{ 
-		Data = NULL; 
-		Count = Max = 0; 
-	}; 
+	TArray()
+	{
+		Data = NULL;
+		Count = 0;
+		Max = 0;
+	}
 
-public: 
 	int Num() 
 	{ 
 		return this->Count; 
-	}; 
+	}
 
-	T& operator() ( int i ) 
+	T& operator() (int i) 
 	{ 
-		return this->Data[ i ]; 
-	}; 
+		return this->Data[i]; 
+	}
 
-	const T& operator() ( int i ) const 
+	const T& operator() (int i) const 
 	{ 
-		return this->Data[ i ]; 
-	}; 
-
-	void Add ( T InputData ) 
-	{ 
-		Data = (T*) realloc ( Data, sizeof ( T ) * ( Count + 1 ) ); 
-		Data[ Count++ ] = InputData; 
-		Max = Count; 
-	}; 
-
-	void Clear() 
-	{ 
-		free ( Data ); 
-		Count = Max = 0; 
-	}; 
-}; 
+		return this->Data[i]; 
+	}
+};
 
 struct FNameEntry 
 { 
-	unsigned char	UnknownData00[ 0x10 ]; 
-	char			Name[ 0x10 ]; 
+	unsigned char UnknownData00[0x10]; 
+	char Name[1024];
+
+	void AppendNameToString(std::string& out)
+	{
+		out += Name;
+	}
 }; 
 
 struct FName 
 { 
-	int				Index; 
-	int             Number;
+	int Index;
+	int Number;
 
-	FName() : Index ( 0 ), Number ( 0 ) {}; 
+private:
+	FName() {};
 
-	FName ( int i ) : Index ( i ), Number ( 0 ) {}; 
-
-	~FName() {}; 
-
-	FName ( const char* FindName ) 
-	{ 
-		static TArray< int > NameCache; 
+public:
+	FName(const std::string& FindName)
+	{
 		Number = 0;
 
-		for ( int i = 0; i < NameCache.Count; ++i ) 
+		for(int i = 0; i < this->Names()->Count; i++) 
 		{ 
-		if ( ! strcmp ( this->Names()->Data[ NameCache ( i ) ]->Name, FindName ) ) 
+			if(this->Names()->Data[i]) 
 			{ 
-				Index = NameCache ( i ); 
-				return; 
-			} 
-		} 
+				if(this->Names()->Data[i]->Name == FindName) 
+				{
+					Index = i;
+				}
+			}
+		}
+	}
 
-		for ( int i = 0; i < this->Names()->Count; ++i ) 
-		{ 
-			if ( this->Names()->Data[ i ] ) 
-			{ 
-				if ( ! strcmp ( this->Names()->Data[ i ]->Name, FindName ) ) 
-				{ 
-					NameCache.Add ( i ); 
-					Index = i; 
-				} 
-			} 
-		} 
-	}; 
-
-	static TArray< FNameEntry* >* Names() 
+	static TArray<FNameEntry*>* Names()
 	{ 
-		return (TArray< FNameEntry* >*) BL2SDK::pGNames; 
-	}; 
+		return (TArray<FNameEntry*>*)BL2SDK::pGNames; 
+	}
 
-	char* GetName() 
+	char* GetName()
 	{ 
 		if ( Index < 0 || Index > this->Names()->Num() ) 
 			return "UnknownName"; 
 		else 
 			return this->Names()->Data[ Index ]->Name; 
-	}; 
+	};
 
-	bool operator == ( const FName& A ) const 
+	void AppendString(std::string& out)
+	{
+		FNameEntry* entry = Names()->Data[Index];
+		entry->AppendNameToString(out);
+		if(Number != 0)
+		{
+			out += "_";
+			out += std::to_string(Number - 1);
+		}
+	}
+
+	bool operator == (const FName& A) const 
 	{ 
-		return ( Index == A.Index ); 
-	}; 
+		return Index == A.Index;
+	}
 }; 
 
-struct FString : public TArray< wchar_t > 
+struct FString : public TArray<wchar_t> 
 { 
 	FString() {}; 
 
@@ -220,46 +194,3 @@ struct ULinkerLoad : FArchive
 	unsigned char Unknown[0x498];
 	FArchiveAsync* Loader;
 };
-
-
-/*
-# ========================================================================================= #
-# Includes
-# ========================================================================================= #
-*/
-
-/*
-#include "SDK_HEADERS\Core_structs.h"
-#include "SDK_HEADERS\Core_classes.h"
-#include "SDK_HEADERS\Core_f_structs.h"
-#include "SDK_HEADERS\Engine_structs.h"
-#include "SDK_HEADERS\Engine_classes.h"
-#include "SDK_HEADERS\Engine_f_structs.h"
-#include "SDK_HEADERS\GameFramework_structs.h"
-#include "SDK_HEADERS\GameFramework_classes.h"
-#include "SDK_HEADERS\GameFramework_f_structs.h"
-#include "SDK_HEADERS\GFxUI_structs.h"
-#include "SDK_HEADERS\GFxUI_classes.h"
-#include "SDK_HEADERS\GFxUI_f_structs.h"
-#include "SDK_HEADERS\GearboxFramework_structs.h"
-#include "SDK_HEADERS\GearboxFramework_classes.h"
-#include "SDK_HEADERS\GearboxFramework_f_structs.h"
-#include "SDK_HEADERS\IpDrv_structs.h"
-#include "SDK_HEADERS\IpDrv_classes.h"
-#include "SDK_HEADERS\IpDrv_f_structs.h"
-#include "SDK_HEADERS\XAudio2_structs.h"
-#include "SDK_HEADERS\XAudio2_classes.h"
-#include "SDK_HEADERS\XAudio2_f_structs.h"
-#include "SDK_HEADERS\AkAudio_structs.h"
-#include "SDK_HEADERS\AkAudio_classes.h"
-#include "SDK_HEADERS\AkAudio_f_structs.h"
-#include "SDK_HEADERS\WinDrv_structs.h"
-#include "SDK_HEADERS\WinDrv_classes.h"
-#include "SDK_HEADERS\WinDrv_f_structs.h"
-#include "SDK_HEADERS\OnlineSubsystemSteamworks_structs.h"
-#include "SDK_HEADERS\OnlineSubsystemSteamworks_classes.h"
-#include "SDK_HEADERS\OnlineSubsystemSteamworks_f_structs.h"
-#include "SDK_HEADERS\WillowGame_structs.h"
-#include "SDK_HEADERS\WillowGame_classes.h"
-#include "SDK_HEADERS\WillowGame_f_structs.h"
-*/

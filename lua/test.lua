@@ -165,8 +165,9 @@ if bit.band(0x400880, 0x100) then
 end
 ]]
 
-local pc = engine.FindObject("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
-pc = ffi.cast("struct AWillowPlayerController*", pc)
+--local pc = engine.FindObject("WillowPlayerController TheWorld.PersistentLevel.WillowPlayerController", engine.Classes.AWillowPlayerController)
+--pc = ffi.cast("struct AWillowPlayerController*", pc)
+local pc = LocalPlayer()
 --LocalPlayer = pc
 --local time = 1/40
 local time = 2

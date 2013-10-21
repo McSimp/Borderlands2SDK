@@ -35,6 +35,8 @@ function ProcessHooks(pObject, pFunction, pParms, pResult)
 		return true
 	end
 
+	-- TODO: This section is always run even if there are no hooks (which shouldn't happpen) or
+	-- even if all the hooks are raw hooks and don't get given argData anyway.
 	local args = engine._FuncsInternal[ptrNum].args
 
 	local argData = {}

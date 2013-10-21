@@ -58,7 +58,7 @@ void CHookManager::AddStaticHook(UFunction* function, const tFuncNameHookPair& h
 		hookMap->insert(hookPair); // TODO: Dereference pointer?
 	}
 
-	Logging::LogF("[CHookManager] (%s) Hook \"%s\" added as static hook for \"%s\"\n", this->DebugName.c_str(), hookPair.first.c_str(), function->GetName());
+	Logging::LogF("[CHookManager] (%s) Hook \"%s\" added as static hook for \"%s\"\n", this->DebugName.c_str(), hookPair.first.c_str(), function->GetFullName().c_str());
 }
 
 bool CHookManager::RemoveFromTable(tHookMap& hookTable, const std::string& funcName, const std::string& hookName)
@@ -84,7 +84,7 @@ void CHookManager::Register(const std::string& funcName, const std::string& hook
 	tFuncNameHookPair hookPair = std::make_pair(hookName, funcHook);
 	
 	// Find func
-	UFunction* function = UObject::FindObject<UFunction>(funcName.c_str());
+	UFunction* function = UObject::FindObject<UFunction>(funcName);
 	if(function == NULL)
 	{
 		// The function was not found, so we need to create a virtual hook for it
@@ -99,7 +99,7 @@ void CHookManager::Register(const std::string& funcName, const std::string& hook
 
 bool CHookManager::Remove(const std::string& funcName, const std::string& hookName)
 {
-	UFunction* function = UObject::FindObject<UFunction>(funcName.c_str());
+	UFunction* function = UObject::FindObject<UFunction>(funcName);
 	if(function == NULL)
 	{
 		// Function wasn't found, so virtual hook removal time!
@@ -134,7 +134,7 @@ bool CHookManager::RemoveStaticHook(UFunction* function, const std::string& hook
 	tHookMap* hookTable = GetStaticHookTable(function);
 	if(hookTable == NULL)
 	{
-		Logging::LogF("[CHookManager] (%s) ERROR: Failed to remove static hook \"%s\" for \"%s\"\n", this->DebugName.c_str(), hookName.c_str(), function->GetFullName());
+		Logging::LogF("[CHookManager] (%s) ERROR: Failed to remove static hook \"%s\" for \"%s\"\n", this->DebugName.c_str(), hookName.c_str(), function->GetFullName().c_str());
 		return false;
 	}
 

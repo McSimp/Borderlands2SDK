@@ -294,7 +294,7 @@ namespace BL2SDK
 
 		if(Settings::DeveloperModeEnabled())
 		{
-			GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient.InputKey", "DevInputKeyHook", &DevInputKeyHook);
+			GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient:InputKey", "DevInputKeyHook", &DevInputKeyHook);
 			Logging::LogF("[Internal] Developer mode key hook enabled\n");
 		}
 
@@ -328,7 +328,7 @@ namespace BL2SDK
 		InitializeGameVersions();
 
 		// Set console key to Tilde if not already set
-		UConsole* console = UObject::FindObject<UConsole>("WillowConsole WillowGameEngine.WillowGameViewportClient.WillowConsole");
+		UConsole* console = UObject::FindObject<UConsole>("WillowConsole Transient.WillowGameEngine_0:WillowGameViewportClient_0.WillowConsole_0");
 		if(console && (console->ConsoleKey == FName("None") || console->ConsoleKey == FName("Undefine")))
 		{
 			console->ConsoleKey = FName("Tilde");
@@ -336,7 +336,7 @@ namespace BL2SDK
 
 		GameHooks::EngineHookManager->RemoveStaticHook(function, "StartupSDK");
 
-		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient.PostRender", "GetCanvas", &GetCanvasPostRender);
+		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient:PostRender", "GetCanvas", &GetCanvasPostRender);
 		return true;
 	}
 
@@ -373,7 +373,7 @@ namespace BL2SDK
 		LogAllProcessEventCalls(args->LogAllProcessEventCalls);
 		LogAllUnrealScriptCalls(args->LogAllUnrealScriptCalls);
 
-		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameInfo.InitGame", "StartupSDK", &GameReady);	
+		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameInfo:InitGame", "StartupSDK", &GameReady);	
 	}
 
 	// This is called when the process is closing
@@ -395,9 +395,15 @@ namespace BL2SDK
 		LogAllUnrealScriptCalls(enabled);
 	}
 
-	FFI_EXPORT char* LUAFUNC_UObjectGetFullName(UObject* obj)
+	FFI_EXPORT std::string* LUAFUNC_UObjectGetFullName(UObject* obj)
 	{
-		return obj->GetFullName();
+		// Move name from stack to heap
+		return new std::string(obj->GetFullName());
+	}
+
+	FFI_EXPORT void LUAFUNC_DeleteString(std::string* str)
+	{
+		delete str;
 	}
 
 	FFI_EXPORT UObject* LUAFUNC_StaticConstructObject(UClass* inClass, UObject* outer, FName name, unsigned int flags)

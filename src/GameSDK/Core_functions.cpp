@@ -25,6 +25,7 @@ UClass* UStruct::pClassPointer = NULL;
 UClass* UFunction::pClassPointer = NULL;
 UClass* UState::pClassPointer = NULL;
 UClass* UClass::pClassPointer = NULL;
+UClass* UPackage::pClassPointer = NULL;
 
 /*
 # ========================================================================================= #
@@ -82,7 +83,7 @@ char* UObject::GetNameCPP()
 	return cOutBuffer; 
 } 
 
-char* UObject::GetFullName() 
+char* UObject::GetFullNameOld() 
 { 
 	if ( this->Class && this->Outer ) 
 	{ 
@@ -114,6 +115,66 @@ char* UObject::GetFullName()
 	return "(null)"; 
 } 
 
+void UObject::GetPathName(std::string& result)
+{
+	if(this)
+	{
+		if(Outer)
+		{
+			Outer->GetPathName(result);
+
+			if(Outer->Class != UPackage::StaticClass()
+			&& Outer->Outer->Class == UPackage::StaticClass())
+			{
+				result += ":";
+			}
+			else
+			{
+				result += ".";
+			}
+		}
+
+		AppendName(result);
+	}
+	else
+	{
+		result += "None";
+	}
+}
+
+void UObject::AppendName(std::string& result)
+{
+	if(!this)
+	{
+		result += "None";
+	}
+	else if(ObjectInternalInteger == -1)
+	{
+		result += "<uninitialized>";
+	}
+	else
+	{
+		Name.AppendString(result);
+	}
+}
+
+std::string UObject::GetFullName()
+{
+	if(this)
+	{
+		std::string result;
+		result.reserve(128);
+		Class->AppendName(result);
+		result += " ";
+		GetPathName(result);
+		return result;
+	}
+	else
+	{
+		return "None";
+	}
+}
+
 bool UObject::IsA ( UClass* pClass ) 
 { 
 	for ( UClass* SuperClass = this->Class; SuperClass; SuperClass = ( UClass* ) SuperClass->SuperField ) 
@@ -141,7 +202,7 @@ int UObject::GetBuildChangelistNumber ( )
 	static UFunction* pFnGetBuildChangelistNumber = NULL;
 
 	if ( ! pFnGetBuildChangelistNumber )
-		pFnGetBuildChangelistNumber = UObject::FindObject<UFunction>("Function Core.Object.GetBuildChangelistNumber");
+		pFnGetBuildChangelistNumber = UObject::FindObject<UFunction>("Function Core.Object:GetBuildChangelistNumber");
 
 	UObject_execGetBuildChangelistNumber_Parms GetBuildChangelistNumber_Parms;
 
@@ -164,7 +225,7 @@ int UObject::GetEngineVersion ( )
 	static UFunction* pFnGetEngineVersion = NULL;
 
 	if ( ! pFnGetEngineVersion )
-		pFnGetEngineVersion = UObject::FindObject<UFunction>("Function Core.Object.GetEngineVersion");
+		pFnGetEngineVersion = UObject::FindObject<UFunction>("Function Core.Object:GetEngineVersion");
 
 	UObject_execGetEngineVersion_Parms GetEngineVersion_Parms;
 

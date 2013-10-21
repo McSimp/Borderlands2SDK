@@ -10,7 +10,7 @@ local STRUCT_ALIGN = 4
 local CPF_Const = 0x0000000000000002
 
 -- Add the structs added manually to the generated list so they aren't generated again
-local preGenerated = { "Core.Object.Pointer", "Core.Object.QWord" }
+local preGenerated = { "Core.Object:Pointer", "Core.Object:QWord" }
 for _, structName in ipairs(preGenerated) do
 	local struct = engine.FindObject("ScriptStruct " .. structName, engine.Classes.UScriptStruct)
 	if NotNull(struct) then

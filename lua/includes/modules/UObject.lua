@@ -20,23 +20,25 @@ function funcs.IsA(self, class)
 end
 
 function funcs.GetName(self)
-
 	return self.UObject.Name:GetName()
-
 end
 
 ffi.cdef[[
-	char* LUAFUNC_UObjectGetFullName(struct UObject* obj);
+	struct std_string* LUAFUNC_UObjectGetFullName(struct UObject* obj);
 ]]
 
 function funcs.GetFullName(self)
 	local cast = ffi.cast("struct UObject*", self)
-	return ffi.string(ffi.C.LUAFUNC_UObjectGetFullName(cast))
+
+	local std_str = ffi.C.LUAFUNC_UObjectGetFullName(cast)
+	local luaStr = std_str:ToLuaString()
+	std_str:Delete()
+
+	return luaStr
 end
 
 -- TOOD: Fix this steaming pile of shit.
 function funcs.GetCName(self)
-
 	local cname
 	if self:IsA(engine.Classes.UClass) then
 		cname = "U" -- Just a plain old object by default
@@ -57,7 +59,6 @@ function funcs.GetCName(self)
 end
 
 function funcs.GetPackageObject(self)
-
 	local pkg = nil
 	local outer = self.UObject.Outer
 
@@ -69,7 +70,6 @@ function funcs.GetPackageObject(self)
 	end
 
 	return pkg
-
 end
 
 module("UObject")

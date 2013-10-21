@@ -162,6 +162,7 @@ function weaponEditor.CleanupInspector(gfx)
 end
 
 function weaponEditor.GetInspector()
+	-- ItemInspectionGFxMovie Transient.ItemInspectionGFxMovie_0
 	local gfx = engine.FindObjectExactClass("ItemInspectionGFxMovie Transient.ItemInspectionGFxMovie", engine.Classes.UItemInspectionGFxMovie)
 	if gfx == nil then error("Could not find inspector") end
 

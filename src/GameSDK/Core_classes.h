@@ -11,6 +11,8 @@
 	#pragma pack ( push, 0x4 )
 #endif
 
+#include <string>
+
 /*
 # ========================================================================================= #
 # Classes
@@ -44,9 +46,13 @@ public:
 
 	char* GetName(); 
 	char* GetNameCPP(); 
-	char* GetFullName(); 
+	char* GetFullNameOld();
 
-	template< class T > static T* FindObject ( const char* ObjectFullName ) 
+	void GetPathName(std::string& result);
+	void AppendName(std::string& result);
+	std::string GetFullName();
+
+	template< class T > static T* FindObject ( const std::string& ObjectFullName ) 
 	{ 
 		while ( ! UObject::GObjObjects() ) 
 			Sleep ( 100 ); 
@@ -67,7 +73,7 @@ public:
 				continue; 
 
 			// check 
-			if ( ! _stricmp ( Object->GetFullName(), ObjectFullName ) ) 
+			if (Object->GetFullName() == ObjectFullName) 
 				return (T*) Object; 
 		} 
 
@@ -282,6 +288,18 @@ class UPackage : public UObject
 {
 public:
 	unsigned char                                      UnknownData00[ 0xBC ];                            		// 0x003C (0x00BC) MISSED OFFSET
+
+private:
+	static UClass* pClassPointer;
+
+public:
+	static UClass* StaticClass()
+	{
+		if ( ! pClassPointer )
+			pClassPointer = (UClass*) UObject::GObjObjects()->Data[ 136 ];
+
+		return pClassPointer;
+	};
 };
 
 #ifdef _MSC_VER

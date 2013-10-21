@@ -4,6 +4,9 @@
 -- Load helper functions
 require("base")
 
+-- Some types used in FFI
+require("ffitypes")
+
 -- Profiling library
 require("profiling")
 
