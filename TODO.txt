@@ -1,9 +1,7 @@
 C++
-* Detach detours? Is this even worth doing?
 * Fix hook system - use pointers to avoid map copies - This shouldn't need to be done, check C++ move semantics.
 * Fix the MAJOR PROBLEM in hook system - probably can just search for the virtual function on deletion
 * Benchmark and analyse Widen/Narrow functions
-* Replace slow DirectX font rendering with something faster
 * Remake object searching to use the hash table
 * The whole namespace thing is getting a bit messy, might need to think about using a class
 
@@ -13,11 +11,9 @@ Lua
 * Allow for return values to be passed from a ProcessEvent hook back into the engine
 * FFrame.GetFuncArgsHex possible infinite loop
 * FFrameMT.GetTArray does not take into account TArray inner type
-* Get the SDKGen to run on coroutines so maybe we can render something to tell the user about the sdk generating
 * Add __tostring for structs
 * Complete file library (unload for the moment)
 * Figure out what's going on with FTurnData
-* Fix LocalPlayerController finding - probably need to grab it out of GEngine->GamePlayers and then check when it changes using Actor:eventDestroyed
 * Default arguments don't work correctly
 
 Other
@@ -34,3 +30,6 @@ Other
 Bugs:
 * Cursor does not work correctly in full screen - I think it's fine in borderless windowed though
 * Tabs in Unreal console are fucked
+
+Not Important
+* Get the SDKGen to run on coroutines so maybe we can render something to tell the user about the sdk generating
