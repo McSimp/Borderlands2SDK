@@ -69,6 +69,8 @@ else
 	require("engineHook")
 	require("scriptHook")
 
+	require("localPC")
+
 	require("command")
 	include("luacommands.lua")
 

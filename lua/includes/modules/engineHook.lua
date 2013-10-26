@@ -72,8 +72,12 @@ end
 
 local EngineCallback = ffi.cast("tProcessEventHook", ProcessHooks)
 
-local function AddInternal(funcData, hookName, hookFunc, rawHook)
-	if type(funcData) ~= "table" then error("Function must be a function data table") end
+local function AddInternal(className, funcName, hookName, hookFunc, rawHook)
+	if engine.Classes[className] == nil then error("Class " .. className .. " not found") end
+	
+	local funcData = engine.Classes[className].funcs[funcName]
+	if funcData == nil then error("Function " .. funcName .. " not found") end
+	
 	if not funcData.ptr or funcData.ptr == nil then error("Function has no pointer") end
 	if type(hookName) ~= "string" then error("Hook name must be a string") end
 	if type(hookFunc) ~= "function" then error("Hook function must be a function") end
@@ -86,15 +90,15 @@ local function AddInternal(funcData, hookName, hookFunc, rawHook)
 
 	RegisteredHooks[ptrNum][hookName] = { hookFunc, rawHook }
 
-	print(string.format("[Lua] Engine Hook added for function at 0x%X", ptrNum))
+	print(string.format("[Lua] Engine Hook added for function %q", funcData.ptr:GetFullName()))
 end
 
-function Add(funcData, hookName, hookFunc)
-	return AddInternal(funcData, hookName, hookFunc, false)
+function Add(className, funcName, hookName, hookFunc)
+	return AddInternal(className, funcName, hookName, hookFunc, false)
 end
 
-function AddRaw(funcData, hookName, hookFunc)
-	return AddInternal(funcData, hookName, hookFunc, true)
+function AddRaw(className, funcName, hookName, hookFunc)
+	return AddInternal(className, funcName, hookName, hookFunc, true)
 end
 
 function RemoveAll()
@@ -109,8 +113,12 @@ function RemoveAll()
 	end
 end
 
-function Remove(funcData, hookName)
-	if type(funcData) ~= "table" then error("Function must be a function data table") end
+function Remove(className, funcName, hookName)
+	if engine.Classes[className] == nil then error("Class " .. className .. " not found") end
+	
+	local funcData = engine.Classes[className].funcs[funcName]
+	if funcData == nil then error("Function " .. funcName .. " not found") end
+	
 	if not funcData.ptr then error("Function has no pointer") end
 	if type(hookName) ~= "string" then error("Hook name must be a string") end
 
@@ -123,5 +131,5 @@ function Remove(funcData, hookName)
 		RegisteredHooks[ptrNum] = nil
 	end
 
-	print(string.format("[Lua] Engine Hook removed for function at 0x%X", ptrNum))
+	print(string.format("[Lua] Engine Hook removed for function %q", funcData.ptr:GetFullName()))
 end

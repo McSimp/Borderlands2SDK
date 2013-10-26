@@ -73,7 +73,7 @@ local function CommandHook(Object, Stack, Result, Function)
 	scriptHook.CallFunction(Object, Stack, Result, engine.Classes.UConsole.funcs.eventConsoleCommand.ptr)
 	return true
 end
-scriptHook.AddRaw(engine.Classes.UConsole.funcs.ShippingConsoleCommand, "CommandHook", CommandHook)
+scriptHook.AddRaw("UConsole", "ShippingConsoleCommand", "CommandHook", CommandHook)
 
 module("command")
 

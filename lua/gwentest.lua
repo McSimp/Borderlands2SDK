@@ -88,7 +88,7 @@ end
 function ToggleNoclip()
 	print("Toggling Noclip")
 
-	local pc = LocalPlayer()
+	local pc = LocalPC()
 	local pawn = pc.AcknowledgedPawn
 	
 	if pc.bCheatFlying then
@@ -150,14 +150,14 @@ function RemoveKeyHook()
 end
 
 function Brap()
-	local endTrace = LocalPlayer():GetAxes(LocalPlayer().Rotation)
-	local startTrace = LocalPlayer().Pawn.Mesh:GetBoneLocation("Head", 0)
+	local endTrace = LocalPC():GetAxes(LocalPC().Rotation)
+	local startTrace = LocalPC().Pawn.Mesh:GetBoneLocation("Head", 0)
 
 	endTrace.X = (endTrace.X * 30000) + startTrace.X
 	endTrace.Y = (endTrace.Y * 30000) + startTrace.Y
 	endTrace.Z = (endTrace.Z * 30000) + startTrace.Z
 
-	local ret = LocalPlayer():Trace(endTrace, startTrace, true)
+	local ret = LocalPC():Trace(endTrace, startTrace, true)
 	print(ret)
 
 	if NotNull(ret) then print(ret:GetFullName()) end
@@ -265,17 +265,17 @@ end
 
 function SpawnTest()
 	--[[
-	local endTrace = LocalPlayer():GetAxes(LocalPlayer().Rotation)
-	local startTrace = LocalPlayer().Pawn.Mesh:GetBoneLocation("Head", 0)
+	local endTrace = LocalPC():GetAxes(LocalPC().Rotation)
+	local startTrace = LocalPC().Pawn.Mesh:GetBoneLocation("Head", 0)
 
 	endTrace.X = (endTrace.X * 30000) + startTrace.X
 	endTrace.Y = (endTrace.Y * 30000) + startTrace.Y
 	endTrace.Z = (endTrace.Z * 30000) + startTrace.Z
 
-	local ret, HitLocation = LocalPlayer():Trace(endTrace, startTrace, true)
+	local ret, HitLocation = LocalPC():Trace(endTrace, startTrace, true)
 	]]
 
-	spawned = LocalPlayer():Spawn(engine.Classes.AWillowVehicle_WheeledVehicle, nil, nil, LocalPlayer().Pawn.Mesh:GetBoneLocation("Head", 0), nil, engine.Objects:Get(202747), nil)
+	spawned = LocalPC():Spawn(engine.Classes.AWillowVehicle_WheeledVehicle, nil, nil, LocalPC().Pawn.Mesh:GetBoneLocation("Head", 0), nil, engine.Objects:Get(202747), nil)
 
 	print(spawned)
 	print(spawned.Mesh)

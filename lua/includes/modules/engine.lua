@@ -38,16 +38,6 @@ function engine.LogAllUnrealScriptCalls(enabled)
 	ffi.C.LUAFUNC_LogAllUnrealScriptCalls(enabled)
 end
 
-local localPC = nil
-function LocalPlayer()
-	if localPC == nil or localPC.UObject.Class ~= engine.Classes.AWillowPlayerController.static then
-		local localPlayer = engine.FindObjectExactClass("LocalPlayer Transient.WillowGameEngine_0:LocalPlayer_0", engine.Classes.ULocalPlayer)
-		localPC = ffi.cast("struct APlayerController*", localPlayer.Actor)
-	end
-	
-	return localPC
-end
-
 local function InitializeFunctions(funcsTable)
 	if funcsTable == nil then return 0 end
 
