@@ -86,7 +86,7 @@ end
 
 -- TODO: Grab this from the object structure rather than a hook - creates a race condition
 -- and may actually be incorrect if the UDN is anything to go by.
-engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GetCanvas", function(caller, args)
+engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.eventPostRender, "GetCanvas", function(caller, args)
 	engineCanvas = ffi.cast("struct UCanvas*", args.Canvas)
-	engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.PostRender, "GetCanvas")
+	engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.eventPostRender, "GetCanvas")
 end)

@@ -11,45 +11,57 @@ function PrintPatches()
 	end
 end
 
-local ffi = require("ffi")
+local FUNC_HasOptionalParms = 0x00004000
+local FUNC_Native = 0x00000400
 
-function GetName(obj)
-	if obj == nil then return "None" end
+function OptFuncs()
+	for i=0,(engine.Objects.Count-1) do
+		local obj = engine.Objects[i]
+		if IsNull(obj) then goto continue end
+		if obj.UObject.Class ~= engine.Classes.UFunction.static then goto continue end
 
-	local nameEntry = engine.Names[obj.Name.Index]
-	local str = ffi.string(nameEntry.Name)
+		obj = ffi.cast("struct UFunction*", obj)
 
-	if obj.Name.Number ~= 0 then
-		str = str .. "_" .. tostring(obj.Name.Number - 1)
-	end
-
-	return str
-end
-
-function GetPathName(obj, result)
-	if obj ~= nil then
-		local outer = obj.Outer
-		if outer ~= nil then
-			result = GetPathName(outer, result)
-
-			if outer.Class ~= engine.Classes.UPackage.static and outer.Outer.Class == engine.Classes.UPackage.static then
-				result = result .. ":"
-			else
-				result = result .. "."
-			end
+		if flags.IsSet(obj.UFunction.FunctionFlags, FUNC_HasOptionalParms)
+		and not flags.IsSet(obj.UFunction.FunctionFlags, FUNC_Native) then
+			print(obj:GetFullName())
 		end
 
-		result = result .. GetName(obj)
-	else
-		result = result .. "None"
+		::continue::
 	end
-
-	return result
 end
 
-function GetFullName(obj)
-	if obj == nil then return "None" end
-	local result = GetName(obj.Class) .. " "
-	result = GetPathName(obj, result)
-	return result
+function PrintCode(idx)
+	local func = ffi.cast("struct UFunction*", engine.Objects[idx])
+	local code = func.UStruct.Script
+
+	local parms = ""
+	for i=0,(code.Count-1) do
+		parms = parms .. string.format("%s ", bit.tohex(code[i], 2))
+	end
+	print(parms)
+end
+
+local ffi = require("ffi")
+
+function DebugProperties(className)
+	local class = engine.Classes[className].static
+
+	local properties = {}
+	local classProperty = ffi.cast("struct UProperty*", class.UStruct.Children)
+	while NotNull(classProperty) do
+		if 	classProperty.UProperty.ElementSize > 0
+			and not classProperty:IsA(engine.Classes.UConst) -- Consts and enums are in children
+			and not classProperty:IsA(engine.Classes.UEnum)
+		then
+			table.insert(properties, classProperty)
+		end
+
+		classProperty = ffi.cast("struct UProperty*", classProperty.UField.Next)
+	end
+
+	for k,property in ipairs(properties) do
+		print(property:GetName())
+		print(property.UProperty.ElementSize, property.UProperty.ArrayDim)
+	end
 end

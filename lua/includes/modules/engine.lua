@@ -84,9 +84,9 @@ local function InitializeClasses()
 
 		-- If it's a string, it's a full name and we need to search.
 		if type(class[2]) == "string" then
-			members.static = engine.FindClass(class[2])
+			members.static = ffi.cast("struct UClass*", engine.FindClass(class[2]))
 		else -- Otherwise it's just an offset and we can just get it out of the array
-			members.static = engine.Objects[class[2]]
+			members.static = ffi.cast("struct UClass*", engine.Objects[class[2]])
 		end
 
 		if members.static == nil then

@@ -10,6 +10,8 @@ local CPF_OutParm = 0x0000000000000100
 local CPF_SkipParm = 0x0000000000000200
 local CPF_ReturnParm = 0x0000000000000400
 
+local FUNC_Event = 0x00000800
+
 function Package:ProcessClassForFuncs(class)
 	if class == DefaultClass then return end
 
@@ -167,7 +169,12 @@ function Package:ProcessFunction(func)
 		end
 	end
 
-	self.File:write(string.format("\t[%q] = {\n", func:GetName()))
+	local name = func:GetName()
+	if flags.IsSet(func.UFunction.FunctionFlags, FUNC_Event) then
+		name = "event" .. name
+	end
+
+	self.File:write(string.format("\t[%q] = {\n", name))
 
 	self.File:write("\t\targs = {\n")
 	self.File:write(args)

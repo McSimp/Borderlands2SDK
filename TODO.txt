@@ -17,8 +17,8 @@ Lua
 * Add __tostring for structs
 * Complete file library (unload for the moment)
 * Figure out what's going on with FTurnData
-* SDKGen: Properly prefix event functions with event
 * Fix LocalPlayerController finding - probably need to grab it out of GEngine->GamePlayers and then check when it changes using Actor:eventDestroyed
+* Default arguments don't work correctly
 
 Other
 * CrashRpt endpoint on mcsi.mp
@@ -29,6 +29,7 @@ Other
 * Find some way to move Launcher source code out of the build folder
 * Decide whether to release source code (If so, hide some Unreal structs that I really shouldn't know)
 * Look into a build server and symbol server for crash reporting
+* Check for updates in Launcher
 
 Bugs:
 * Cursor does not work correctly in full screen - I think it's fine in borderless windowed though

@@ -70,7 +70,7 @@ local function CommandHook(Object, Stack, Result, Function)
 
 	-- Call ConsoleCommand instead, because ShippingConsoleCommand adds 'say' to the front
 	Stack.Code = code
-	scriptHook.CallFunction(Object, Stack, Result, engine.Classes.UConsole.funcs.ConsoleCommand.ptr)
+	scriptHook.CallFunction(Object, Stack, Result, engine.Classes.UConsole.funcs.eventConsoleCommand.ptr)
 	return true
 end
 scriptHook.AddRaw(engine.Classes.UConsole.funcs.ShippingConsoleCommand, "CommandHook", CommandHook)

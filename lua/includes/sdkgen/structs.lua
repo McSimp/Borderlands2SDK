@@ -206,7 +206,9 @@ function ScriptStruct:FieldsToC(lastOffset)
 			local special = ""
 
 			if property.UProperty.ArrayDim > 1 then -- It's a C style array, so [x] needed
-				special = special .. string.format("[%d]", property.UProperty.ArrayDim)
+				-- LuaJIT has issues here for some reason
+				local add = string.format("[%d]", property.UProperty.ArrayDim)
+				special = special .. add
 			end
 
 			if property:IsA(engine.Classes.UBoolProperty) then

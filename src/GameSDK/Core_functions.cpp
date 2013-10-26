@@ -206,11 +206,12 @@ int UObject::GetBuildChangelistNumber ( )
 
 	UObject_execGetBuildChangelistNumber_Parms GetBuildChangelistNumber_Parms;
 
+	unsigned long funcFlags = pFnGetBuildChangelistNumber->FunctionFlags;
 	pFnGetBuildChangelistNumber->FunctionFlags |= ~0x400;
 
 	this->ProcessEvent ( pFnGetBuildChangelistNumber, &GetBuildChangelistNumber_Parms, NULL );
 
-	pFnGetBuildChangelistNumber->FunctionFlags |= 0x400;
+	pFnGetBuildChangelistNumber->FunctionFlags = funcFlags;
 
 	return GetBuildChangelistNumber_Parms.ReturnValue;
 };
@@ -229,11 +230,12 @@ int UObject::GetEngineVersion ( )
 
 	UObject_execGetEngineVersion_Parms GetEngineVersion_Parms;
 
+	unsigned long funcFlags = pFnGetEngineVersion->FunctionFlags;
 	pFnGetEngineVersion->FunctionFlags |= ~0x400;
 
 	this->ProcessEvent ( pFnGetEngineVersion, &GetEngineVersion_Parms, NULL );
 
-	pFnGetEngineVersion->FunctionFlags |= 0x400;
+	pFnGetEngineVersion->FunctionFlags = funcFlags;
 
 	return GetEngineVersion_Parms.ReturnValue;
 };
