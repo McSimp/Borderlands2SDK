@@ -289,7 +289,6 @@ namespace BL2SDK
 	// It will also initialize Lua and the command system, so the SDK is essentially fully operational at this point
 	bool GetCanvasPostRender(UObject* caller, UFunction* function, void* parms, void* result)
 	{
-		UGameViewportClient_eventPostRender_Parms* realParms = reinterpret_cast<UGameViewportClient_eventPostRender_Parms*>(parms);
 		InitializeLua();
 
 		if(Settings::DeveloperModeEnabled())
@@ -408,7 +407,7 @@ namespace BL2SDK
 
 	FFI_EXPORT UObject* LUAFUNC_StaticConstructObject(UClass* inClass, UObject* outer, FName name, unsigned int flags)
 	{
-		return pStaticConstructObject(inClass, outer, name, flags, NULL, NULL, NULL, NULL);
+		return pStaticConstructObject(inClass, outer, name, flags, nullptr, nullptr, nullptr, nullptr);
 	}
 
 	FFI_EXPORT UPackage* LUAFUNC_LoadPackage(UPackage* outer, const char* filename, DWORD flags)

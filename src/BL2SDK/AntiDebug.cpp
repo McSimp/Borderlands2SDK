@@ -11,7 +11,7 @@
 namespace BL2SDK
 {
 	typedef NTSTATUS (WINAPI* tNtSIT) (HANDLE, THREAD_INFORMATION_CLASS, PVOID, ULONG);
-	tNtSIT pNtSetInformationThread = NULL;
+	tNtSIT pNtSetInformationThread = nullptr;
 
 	NTSTATUS NTAPI hkNtSetInformationThread(
 		__in HANDLE ThreadHandle, 
@@ -29,7 +29,7 @@ namespace BL2SDK
 	}
 
 	typedef NTSTATUS (WINAPI* tNtQIP) (HANDLE, PROCESSINFOCLASS, PVOID, ULONG, PULONG);
-	tNtQIP pNtQueryInformationProcess = NULL;
+	tNtQIP pNtQueryInformationProcess = nullptr;
 
 	NTSTATUS WINAPI hkNtQueryInformationProcess(
 		__in HANDLE ProcessHandle,
@@ -74,6 +74,4 @@ namespace BL2SDK
 		detNtQIP.Attach();
 		Logging::Log("[AntiDebug] Hook added for NtQueryInformationProcess\n");
 	}
-
-	// TODO: Remove detours on close
 }

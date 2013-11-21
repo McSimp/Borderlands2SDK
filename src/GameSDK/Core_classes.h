@@ -77,7 +77,7 @@ public:
 				return (T*) Object; 
 		} 
 
-		return NULL; 
+		return nullptr; 
 	}
 
 	bool IsA ( UClass* pClass ); 
@@ -161,7 +161,7 @@ public:
 	virtual void VirtualFunction64 ( );																			// 0x00FEA9F0 (0x100)
 	virtual void VirtualFunction65 ( );																			// 0x00DB03E0 (0x104)
 	virtual void VirtualFunction66 ( );																			// 0x00BBF1C0 (0x108)
-	virtual void ProcessEvent ( class UFunction* pFunction, void* pParms, void* pResult = NULL );				// 0x0065C820 (0x10C)
+	virtual void ProcessEvent ( class UFunction* pFunction, void* pParms, void* pResult = nullptr );				// 0x0065C820 (0x10C)
 };
 
 // Class Core.Field

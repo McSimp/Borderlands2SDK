@@ -45,7 +45,7 @@ namespace CrashRptHelper
 		crashRptReady = true;
 		
 		// Add our log file to the error report
-		crAddFile2W(Settings::GetLogFilePath().c_str(), NULL, L"Log File", CR_AF_MAKE_FILE_COPY);
+		crAddFile2W(Settings::GetLogFilePath().c_str(), nullptr, L"Log File", CR_AF_MAKE_FILE_COPY);
 
 		// Add the version of Borderlands 2 to the report if it can be obtained
 		std::wstring gameVer;

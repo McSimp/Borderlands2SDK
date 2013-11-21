@@ -19,7 +19,7 @@ namespace Util
 		char *szBuff = new char[buffSize];
 		memset(szBuff, 0, buffSize);
 
-		int len = vsprintf_s(szBuff, buffSize, fmt, args);
+		vsprintf_s(szBuff, buffSize, fmt, args);
 
 		szBuff[buffSize - 1] = 0;
 
@@ -51,7 +51,7 @@ namespace Util
 		wchar_t* szBuff = new wchar_t[buffSize];
 		memset(szBuff, 0, buffSize);
 
-		int len = vswprintf_s(szBuff, buffSize, fmt, args);
+		vswprintf_s(szBuff, buffSize, fmt, args);
 
 		szBuff[buffSize - 1] = 0;
 
@@ -88,7 +88,7 @@ namespace Util
 
 	void Popup(const std::wstring& strName, const std::wstring& strText)
 	{
-		MessageBox(NULL, strText.c_str(), strName.c_str(), MB_OK | MB_ICONASTERISK);
+		MessageBox(nullptr, strText.c_str(), strName.c_str(), MB_OK | MB_ICONASTERISK);
 	}
 
 	void CloseGame()

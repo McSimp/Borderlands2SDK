@@ -82,9 +82,9 @@ function Run-MSBuild($sln, $config, $params)
 }
 
 Log-Action "Setting Visual Studio environment..."
-if((!(VS-Env VS110COMNTOOLS "Visual Studio 2012" "v110")) -and (!(VS-Env VS100COMNTOOLS "Visual Studio 2010" "v100")))
+if((!(VS-Env VS120COMNTOOLS "Visual Studio 2013" "v120")) -and (!(VS-Env VS110COMNTOOLS "Visual Studio 2012" "v110")))
 {
-	$Host.UI.WriteErrorLine("Failed to determine Visual Studio tools path. Make sure you have VS2010 or VS2012 installed.")
+	$Host.UI.WriteErrorLine("Failed to determine Visual Studio tools path. Make sure you have VS2012 or VS2013 installed.")
 	Exit
 }
 

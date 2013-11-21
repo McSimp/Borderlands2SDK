@@ -15,8 +15,6 @@ public:
 	typedef std::map<UFunction*, tHookMap>::iterator tiStaticHooks;
 
 private:
-	tHookMap* GetVirtualHookTable(const std::string& funcName);
-	tHookMap* GetStaticHookTable(UFunction* function);
 	bool RemoveFromTable(tHookMap& hookTable, const std::string& funcName, const std::string& hookName);
 
 public:

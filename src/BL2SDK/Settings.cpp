@@ -9,7 +9,7 @@ namespace Settings
 
 	void Initialize(LauncherStruct* args)
 	{
-		if(args == NULL || args->BinPath == NULL)
+		if(args == nullptr || args->BinPath == nullptr)
 		{
 			throw FatalSDKException(6000, "Launcher settings struct was invalid, did you use the launcher?");
 		}

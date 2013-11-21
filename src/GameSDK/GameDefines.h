@@ -19,7 +19,7 @@ public:
 
 	TArray()
 	{
-		Data = NULL;
+		Data = nullptr;
 		Count = 0;
 		Max = 0;
 	}

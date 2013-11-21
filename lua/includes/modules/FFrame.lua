@@ -8,7 +8,7 @@ local pFrameStep = ffi.cast("tFrameStep", bl2sdk.FrameStep)
 
 local FFrameMT = {}
 
-function FFrameMT.GetFuncArgsHex(self)
+function FFrameMT.GetFuncCodeHex(self)
 	local originalCode = self.Code
 	local out = ""
 
@@ -21,6 +21,16 @@ function FFrameMT.GetFuncArgsHex(self)
 	end
 
 	self.Code = originalCode
+
+	return out
+end
+
+function FFrameMT.GetLocalsHex(self, length)
+	local out = ""
+
+	for i=1,length do
+		out = out .. bit.tohex(self.Locals[i - 1], 2) .. " "
+	end
 
 	return out
 end

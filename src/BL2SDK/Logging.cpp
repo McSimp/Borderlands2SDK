@@ -10,11 +10,11 @@
 
 namespace Logging
 {
-	HANDLE logFile = NULL;
+	HANDLE logFile = nullptr;
 	bool logToExternalConsole = false;
 	bool logToFile = false;
 	bool logToGameConsole = false;
-	UConsole* gameConsole = NULL;
+	UConsole* gameConsole = nullptr;
 
 	void LogToFile(const char* buff, int len)
 	{
@@ -22,7 +22,7 @@ namespace Logging
 		{
 			// Write to the log file. 0 fucks given if it fails.
 			DWORD bytesWritten = 0;
-			WriteFile(logFile, buff, len, &bytesWritten, NULL);
+			WriteFile(logFile, buff, len, &bytesWritten, nullptr);
 		}
 	}
 
@@ -30,7 +30,7 @@ namespace Logging
 	{
 		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
 		DWORD bytesWritten = 0;
-		WriteFile(output, buff, len, &bytesWritten, NULL);
+		WriteFile(output, buff, len, &bytesWritten, nullptr);
 	}
 
 	void Log(const char* formatted, int length)
@@ -46,7 +46,7 @@ namespace Logging
 		
 		if(logToGameConsole)
 		{
-			if(gameConsole != NULL)
+			if(gameConsole != nullptr)
 			{
 				// It seems that Unreal will automatically put a newline on the end of a 
 				// console output, but if there's already a \n at the end, then it won't
@@ -84,7 +84,7 @@ namespace Logging
 	// Everything else can fail, but InitializeFile must work.
 	void InitializeFile(const std::wstring& fileName)
 	{
-		logFile = CreateFile(fileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		logFile = CreateFile(fileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if(logFile == INVALID_HANDLE_VALUE)
 		{
 			std::string errMsg = Util::Format("Failed to initialize log file (INVALID_HANDLE_VALUE, LastError = %d)", GetLastError());
@@ -100,7 +100,7 @@ namespace Logging
 		// There should only be 1 instance so we should be right to just use it in this way
 		UConsole* console = UObject::FindObject<UConsole>("WillowConsole Transient.WillowGameEngine_0:WillowGameViewportClient_0.WillowConsole_0");
 
-		if(console != NULL)
+		if(console != nullptr)
 		{
 			gameConsole = console;
 			logToGameConsole = true;

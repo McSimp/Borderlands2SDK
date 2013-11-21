@@ -16,10 +16,10 @@ namespace GameHooks
 	void Cleanup()
 	{
 		delete EngineHookManager;
-		EngineHookManager = NULL;
+		EngineHookManager = nullptr;
 
 		delete UnrealScriptHookManager;
-		UnrealScriptHookManager = NULL;
+		UnrealScriptHookManager = nullptr;
 	}
 
 	bool ProcessEngineHooks(UObject* caller, UFunction* function, void* parms, void* result)
@@ -33,7 +33,6 @@ namespace GameHooks
 		{
 			CHookManager::tHookMap hooks = iHooks->second;
 
-			bool engineShouldRun = true;
 			for(CHookManager::tiHookMap iterator = hooks.begin(); iterator != hooks.end(); iterator++)
 			{
 				// maps to std::string, void*, but we want to call a tProcessEventHook* instead
@@ -60,7 +59,6 @@ namespace GameHooks
 		{
 			CHookManager::tHookMap hooks = iHooks->second;
 
-			bool engineShouldRun = true;
 			for(CHookManager::tiHookMap iterator = hooks.begin(); iterator != hooks.end(); iterator++)
 			{
 				// maps to std::string, void*, but we want to call a tCallFunctionHook* instead

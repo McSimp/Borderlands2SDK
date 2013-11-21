@@ -4,7 +4,8 @@
 #include <Windows.h>
 #include <string>
 
-struct LauncherStruct {
+struct LauncherStruct 
+{
 	bool DisableAntiDebug;
 	bool LogAllProcessEventCalls;
 	bool LogAllUnrealScriptCalls;

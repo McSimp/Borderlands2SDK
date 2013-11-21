@@ -11,6 +11,8 @@ function PrintPatches()
 	end
 end
 
+local ffi = require("ffi")
+
 local FUNC_HasOptionalParms = 0x00004000
 local FUNC_Native = 0x00000400
 
@@ -31,6 +33,20 @@ function OptFuncs()
 	end
 end
 
+function FuncOptCodes()
+	for i=0,(engine.Objects.Count-1) do
+		local obj = engine.Objects[i]
+		if IsNull(obj) then goto continue end
+		if obj.UObject.Class ~= engine.Classes.UFunction.static then goto continue end
+
+		obj = ffi.cast("struct UFunction*", obj)
+
+		local code = obj.UStruct.Script
+
+		::continue::
+	end
+end
+
 function PrintCode(idx)
 	local func = ffi.cast("struct UFunction*", engine.Objects[idx])
 	local code = func.UStruct.Script
@@ -41,8 +57,6 @@ function PrintCode(idx)
 	end
 	print(parms)
 end
-
-local ffi = require("ffi")
 
 function DebugProperties(className)
 	local class = engine.Classes[className].static

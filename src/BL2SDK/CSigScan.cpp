@@ -7,7 +7,7 @@
 CSigScan::CSigScan(const wchar_t* moduleName)
 {
 	m_moduleHandle = GetModuleHandle(moduleName);
-	if(m_moduleHandle == NULL)
+	if(m_moduleHandle == nullptr)
 	{
 		throw FatalSDKException(3000, Util::Format("Sigscan failed (GetModuleHandle returned NULL, Error = %d)", GetLastError()));
 	}
@@ -22,7 +22,7 @@ CSigScan::CSigScan(const wchar_t* moduleName)
 	}
  
 	m_pModuleBase = (char*)mem.AllocationBase;
-	if(m_pModuleBase == NULL)
+	if(m_pModuleBase == nullptr)
 	{
 		throw FatalSDKException(3002, "Sigscan failed (mem.AllocationBase was NULL)");
 	}

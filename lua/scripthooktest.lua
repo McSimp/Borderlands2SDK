@@ -60,14 +60,16 @@ scriptHook.Add(engine.Classes.UCustomizationDefinition.funcs.GetAvailableCustomi
 end)
 ]]
 
-scriptHook.Remove(engine.Classes.UCustomizationDefinition.funcs.GetAvailableCustomizationsForPlayer, "LolDev2")
-scriptHook.Add(engine.Classes.UCustomizationDefinition.funcs.GetAvailableCustomizationsForPlayer, "LolDev2", function(Object, Stack, Result, Function)
-	print("GetAvailableCustomizationsForPlayer called")
+scriptHook.Remove("UCustomizationDefinition", "GetAvailableAndUnauthorizedCustomizationsForPlayer", "LolDev2")
+scriptHook.AddRaw("UCustomizationDefinition", "GetAvailableAndUnauthorizedCustomizationsForPlayer", "LolDev2", function(Object, Stack, Result, Function)
+	print("GetAvailableAndUnauthorizedCustomizationsForPlayer called")
 
 	local originalCode = Stack.Code
-	print(Stack:GetFuncArgsHex())
+	print(Stack:GetFuncCodeHex())
+	print(Stack:GetLocalsHex(Function.PropertySize))
 	Stack:PrintStackInfo()
 
+	--[[
 	local newStack = FFrame.NewStack(Stack)
 	local startCode = newStack.Code
 
@@ -83,7 +85,7 @@ scriptHook.Add(engine.Classes.UCustomizationDefinition.funcs.GetAvailableCustomi
 	newStack.Code = startCode
 	Stack.Code = originalCode
 
-	print(newStack:GetFuncArgsHex())
+	print(newStack:GetFuncCodeHex())
 	newStack:PrintStackInfo()
 
 	scriptHook.CallFunction(Object, newStack, Result, Function)
@@ -93,6 +95,7 @@ scriptHook.Add(engine.Classes.UCustomizationDefinition.funcs.GetAvailableCustomi
 	Stack:SkipFunction()
 
 	return true
+	]]
 end)
 
 --[[
