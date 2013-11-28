@@ -4,9 +4,9 @@ C++
 * Benchmark and analyse Widen/Narrow functions
 * Remake object searching to use the hash table
 * The whole namespace thing is getting a bit messy, might need to think about using a class
+* Add a Lua panic handler to popup a message for user and report to me
 
 Lua
-* Implement checking that controls have not been freed before acting on them
 * Figure out what the fuck is going wrong with UObjectIndex
 * Allow for return values to be passed from a ProcessEvent hook back into the engine
 * FFrame.GetFuncArgsHex possible infinite loop
@@ -15,6 +15,7 @@ Lua
 * Complete file library (unload for the moment)
 * Figure out what's going on with FTurnData
 * Default arguments don't work correctly
+* Implement scriptHook.Add (instead of just AddRaw)
 
 Other
 * CrashRpt endpoint on mcsi.mp
@@ -30,6 +31,10 @@ Other
 Bugs:
 * Cursor does not work correctly in full screen - I think it's fine in borderless windowed though
 * Tabs in Unreal console are fucked
+* Launcher won't find Borderlands 2 sometimes if installed in a custom library directory (perhaps check in the Firewall entries in the registry for the path?)
+* If you give it the path to Borderlands2.exe and Steam has to update/install something, then launching will fail silenty - need to give a message for this.
+* Cleanup functions may be unnecessary and may cause more crashes when the game has crashed
 
 Not Important
 * Get the SDKGen to run on coroutines so maybe we can render something to tell the user about the sdk generating
+

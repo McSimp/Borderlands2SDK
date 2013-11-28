@@ -1,5 +1,6 @@
 local ffi = require("ffi")
 local bit = require("bit")
+local PtrToNum = PtrToNum
 
 ffi.cdef[[
 typedef void (__thiscall *tFrameStep) (struct FFrame*, struct UObject*, void*);
@@ -168,9 +169,9 @@ end
 
 ffi.metatype("struct FFrame", { __index = FFrameMT })
 
-module("FFrame")
+local FFrame = {}
 
-function NewStack(oldStack)
+function FFrame.NewStack(oldStack)
 	local stack = ffi.new("struct FFrame")
 	local buffer = ffi.new("unsigned char[?]", 128)
 
@@ -188,3 +189,5 @@ function NewStack(oldStack)
 
 	return stack
 end
+
+return FFrame

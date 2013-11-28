@@ -22,6 +22,7 @@ namespace Settings
 	std::wstring GetTextureFile(const std::wstring& filename);
 	std::wstring GetLuaFile(const std::wstring& filename);
 	bool DeveloperModeEnabled();
+	bool DisableAntiDebug();
 }
 
 #endif

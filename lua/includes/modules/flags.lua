@@ -1,7 +1,10 @@
 local bit = require("bit")
 
-module("flags")
+local flags = {}
 
-function IsSet(field, flag)
+function flags.IsSet(field, flag)
 	return bit.band(field, flag) ~= 0
 end
+
+return flags
+

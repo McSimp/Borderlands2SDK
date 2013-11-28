@@ -321,7 +321,7 @@ function EditorTest()
 
 	-- Populate the weapon type box
 	weaponEditor.ClearAndNone(typeBox)
-	for k,v in pairs(enums.EWeaponType) do
+	for k,v in pairs(enum.EWeaponType) do
 		if k ~= "WT_MAX" then
 			typeBox:AddItem(k).value = v
 		end

@@ -13,7 +13,7 @@ namespace CrashRptHelper
 
 	BOOL WINAPI CrashCallback(LPVOID lpvState)
 	{
-		BL2SDK::Cleanup();
+		//BL2SDK::Cleanup();
 		return CR_CB_DODEFAULT;
 	}
 

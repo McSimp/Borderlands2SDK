@@ -47,6 +47,8 @@ local function GetReturn(retVal, pParamBlockBase)
 end
 
 function FuncMT.__call(funcData, obj, ...)
+	if obj == nil then error("Cannot execute function on null object") end
+
 	local args = { ... }
 	--local n = select("#", ...)
 

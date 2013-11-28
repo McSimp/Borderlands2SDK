@@ -139,7 +139,7 @@ function AddKeyHook()
 		local key = args.Key
 		local event = args.EventType
 
-		if key == "V" and event == enums.EInputEvent.IE_Pressed then
+		if key == "V" and event == enum.EInputEvent.IE_Pressed then
 			ToggleNoclip()
 		end
 	end)

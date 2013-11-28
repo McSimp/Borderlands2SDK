@@ -17,13 +17,12 @@ void LUAFUNC_RemoveStaticScriptHook(struct UFunction* pFunction);
 typedef void (__thiscall *tCallFunction) (struct UObject*, struct FFrame*, void* const, struct UFunction*);
 ]]
 
-module("scriptHook")
+local RegisteredHooks = {}
+local scriptHook = {}
 
-CallFunction = ffi.cast("tCallFunction", bl2sdk.CallFunction)
+scriptHook.CallFunction = ffi.cast("tCallFunction", bl2sdk.CallFunction)
 
-RegisteredHooks = {}
-
-function ProcessHooks(Object, Stack, Result, Function)
+function scriptHook.ProcessHooks(Object, Stack, Result, Function)
 	local ptrNum = PtrToNum(Function)
 	local hookTable = RegisteredHooks[ptrNum]
 
@@ -62,7 +61,7 @@ function ProcessHooks(Object, Stack, Result, Function)
 	return true
 end
 
-local EngineCallback = ffi.cast("tCallFunctionHook", ProcessHooks)
+local EngineCallback = ffi.cast("tCallFunctionHook", scriptHook.ProcessHooks)
 
 local function AddInternal(className, funcName, hookName, hookFunc, rawHook)
 	if engine.Classes[className] == nil then error("Class " .. className .. " not found") end
@@ -85,16 +84,16 @@ local function AddInternal(className, funcName, hookName, hookFunc, rawHook)
 	print(string.format("[Lua] UnrealScript Hook added for function %q", funcData.ptr:GetFullName()))
 end
 
-function Add(className, funcName, hookName, hookFunc)
+function scriptHook.Add(className, funcName, hookName, hookFunc)
 	error("Adding normal script hooks is not yet implemented")
 	--return AddInternal(className, funcName, hookName, hookFunc, false)
 end
 
-function AddRaw(className, funcName, hookName, hookFunc)
+function scriptHook.AddRaw(className, funcName, hookName, hookFunc)
 	return AddInternal(className, funcName, hookName, hookFunc, true)
 end
 
-function RemoveAll()
+function scriptHook.RemoveAll()
 	-- Foreach function
 	for ptrNum,_ in pairs(RegisteredHooks) do
 		-- Remove the hook inside the engine
@@ -106,7 +105,7 @@ function RemoveAll()
 	end
 end
 
-function Remove(className, funcName, hookName)
+function scriptHook.Remove(className, funcName, hookName)
 	if engine.Classes[className] == nil then error("Class " .. className .. " not found") end
 	
 	local funcData = engine.Classes[className].funcs[funcName]
@@ -126,3 +125,5 @@ function Remove(className, funcName, hookName)
 
 	print(string.format("[Lua] UnrealScript Hook removed for function %q", funcData.ptr:GetFullName()))
 end
+
+return scriptHook

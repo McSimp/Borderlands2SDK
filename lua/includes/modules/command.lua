@@ -75,13 +75,13 @@ local function CommandHook(Object, Stack, Result, Function)
 end
 scriptHook.AddRaw("UConsole", "ShippingConsoleCommand", "CommandHook", CommandHook)
 
-module("command")
+local command = {}
 
-function GetTable()
+function command.GetTable()
 	return LuaCommands
 end
 
-function Add(name, func)
+function command.Add(name, func)
 	local nameLower = string.lower(name)
 
 	if LuaCommands[nameLower] ~= nil then
@@ -91,7 +91,9 @@ function Add(name, func)
 	LuaCommands[nameLower] = func
 end
 
-function Remove(name)
+function command.Remove(name)
 	local nameLower = string.lower(name)
 	LuaCommands[nameLower] = nil
 end
+
+return command

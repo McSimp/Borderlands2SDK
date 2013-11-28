@@ -1,5 +1,9 @@
 local ffi = require("ffi")
 
+--[[
+CAUTION: DO NOT USE THIS TYPE UNLESS YOU REALLY KNOW WHAT YOU'RE DOING.
+]]
+
 ffi.cdef[[
 	// Needed since default bool in LuaJIT is 1 byte and screws with alignment
 	typedef _Bool int BOOL;

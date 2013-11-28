@@ -1,0 +1,13 @@
+diff --git a/src/lj_load.c b/src/lj_load.c
+index 37dde79..bf8e4cf 100644
+--- a/src/lj_load.c
++++ b/src/lj_load.c
+@@ -34,7 +34,7 @@ static TValue *cpparser(lua_State *L, lua_CFunction dummy, void *ud)
+   UNUSED(dummy);
+   cframe_errfunc(L->cframe) = -1;  /* Inherit error function. */
+   bc = lj_lex_setup(L, ls);
+-  if (ls->mode && !strchr(ls->mode, bc ? 'b' : 't')) {
++  if (bc || (ls->mode && !strchr(ls->mode, bc ? 'b' : 't'))) {
+     setstrV(L, L->top++, lj_err_str(L, LJ_ERR_XMODE));
+     lj_err_throw(L, LUA_ERRSYNTAX);
+   }

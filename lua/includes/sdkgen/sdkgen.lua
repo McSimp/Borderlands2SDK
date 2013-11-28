@@ -289,10 +289,11 @@ end
 local VERSION_TEMPLATE = 
 [[SDKGEN_ENGINE_VERSION = %d
 SDKGEN_CHANGELIST_NUMBER = %d
+SDKGEN_BL2SDK_VERSION = %q
 ]]
 local function CreateVersionFile()
 	local file = file.Open("sdkgen/version.lua", "w+")
-	file:write(string.format(VERSION_TEMPLATE, bl2sdk.engineVersion, bl2sdk.changeListNumber))
+	file:write(string.format(VERSION_TEMPLATE, bl2sdk.EngineVersion, bl2sdk.ChangeListNumber, bl2sdk.SDKVersion))
 	file:close()
 end
 
@@ -318,7 +319,7 @@ print("[SDKGen] Generating SDK...")
 ProcessPackages()
 CreateLoaderFile()
 CreateVersionFile()
-PrintErrors()
+--PrintErrors()
 
 -- Set a flag in the SDK to reset the lua state when this has finished executing
 RESET_FLAG = true

@@ -210,7 +210,7 @@ function KeyHook(caller, args)
 	local Key = args.Key
 	local Event = args.Event
 
-	print(Key:GetName(), Event, table.sfind(enums.EInputEvent, Event))
+	print(Key:GetName(), Event, table.find(enum.EInputEvent, Event))
 end
 
 function AddKeyHook()

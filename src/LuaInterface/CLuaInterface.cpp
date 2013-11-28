@@ -14,6 +14,7 @@
 #include "cryptopp/c5/files.h"
 
 #include "generated/LuaHashes.h"
+#include "generated/SDKVersion.h"
 
 #define luaL_dofile_nobc(L, fn) \
 	(luaL_loadfilex(L, fn, "t") || lua_pcall(L, 0, LUA_MULTRET, 0))
@@ -312,8 +313,9 @@ void CLuaInterface::SetSDKValues()
 	SET_POINTER(m_pState, "FrameStep", BL2SDK::pFrameStep);
 	SET_POINTER(m_pState, "CallFunction", BL2SDK::pCallFunction);
 
-	SET_NUMBER(m_pState, "engineVersion", BL2SDK::EngineVersion);
-	SET_NUMBER(m_pState, "changeListNumber", BL2SDK::ChangelistNumber);
+	SET_NUMBER(m_pState, "EngineVersion", BL2SDK::EngineVersion);
+	SET_NUMBER(m_pState, "ChangeListNumber", BL2SDK::ChangelistNumber);
+	SET_STRING(m_pState, "SDKVersion", BL2SDK::Version.c_str());
 
 	lua_setfield(m_pState, LUA_GLOBALSINDEX, "bl2sdk");
 }
@@ -325,11 +327,8 @@ void CLuaInterface::SetPaths()
 	Logging::LogF("[Lua] Lua Path = %s\n", m_luaPath.c_str());
 
 	lua_getfield(m_pState, LUA_GLOBALSINDEX, LUA_LOADLIBNAME);
-	lua_getfield(m_pState, -1, "path");
-	const char* pkgPath = lua_tostring(m_pState, -1);
-	lua_pop(m_pState, 1); // pop path string
 
-	std::string newPath = Util::Format("%s\\includes\\modules\\?.lua;%s", m_luaPath.c_str(), pkgPath);
+	std::string newPath = Util::Format("%s\\includes\\modules\\?.lua;%s\\includes\\modules\\?\\init.lua;.\\?.lua;", m_luaPath.c_str(), m_luaPath.c_str());
 	SET_STRING(m_pState, "path", newPath.c_str());
 	lua_pop(m_pState, 1); // pop table
 }

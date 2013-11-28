@@ -2,6 +2,7 @@ local ffi = require("ffi")
 local string = string
 local math = math
 local tonumber = tonumber
+local rawequal = rawequal
 
 local FColorMT = { __index = {} }
 

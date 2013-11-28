@@ -7,8 +7,17 @@ local print = print
 local string = string
 local profiling = profiling
 
-local engine = {}
-_G["engine"] = engine
+-- Import core data structures
+require("engine.core.structs")
+require("engine.core.classes")
+
+-- Load Lua helpers for core engine types
+TArray = require("engine.helpers.TArray")
+FString = require("engine.helpers.FString")
+UObject = require("engine.helpers.UObject")
+
+engine = {}
+local engine = engine
 
 -- Core engine data structures that we'll need access to
 engine.Objects = TArray.Create("struct UObject*", ffi.cast("struct TArray*", bl2sdk.GObjects))
@@ -19,11 +28,14 @@ engine.Classes = {} -- maps a name to a class
 
 engine._FuncsInternal = {} -- maps a function pointer to its metadata
 
-include("engine/hash.lua")
-include("engine/find.lua")
-include("engine/funcmt.lua")
-include("engine/objectmt.lua")
-include("engine/package.lua")
+require("engine.hash")
+require("engine.find")
+require("engine.funcmt")
+require("engine.objectmt")
+require("engine.package")
+
+require("engine.helpers.FName")
+FFrame = require("engine.helpers.FFrame")
 
 ffi.cdef[[
 void LUAFUNC_LogAllProcessEventCalls(bool enabled);
@@ -43,7 +55,7 @@ local function InitializeFunctions(funcsTable)
 
 	-- Foreach function, get its pointer and add it to the _FuncsInternal map
 	local count = 0
-	for _,funcData in pairs(funcsTable) do -- NOOO NOT PAIRS
+	for _,funcData in pairs(funcsTable) do
 		funcData.ptr = ffi.cast("struct UFunction*", engine.Objects[funcData.index])
 		funcData.index = nil
 

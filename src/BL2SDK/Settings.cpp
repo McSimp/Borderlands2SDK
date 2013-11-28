@@ -6,6 +6,7 @@ namespace Settings
 {
 	std::wstring binPath;
 	bool developerMode;
+	bool disableAntiDebug;
 
 	void Initialize(LauncherStruct* args)
 	{
@@ -16,6 +17,7 @@ namespace Settings
 
 		binPath = args->BinPath;
 		developerMode = args->DeveloperMode;
+		disableAntiDebug = args->DisableAntiDebug;
 	}
 
 	std::wstring GetLogFilePath()
@@ -47,5 +49,10 @@ namespace Settings
 	bool DeveloperModeEnabled()
 	{
 		return developerMode;
+	}
+
+	bool DisableAntiDebug()
+	{
+		return disableAntiDebug;
 	}
 }

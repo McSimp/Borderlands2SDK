@@ -304,7 +304,7 @@ function InspectRandomWeapon()
 	invManager:AddInventoryToBackpack(ffi.cast("struct AWillowInventory*", newWep))
 
 	--print("Equipping weapon")
-	--invManager:SafelySetQuickSlot(ffi.cast("struct AWeapon*", newWep), enums.EQuickWeaponSlot.QuickSelectUp)
+	--invManager:SafelySetQuickSlot(ffi.cast("struct AWeapon*", newWep), enum.EQuickWeaponSlot.QuickSelectUp)
 end
 
 -- l InspectRandomWeapon()

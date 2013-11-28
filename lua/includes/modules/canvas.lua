@@ -4,82 +4,82 @@ local print = print
 local engineHook = engineHook
 local engine = engine
 
-local EBlendMode = enums.EBlendMode
+local EBlendMode = enum.EBlendMode
 local whiteLinearColor = ffi.new("struct FLinearColor", 1, 1, 1, 1)
 
 local engineCanvas = nil -- make sure it's a struct UCanvas*
 local currentTexture = nil
 local currentLinearColor = whiteLinearColor
 
-module("canvas")
+local canvas = {}
 
-function _SetPos(x, y)
+function canvas._SetPos(x, y)
 	engineCanvas.UCanvas.CurX = x
 	engineCanvas.UCanvas.CurY = y
 end
 
-function SetDrawColor(color)
+function canvas.SetDrawColor(color)
 	engineCanvas.UCanvas.DrawColor = color
 	currentLinearColor = color:ToLinear()
 end
 
-function DrawRect(x, y, w, h)
-	_SetPos(x, y)
+function canvas.DrawRect(x, y, w, h)
+	canvas._SetPos(x, y)
 
 	local tex = engineCanvas.UCanvas.DefaultTexture
 	engineCanvas:DrawTile(tex, w, h, 0, 0, tex.UTexture2D.SizeX, tex.UTexture2D.SizeY, currentLinearColor, false, EBlendMode.BLEND_Translucent)
 end
 
-function DrawBorderedRect(x, y, w, h)
-	DrawRect(x, y, 1, h) -- left
-	DrawRect(x + w - 1, y, 1, h) -- right
-	DrawRect(x + 1, y, w - 2, 1) -- top
-	DrawRect(x + 1, y + h - 1, w - 2, 1) -- bottom
+function canvas.DrawBorderedRect(x, y, w, h)
+	canvas.DrawRect(x, y, 1, h) -- left
+	canvas.DrawRect(x + w - 1, y, 1, h) -- right
+	canvas.DrawRect(x + 1, y, w - 2, 1) -- top
+	canvas.DrawRect(x + 1, y + h - 1, w - 2, 1) -- bottom
 end
 
-function DrawLine(startX, startY, endX, endY)
+function canvas.DrawLine(startX, startY, endX, endY)
 	engineCanvas:Draw2DLine(startX, startY, endX, endY, engineCanvas.UCanvas.DrawColor)
 end
 
-function SetFont(font)
+function canvas.SetFont(font)
 	engineCanvas.UCanvas.Font = font
 end
 
-function DrawText(x, y, text)
-	_SetPos(x, y)
+function canvas.DrawText(x, y, text)
+	canvas._SetPos(x, y)
 	engineCanvas:DrawText(text, false, 1, 1)
 end
 
-function GetTextSize(text)
+function canvas.GetTextSize(text)
 	return engineCanvas:TextSize(text)
 end
 
-function SetTexture(tex)
+function canvas.SetTexture(tex)
 	--if scale == nil then scale = 1 end
 	currentTexture = ffi.cast("struct UTexture2D*", tex)
 end
 
-function _InternalDrawTexturedRectUV(x, y, w, h, u, v, ul, vl)
-	_SetPos(x, y)
+function canvas._InternalDrawTexturedRectUV(x, y, w, h, u, v, ul, vl)
+	canvas._SetPos(x, y)
 	engineCanvas:DrawTile(currentTexture, w, h, u, v, ul, vl, currentLinearColor, true, EBlendMode.BLEND_Translucent)
 end
 
-function DrawTexturedRect(x, y, w, h)
+function canvas.DrawTexturedRect(x, y, w, h)
 	if currentTexture == nil then error("Current canvas texture is nil") end
-	_InternalDrawTexturedRectUV(x, y, w, h, 0, 0, currentTexture.UTexture2D.SizeX, currentTexture.UTexture2D.SizeY)
+	canvas._InternalDrawTexturedRectUV(x, y, w, h, 0, 0, currentTexture.UTexture2D.SizeX, currentTexture.UTexture2D.SizeY)
 end
 
-function DrawTexturedRectUV(x, y, w, h, u, v, ul, vl)
+function canvas.DrawTexturedRectUV(x, y, w, h, u, v, ul, vl)
 	if currentTexture == nil then error("Current canvas texture is nil") end
-	_InternalDrawTexturedRectUV(x, y, w, h, u, v, ul, vl)
+	canvas._InternalDrawTexturedRectUV(x, y, w, h, u, v, ul, vl)
 end
 
-function SetClipRect(x, y, w, h)
+function canvas.SetClipRect(x, y, w, h)
 	engineCanvas:SetOrigin(x, y)
 	engineCanvas:SetClip(x + w, y + h)
 end
 
-function ResetClip()
+function canvas.ResetClip()
 	engineCanvas:SetOrigin(0, 0)
 	engineCanvas:SetClip(engineCanvas.UCanvas.SizeX, engineCanvas.UCanvas.SizeY)
 end
@@ -90,3 +90,5 @@ engineHook.Add("UWillowGameViewportClient", "eventPostRender", "GetCanvas", func
 	engineCanvas = ffi.cast("struct UCanvas*", args.Canvas)
 	engineHook.Remove("UWillowGameViewportClient", "eventPostRender", "GetCanvas")
 end)
+
+return canvas

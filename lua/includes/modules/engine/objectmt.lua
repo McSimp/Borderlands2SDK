@@ -14,9 +14,15 @@ local LogObjectIndex = false
 local BaseObjFuncs = UObject.BaseFuncs
 local FuncMT = engine.FuncMT
 
+local function LogSlowObjectIndex(b)
+	LogObjectIndex = b
+end
+
 local UObjectMT = {}
 
 function UObjectMT.__index(self, k)
+	if self == nil then error("Object is null - cannot access field") end
+
 	-- First check the base functions
 	if BaseObjFuncs[k] ~= nil then return BaseObjFuncs[k] end
 
@@ -68,6 +74,8 @@ function UObjectMT.__index(self, k)
 end
 
 function UObjectMT.__newindex(self, k, v)
+	if self == nil then error("Object is null - cannot set field") end
+
 	if LogObjectIndex then print("Calling UObjectMT.__newindex", self, k, v) end
 
 	-- Get the actual class information for this object
@@ -112,6 +120,6 @@ function UObjectDataMT.__index(self, k)
 end
 
 -- Public members
-engine.LogObjectIndex = LogObjectIndex
+engine.LogSlowObjectIndex = LogSlowObjectIndex
 engine.UObjectMT = UObjectMT
 engine.UObjectDataMT = UObjectDataMT

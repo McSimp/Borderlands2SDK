@@ -114,6 +114,17 @@ namespace BL2SDK
 		{
 			Util::CloseGame();
 		}
+		else if(Settings::DisableAntiDebug())
+		{
+			Util::Popup(L"Fatal Error", L"There was a fatal error - attach your debugger now.");
+			if(IsDebuggerPresent())
+			{
+				DebugBreak();
+			}
+		}
+
+		// Don't ever pass it back into the engine
+		Util::CloseGame();
 
 		return EXCEPTION_EXECUTE_HANDLER;
 	}

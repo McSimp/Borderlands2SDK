@@ -8,7 +8,7 @@ function funcs.IsA(self, class)
 
 	local superclass = self.UObject.Class
 
-	while NotNull(superclass) do
+	while superclass ~= nil do
 		if superclass == class_instance then
 			return true
 		end
@@ -44,7 +44,7 @@ function funcs.GetCName(self)
 		cname = "U" -- Just a plain old object by default
 
 		local class = ffi.cast("struct UClass*", self)
-		while NotNull(class) do
+		while class ~= nil do
 			if class:GetName() == "Actor" then
 				cname = "A"
 				break
@@ -59,19 +59,18 @@ function funcs.GetCName(self)
 end
 
 function funcs.GetPackageObject(self)
-	local pkg = nil
+	local pkg
 	local outer = self.UObject.Outer
 
-	while NotNull(outer) do
-		
+	while outer ~= nil do
 		pkg = outer
 		outer = outer.UObject.Outer
-
 	end
 
 	return pkg
 end
 
-module("UObject")
+local UObject = {}
+UObject.BaseFuncs = funcs
 
-BaseFuncs = funcs
+return UObject

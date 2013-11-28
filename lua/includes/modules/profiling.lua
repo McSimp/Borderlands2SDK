@@ -6,42 +6,44 @@ local collectgarbage = collectgarbage
 local timers = {}
 local memTracks = {}
 
-module("profiling")
+local profiling = {}
 
-function StartTimer(id, name)
+function profiling.StartTimer(id, name)
 	if timers[id] ~= nil then
 		print("[Profiling] Warning: Timer '" .. name .. "' not stopped")
 	end
 
-	timers[id] = { name, os.clock() }
+	timers[id] = { name = name, start = os.clock() }
 end
 
-function StopTimer(id)
+function profiling.StopTimer(id)
 	local timer = timers[id]
 	if timer ~= nil then
-		local elapsed = os.clock() - timer[2]
-		print(string.format("[Profiling] %s took %.3f seconds", timer[1], elapsed))
+		local elapsed = os.clock() - timer.start
+		print(string.format("[Profiling] %s took %.3f seconds", timer.name, elapsed))
 		timers[id] = nil
 	else
 		print("[Profiling] Warning: Timer '" .. id .. "' not started")
 	end
 end
 
-function TrackMemory(id, name)
+function profiling.TrackMemory(id, name)
 	if memTracks[id] ~= nil then
 		print("[Profiling] Warning: Memory tracker '" .. name .. "' overwritten")
 	end
 
-	memTracks[id] = { name, collectgarbage("count") }
+	memTracks[id] = { name = name, start = collectgarbage("count") }
 end
 
-function GetMemoryUsage(id)
+function profiling.GetMemoryUsage(id)
 	local memTrack = memTracks[id]
 	if memTrack ~= nil then
-		local elapsed = collectgarbage("count") - memTrack[2]
-		print(string.format("[Profiling] %s used %.3f kB mem", memTrack[1], elapsed))
+		local diff = collectgarbage("count") - memTrack.start
+		print(string.format("[Profiling] %s used %.3f kB mem", memTrack.name, diff))
 		memTracks[id] = nil
 	else
 		print("[Profiling] Warning: Memory tracker '" .. id .. "' not initialized")
 	end
 end
+
+return profiling

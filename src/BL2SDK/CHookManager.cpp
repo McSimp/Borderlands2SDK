@@ -42,11 +42,9 @@ void CHookManager::AddStaticHook(UFunction* function, const tFuncNameHookPair& h
 bool CHookManager::RemoveFromTable(tHookMap& hookTable, const std::string& funcName, const std::string& hookName)
 {
 	// Remove it and ensure that it actually got removed
-	int sizeDiff = hookTable.size();
-	hookTable.erase(hookName);
-	sizeDiff -= hookTable.size();
+	int removed = hookTable.erase(hookName);
 
-	if(sizeDiff == 0)
+	if(removed == 0)
 	{
 		Logging::LogF("[CHookManager] (%s) Failed to remove hook \"%s\" for function \"%s\"\n", this->DebugName.c_str(), hookName.c_str(), funcName.c_str());
 		return false;

@@ -1,6 +1,10 @@
 local ffi = require("ffi")
 local setmetatable = setmetatable
 local error = error
+local type = type
+local print = print
+local setmetatable = setmetatable
+local rawget = rawget
 
 local TArrayMT = {}
 
@@ -27,7 +31,7 @@ local function TArrayIter(obj, k)
 		k = k + 1
 
 		local v = obj.Data[k]
-		if NotNull(v) then
+		if v ~= nil then
 			return k, v
 		else
 			return TArrayIter(obj, k)
@@ -49,9 +53,9 @@ end
 
 ffi.metatype("struct TArray", TArrayMT)
 
-module("TArray")
+local TArray = {}
 
-function Create(innerType, cdata)
+function TArray.Create(innerType, cdata)
 	local type = ffi.typeof([[
 	struct {
 		$* Data;
@@ -83,4 +87,6 @@ function Create(innerType, cdata)
 	return setmetatable({}, mt)
 end
 
-BaseMT = TArrayMT
+TArray.BaseMT = TArrayMT
+
+return TArray

@@ -16,7 +16,7 @@ function FStringMT.__index:GetLuaString()
 end
 
 function FStringMT.__index:IsValid()
-	return (self.Data ~= nil)
+	return self.Data ~= nil
 end
 
 FStringMT.__tostring = FStringMT.__index.GetLuaString
@@ -24,7 +24,7 @@ FStringMT.__tostring = FStringMT.__index.GetLuaString
 function FStringMT.__eq(self, cmp)
 	if ffi.istype("struct FString", cmp) then
 		if self.Data ~= nil and cmp.Data ~= nil then
-			return (ffi.C._wcsnicmp(self.Data, cmp.Data, self.Count) == 0)
+			return ffi.C._wcsnicmp(self.Data, cmp.Data, self.Count) == 0
 		end
 	end
 
@@ -33,12 +33,14 @@ end
 
 ffi.metatype("struct FString", FStringMT)
 
-module("FString")
+local FString = {}
 
-function GetFromLuaString(str)
+function FString.GetFromLuaString(str)
 	-- TODO: What about GC?
 	local len = string.len(str) + 1
 	local buff = ffi.new("wchar_t[?]", len)
 	ffi.C.mbstowcs(buff, str, len)
 	return ffi.new("struct FString", buff, len, len)
 end
+
+return FString

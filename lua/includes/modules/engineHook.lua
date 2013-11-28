@@ -16,15 +16,14 @@ void LUAFUNC_AddStaticEngineHook(struct UFunction* pFunction, tProcessEventHook 
 void LUAFUNC_RemoveStaticEngineHook(struct UFunction* pFunction);
 ]]
 
-module("engineHook")
-
-RegisteredHooks = {}
+local RegisteredHooks = {}
+local engineHook = {}
 
 local function GetArg(arg, pParms)
 	return ffi.cast(arg.castTo, pParms + arg.offset)[0]
 end
 
-function ProcessHooks(pObject, pFunction, pParms, pResult)
+function engineHook.ProcessHooks(pObject, pFunction, pParms, pResult)
 	local ptrNum = PtrToNum(pFunction)
 	local hookTable = RegisteredHooks[ptrNum]
 
@@ -63,14 +62,14 @@ function ProcessHooks(pObject, pFunction, pParms, pResult)
 	return true
 end
 
-function SafeProcessHooks(pObject, pFunction, pParms, pResult)
+local function SafeProcessHooks(pObject, pFunction, pParms, pResult)
 	local status, ret = pcall(ProcessHooks, pObject, pFunction, pParms, pResult)
 	print(status, ret)
 
 	return true
 end
 
-local EngineCallback = ffi.cast("tProcessEventHook", ProcessHooks)
+local EngineCallback = ffi.cast("tProcessEventHook", engineHook.ProcessHooks)
 
 local function AddInternal(className, funcName, hookName, hookFunc, rawHook)
 	if engine.Classes[className] == nil then error("Class " .. className .. " not found") end
@@ -93,15 +92,15 @@ local function AddInternal(className, funcName, hookName, hookFunc, rawHook)
 	print(string.format("[Lua] Engine Hook added for function %q", funcData.ptr:GetFullName()))
 end
 
-function Add(className, funcName, hookName, hookFunc)
+function engineHook.Add(className, funcName, hookName, hookFunc)
 	return AddInternal(className, funcName, hookName, hookFunc, false)
 end
 
-function AddRaw(className, funcName, hookName, hookFunc)
+function engineHook.AddRaw(className, funcName, hookName, hookFunc)
 	return AddInternal(className, funcName, hookName, hookFunc, true)
 end
 
-function RemoveAll()
+function engineHook.RemoveAll()
 	-- Foreach function
 	for ptrNum,_ in pairs(RegisteredHooks) do
 		-- Remove the hook inside the engine
@@ -113,7 +112,7 @@ function RemoveAll()
 	end
 end
 
-function Remove(className, funcName, hookName)
+function engineHook.Remove(className, funcName, hookName)
 	if engine.Classes[className] == nil then error("Class " .. className .. " not found") end
 	
 	local funcData = engine.Classes[className].funcs[funcName]
@@ -133,3 +132,5 @@ function Remove(className, funcName, hookName)
 
 	print(string.format("[Lua] Engine Hook removed for function %q", funcData.ptr:GetFullName()))
 end
+
+return engineHook
