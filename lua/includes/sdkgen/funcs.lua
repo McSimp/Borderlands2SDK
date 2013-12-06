@@ -55,6 +55,11 @@ local function ProcessRetval(field)
 		end
 	end
 
+	-- TArray and FStrings need a flag so we can free them properly later on
+	if field:IsA(engine.Classes.UArrayProperty) or field:IsA(engine.Classes.UStrProperty) then
+		text = text .. "\t\t\t\tTArray = true,\n"
+	end
+
 	-- Offset and closing bracket
 	text = text .. string.format("\t\t\t\toffset = %d\n\t\t\t},\n", field.UProperty.Offset)
 

@@ -3,6 +3,7 @@
 #include "BL2SDK/Settings.h"
 #include "BL2SDK/Util.h"
 #include "BL2SDK/BL2SDK.h"
+#include "BL2SDK/GameHooks.h"
 #include <algorithm>
 #include <sstream>
 
@@ -148,10 +149,19 @@ static void StackDump(lua_State* L)
 	Logging::Log("--------------- Stack Dump Finished ---------------\n" );
 }
 
+bool LuaGCTick(UObject* caller, UFunction* function, void* parms, void* result)
+{
+	lua_State* L = BL2SDK::Lua->GetLuaState();
+	lua_gc(L, LUA_GCSTEP, 2); // CryEngine seems to do this, let's see how it goes.
+	return true;
+}
+
 CLuaInterface::CLuaInterface()
 {
 	m_modulesInitialized = false;
 	InitializeState();
+
+	GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient:Tick", "LuaGCTick", &LuaGCTick);
 }
 
 CLuaInterface::~CLuaInterface()
@@ -162,6 +172,8 @@ CLuaInterface::~CLuaInterface()
 	}
 
 	CleanupState();
+
+	GameHooks::EngineHookManager->Remove("Function WillowGame.WillowGameViewportClient:Tick", "LuaGCTick");
 }
 
 void CLuaInterface::InitializeState()
@@ -312,10 +324,13 @@ void CLuaInterface::SetSDKValues()
 	SET_POINTER(m_pState, "NameHash", BL2SDK::pNameHash);
 	SET_POINTER(m_pState, "FrameStep", BL2SDK::pFrameStep);
 	SET_POINTER(m_pState, "CallFunction", BL2SDK::pCallFunction);
+	SET_POINTER(m_pState, "GMalloc", BL2SDK::pGMalloc);
 
 	SET_NUMBER(m_pState, "EngineVersion", BL2SDK::EngineVersion);
 	SET_NUMBER(m_pState, "ChangeListNumber", BL2SDK::ChangelistNumber);
 	SET_STRING(m_pState, "SDKVersion", BL2SDK::Version.c_str());
+
+	SET_BOOL(m_pState, "EnableMemoryDebugging", Settings::MemoryDebugEnabled());
 
 	lua_setfield(m_pState, LUA_GLOBALSINDEX, "bl2sdk");
 }
@@ -361,4 +376,9 @@ void CLuaInterface::CallShutdownFuncs()
 	{
 		lua_call(m_pState, 0, 0);
 	}
+}
+
+lua_State* CLuaInterface::GetLuaState()
+{
+	return m_pState;
 }

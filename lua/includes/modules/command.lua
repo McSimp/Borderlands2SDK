@@ -1,6 +1,7 @@
 local string = string
 local print = print
 local ffi = require("ffi")
+local xpcall = xpcall
 
 local LuaCommands = {}
 
@@ -27,6 +28,10 @@ local function ParseCommand(cmdString)
 	return cmd, argT
 end
 
+local function CommandError(err)
+	return tostring(err) .. "\n" .. debug.traceback()
+end
+
 local function CommandHook(Object, Stack, Result, Function)
 	local code = Stack.Code
 	local cmdStringObject = Stack:GetString()
@@ -43,7 +48,7 @@ local function CommandHook(Object, Stack, Result, Function)
 	if LuaCommands[cmdLower] ~= nil then
 		print("\n>>> " .. fullCmdString .. " <<<")
 
-		local status, ret = pcall(LuaCommands[cmdLower], cmd, args)
+		local status, ret = xpcall(LuaCommands[cmdLower], CommandError, cmd, args)
 		if not status then print("Error in command: " .. ret) end
 --[[
 		local console = ffi.cast("struct UConsole*", Object)

@@ -35,14 +35,14 @@ ffi.cdef[[
 		struct UField_Data 		UField;
 	};
 
-	struct TArray_FName_ {
+	struct TArray_FName {
 		struct FName* Data;
 		int Count;
 		int Max;
 	};
 
 	struct UEnum_Data {
-		struct TArray_FName_ Names;
+		struct TArray_FName Names;
 	};
 
 	struct UEnum {
@@ -61,7 +61,7 @@ ffi.cdef[[
 		struct UConst_Data 		UConst;
 	};
 
-	struct TArray_char_ {
+	struct TArray_char {
 		char* Data;
 		int Count;
 		int Max;
@@ -74,7 +74,7 @@ ffi.cdef[[
 		unsigned short 	PropertySize;
 		unsigned char 	Unknown2;
 		unsigned char 	MinAlignment;
-		struct TArray_char_ Script;
+		struct TArray_char Script;
 		unsigned char 	Unknown3[0x2C];
 	};
 

@@ -7,6 +7,7 @@ namespace Settings
 	std::wstring binPath;
 	bool developerMode;
 	bool disableAntiDebug;
+	bool enableMemoryDebug;
 
 	void Initialize(LauncherStruct* args)
 	{
@@ -18,6 +19,7 @@ namespace Settings
 		binPath = args->BinPath;
 		developerMode = args->DeveloperMode;
 		disableAntiDebug = args->DisableAntiDebug;
+		enableMemoryDebug = args->EnableMemoryDebug;
 	}
 
 	std::wstring GetLogFilePath()
@@ -54,5 +56,10 @@ namespace Settings
 	bool DisableAntiDebug()
 	{
 		return disableAntiDebug;
+	}
+
+	bool MemoryDebugEnabled()
+	{
+		return enableMemoryDebug;
 	}
 }

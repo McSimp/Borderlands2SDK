@@ -36,66 +36,106 @@ function FFrameMT.GetLocalsHex(self, length)
 	return out
 end
 
-function FFrameMT.ReadType(self, ptrType, size)
+-- Use this function if you're reading out something that's not a struct
+-- ie. an int, float, pointer, etc.
+function FFrameMT.ReadBasicType(self, ptrType, size)
 	local result = ffi.cast(ptrType, self.Code)[0]
 	self.Code = self.Code + size
 	return result
 end
 
+function FFrameMT.ReadStructType(self, structType, ptrType, size)
+	local inCode = ffi.cast(ptrType, self.Code)[0]
+	self.Code = self.Code + size
+
+	local result = ffi.new(structType)
+	ffi.copy(result, inCode, size)
+	return result
+end
+
 function FFrameMT.ReadInt(self)
-	return self:ReadType(ffi.typeof("int*"), 4)
+	return self:ReadBasicType(ffi.typeof("int*"), 4)
 end
 
 function FFrameMT.ReadFloat(self)
-	return self:ReadType(ffi.typeof("float*"), 4)
+	return self:ReadBasicType(ffi.typeof("float*"), 4)
 end
 
 function FFrameMT.ReadName(self)
-	return self:ReadType(ffi.typeof("struct FName*"), ffi.sizeof("struct FName"))
+	return self:ReadStructType(ffi.typeof("struct FName"), ffi.typeof("struct FName*"), ffi.sizeof("struct FName"))
 end
 
 function FFrameMT.ReadObject(self)
-	return self:ReadType(ffi.typeof("struct UObject**"), 8) -- In C++, size = sizeof(ScriptPointerType) = sizeof(QWORD) = 8
+	return self:ReadBasicType(ffi.typeof("struct UObject**"), 8) -- In C++, size = sizeof(ScriptPointerType) = sizeof(QWORD) = 8
 end
 
 function FFrameMT.ReadWord(self)
-	return self:ReadType(ffi.typeof("unsigned short*"), 2)
+	return self:ReadBasicType(ffi.typeof("unsigned short*"), 2)
 end
 
 FFrameMT.Step = pFrameStep
 
-local function GetGenericNumber(Stack)
-	local var = ffi.new("int[1]", 0)
-	pFrameStep(Stack, Stack.Object, var)
+function FFrameMT:GetBasicType(arrayType, default)
+	local var = ffi.new(arrayType, default)
+	pFrameStep(self, self.Object, var)
 	return var[0]
 end
 
-local function GetCastedType(Stack, toCast)
-	local var = ffi.new(toCast .. "[1]")
-	pFrameStep(Stack, Stack.Object, var)
-	return var[0]
+function FFrameMT:GetStructType(structType, arrayType, size)
+	local var = ffi.new(arrayType)
+	pFrameStep(self, self.Object, var)
+
+	local result = ffi.new(structType)
+	ffi.copy(result, var[0], size)
+	return result
 end
 
-FFrameMT.GetBool = GetGenericNumber
-FFrameMT.GetStruct = GetCastedType
-FFrameMT.GetInt = GetGenericNumber
-FFrameMT.GetFloat = GetGenericNumber
-FFrameMT.GetByte = GetGenericNumber
-
-function FFrameMT.GetName(self)
-	return GetCastedType(self, "struct FName")
+function FFrameMT:GetBool()
+	return self:GetBasicType(ffi.typeof("BOOL[1]"), false)
 end
 
-function FFrameMT.GetString(self)
-	return GetCastedType(self, "struct FString")
+function FFrameMT:GetStruct(structType)
+	return self:GetStructType(structType, ffi.typeof("$[1]", structType), ffi.sizeof(structType))
 end
 
--- TODO: TArray inner type
-function FFrameMT.GetTArray(self)
-	return GetCastedType(self, "struct TArray")
+function FFrameMT:GetInt()
+	return self:GetBasicType(ffi.typeof("int[1]"), 0)
 end
 
-FFrameMT.GetObject = GetCastedType -- Have to use a pointer type (like struct UObject*)
+function FFrameMT:GetFloat()
+	return self:GetBasicType(ffi.typeof("float[1]"), 0)
+end
+
+function FFrameMT:GetByte()
+	return self:GetBasicType(ffi.typeof("int[1]"), 0) -- TODO: What does Unreal do here?
+end
+
+function FFrameMT:GetName()
+	return self:GetStructType("struct FName", "struct FName[1]", ffi.sizeof("struct FName"))
+end
+
+function FFrameMT:GetString()
+	return self:GetStructType("struct FString", "struct FString[1]", ffi.sizeof("struct FString"))
+end
+
+function FFrameMT:GetTArray(innerType)
+	-- If you get an error here, it means that you've specified an invalid inner type,
+	-- or there is no pre-existing definition for a TArray of the type you specified.
+	local actualType = ffi.typeof("struct TArray_" .. innerType)
+	return self:GetStructType(actualType, ffi.typeof("$[1]", actualType), ffi.sizeof("struct TArray"))
+end
+
+-- This function expects exactType to be an ffi.typeof'd TArray type (eg. ffi.typeof("struct TArray_char"))
+function FFrameMT:GetTArrayRaw(exactType)
+	return self:GetStructType(exactType, ffi.typeof("$[1]", exactType), ffi.sizeof("struct TArray"))
+end
+
+function FFrameMT:GetObject(className)
+	local class = engine.Classes[className]
+	if class == nil then error(string.format("Class %q not found", className)) end
+
+	return self:GetBasicType(ffi.typeof("$[1]", class.ptrType))
+end
 
 function FFrameMT.WriteOpToCode(self, opCode)
 	self.Code[0] = opCode -- Code is already an unsigned char*

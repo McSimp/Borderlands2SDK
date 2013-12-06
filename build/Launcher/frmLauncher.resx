@@ -230,6 +230,16 @@
         8py+2/9xW4SYGhVjkyMi9SdNjYqxX8l9J/o4xrDpAAAAAElFTkSuQmCC
 </value>
   </data>
+  <data name="enableMemoryDebuggingToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAZdEVYdFNvZnR3YXJlAEFkb2JlIEltYWdlUmVhZHlxyWU8AAAA5klEQVQ4T2P4//8/RRirICkY
+        qyApGKsgKZiBuZS5H4j3kYH7IQYUMu8vPFb4P/dQLtEYpB6kD2JALvPB5B3J/z08PP77+Pj8d3Z2/u88
+        wxkvH6QepA9sAFM60+GwVWH/HRwc/gcHB/+3tLT8bzvJFi8fpB6kD2JAAtNRj7ke/7W1teHYtMsULx+k
+        HqQPYkAk04nkWZ7/rSdY/0+Y7kYUDVIP0gcxIJDp1L1Ddf/VqtX+k0KD9IENYNRlnFPd5f+U0ZLxNEk0
+        UB/YACDgAmJxIJYiAYPUc4ENABGUYKyCpGCsgsTj/wwAywVI9Uj8dCoAAAAASUVORK5CYII=
+</value>
+  </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAIAEBAAAAAAIABoBAAAJgAAACAgAAAAACAAqBAAAI4EAAAoAAAAEAAAACAAAAABACAAAAAAAEAE

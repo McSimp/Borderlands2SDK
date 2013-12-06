@@ -16,6 +16,8 @@ Lua
 * Figure out what's going on with FTurnData
 * Default arguments don't work correctly
 * Implement scriptHook.Add (instead of just AddRaw)
+* Assigning an FString that we've ffi.new'd to an object needs to remove the finalizer since we have transferred ownership of the heap memory to the engine
+* Remove TArray.Create
 
 Other
 * CrashRpt endpoint on mcsi.mp
@@ -38,3 +40,5 @@ Bugs:
 Not Important
 * Get the SDKGen to run on coroutines so maybe we can render something to tell the user about the sdk generating
 
+
+// After ProcessEvent is called, all structs inside the Parms need to have their destructors called. That INCLUDES ones that have been returned from the engine. Basically that means anything that's passed into the engine needs to be destroyed - a copy will have been made.

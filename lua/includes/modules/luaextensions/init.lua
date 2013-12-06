@@ -1,4 +1,5 @@
 local tonumber = tonumber
+local debug = debug
 
 function IsNull(ptr)
 	return ptr == nil

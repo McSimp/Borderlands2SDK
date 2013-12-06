@@ -3,7 +3,7 @@ local engine = engine
 
 local GeneratedTArrays = { "FName", "char" } -- An array of inner type name strings
 local TARRAY_TEMPLATE = [[%s
-struct TArray_%s_ {
+struct TArray_%s {
 	%s* Data;
 	int Count;
 	int Max;

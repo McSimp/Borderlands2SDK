@@ -84,6 +84,12 @@ namespace BL2SDK
 			"xxxxxxx????xx",
 			13
 		};
+
+		MemorySignature GMalloc = {
+			"\x00\x00\x00\x00\xFF\xD7\x83\xC4\x04\x89\x45\xE4",
+			"????xxxxxxxx",
+			12
+		};
 	}
 }
 

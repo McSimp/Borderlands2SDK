@@ -11,6 +11,7 @@ local tostring = tostring
 local table = table
 local unpack = unpack
 
+local TArrayEngineFinalizer = TArray.EngineFinalizer
 local FindName = engine.FindName
 
 FUNCPARM_CLASS = 1
@@ -36,12 +37,18 @@ local FuncMT = {}
 local function GetReturn(retVal, pParamBlockBase)
 	local field = ffi.cast(retVal.castTo, pParamBlockBase + retVal.offset)
 
+	-- The param block will be freed when we're done with the function call, so
+	-- if there's a struct that we want, we need to copy it out so that our reference
+	-- doesn't get GCed while we're still using it.
+
+	-- HOWEVER, if the return type is an FString or TArray (or anything else where we
+	-- become the owners of a heap allocated block of memory) then we need to make sure 
+	-- that we free that when we're done.
 	if not retVal.cType then
 		return field[0]
 	else
 		local new = ffi.new(retVal.cType)
 		ffi.copy(new, field, ffi.sizeof(retVal.cType))
-
 		return new
 	end
 end
@@ -108,6 +115,8 @@ function FuncMT.__call(funcData, obj, ...)
 		-- Otherwise make sure it's a struct FString
 		elseif flags.IsSet(v.flags, FUNCPARM_STRING) then
 			if type(luaArg) == "string" then
+				-- TODO: If GC is run between here and ProcessEvent call, this string will
+				-- be deleted and there's going to be issues.
 				luaArg = FString.GetFromLuaString(luaArg)
 			elseif not ffi.istype(v.type, luaArg) then
 				error(string.format("Arg #%d (%s) expects a string", k, v.name))

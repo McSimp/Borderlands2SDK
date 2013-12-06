@@ -136,6 +136,8 @@ namespace Launcher
             public bool DisableCrashRpt;
             [MarshalAs(UnmanagedType.I1)]
             public bool DeveloperMode;
+            [MarshalAs(UnmanagedType.I1)]
+            public bool EnableMemoryDebug;
             [CustomMarshalAs(CustomUnmanagedType.LPWStr)]
             public string BinPath;
         }
@@ -174,6 +176,7 @@ namespace Launcher
                         LogAllUnrealScriptCalls = logAllUnrealScriptCallsToolStripMenuItem.Checked,
                         DisableCrashRpt = disableCrashReportingToolStripMenuItem.Checked,
                         DeveloperMode = developerModeToolStripMenuItem.Checked,
+                        EnableMemoryDebug = enableMemoryDebuggingToolStripMenuItem.Checked,
                         BinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\"
                     };
                     syringe.CallExport("BL2SDKDLL.dll", "InitializeSDK", arg);
@@ -307,10 +310,7 @@ namespace Launcher
                 MessageBoxButtons.YesNo, 
                 MessageBoxIcon.Exclamation);
 
-            if(result == DialogResult.Yes)
-            {
-                developerModeToolStripMenuItem.Checked = true;
-            }
+            developerModeToolStripMenuItem.Checked = (result == DialogResult.Yes);
         }
     }
 }

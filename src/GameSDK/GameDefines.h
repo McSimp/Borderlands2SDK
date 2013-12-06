@@ -194,3 +194,8 @@ struct ULinkerLoad : FArchive
 	unsigned char Unknown[0x498];
 	FArchiveAsync* Loader;
 };
+
+struct FMalloc
+{
+	void** VfTable;
+};

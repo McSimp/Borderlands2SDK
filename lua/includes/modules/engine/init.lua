@@ -1,7 +1,6 @@
 local ffi = require("ffi")
 local bit = require("bit")
 local pairs = pairs
-local TArray = TArray
 local PtrToNum = PtrToNum
 local print = print
 local string = string
@@ -110,7 +109,7 @@ end
 
 local function InitializeTArrays()
 	for i=1,#g_TArrayTypes do
-		ffi.metatype("struct TArray_" .. g_TArrayTypes[i] .. "_", TArray.BaseMT)
+		ffi.metatype("struct TArray_" .. g_TArrayTypes[i], TArray.BaseMT)
 	end
 
 	print(string.format("[Lua] %d TArray types initialized", #g_TArrayTypes))

@@ -41,6 +41,7 @@
             this.logAllUnrealScriptCallsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.developerModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.enableMemoryDebuggingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gbGamePath.SuspendLayout();
             this.msMenu.SuspendLayout();
             this.SuspendLayout();
@@ -107,7 +108,8 @@
             this.disableCrashReportingToolStripMenuItem,
             this.logAllProcessEventCallsToolStripMenuItem,
             this.logAllUnrealScriptCallsToolStripMenuItem,
-            this.developerModeToolStripMenuItem});
+            this.developerModeToolStripMenuItem,
+            this.enableMemoryDebuggingToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "Options";
@@ -116,7 +118,7 @@
             // 
             this.disableAntiDebugToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("disableAntiDebugToolStripMenuItem.Image")));
             this.disableAntiDebugToolStripMenuItem.Name = "disableAntiDebugToolStripMenuItem";
-            this.disableAntiDebugToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.disableAntiDebugToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
             this.disableAntiDebugToolStripMenuItem.Text = "Disable Anti-Debug";
             this.disableAntiDebugToolStripMenuItem.Click += new System.EventHandler(this.optionMenuItem_Click);
             // 
@@ -124,7 +126,7 @@
             // 
             this.disableCrashReportingToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("disableCrashReportingToolStripMenuItem.Image")));
             this.disableCrashReportingToolStripMenuItem.Name = "disableCrashReportingToolStripMenuItem";
-            this.disableCrashReportingToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.disableCrashReportingToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
             this.disableCrashReportingToolStripMenuItem.Text = "Disable crash reporting";
             this.disableCrashReportingToolStripMenuItem.Click += new System.EventHandler(this.optionMenuItem_Click);
             // 
@@ -132,7 +134,7 @@
             // 
             this.logAllProcessEventCallsToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("logAllProcessEventCallsToolStripMenuItem.Image")));
             this.logAllProcessEventCallsToolStripMenuItem.Name = "logAllProcessEventCallsToolStripMenuItem";
-            this.logAllProcessEventCallsToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.logAllProcessEventCallsToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
             this.logAllProcessEventCallsToolStripMenuItem.Text = "Log ProcessEvent calls";
             this.logAllProcessEventCallsToolStripMenuItem.Click += new System.EventHandler(this.optionMenuItem_Click);
             // 
@@ -140,7 +142,7 @@
             // 
             this.logAllUnrealScriptCallsToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("logAllUnrealScriptCallsToolStripMenuItem.Image")));
             this.logAllUnrealScriptCallsToolStripMenuItem.Name = "logAllUnrealScriptCallsToolStripMenuItem";
-            this.logAllUnrealScriptCallsToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.logAllUnrealScriptCallsToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
             this.logAllUnrealScriptCallsToolStripMenuItem.Text = "Log UnrealScript calls";
             this.logAllUnrealScriptCallsToolStripMenuItem.Click += new System.EventHandler(this.optionMenuItem_Click);
             // 
@@ -148,7 +150,7 @@
             // 
             this.developerModeToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("developerModeToolStripMenuItem.Image")));
             this.developerModeToolStripMenuItem.Name = "developerModeToolStripMenuItem";
-            this.developerModeToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.developerModeToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
             this.developerModeToolStripMenuItem.Text = "Developer Mode";
             this.developerModeToolStripMenuItem.Click += new System.EventHandler(this.developerModeToolStripMenuItem_Click);
             // 
@@ -158,6 +160,14 @@
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            // 
+            // enableMemoryDebuggingToolStripMenuItem
+            // 
+            this.enableMemoryDebuggingToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("enableMemoryDebuggingToolStripMenuItem.Image")));
+            this.enableMemoryDebuggingToolStripMenuItem.Name = "enableMemoryDebuggingToolStripMenuItem";
+            this.enableMemoryDebuggingToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.enableMemoryDebuggingToolStripMenuItem.Text = "Enable Memory Debugging";
+            this.enableMemoryDebuggingToolStripMenuItem.Click += new System.EventHandler(this.optionMenuItem_Click);
             // 
             // frmLauncher
             // 
@@ -198,6 +208,7 @@
         private System.Windows.Forms.ToolStripMenuItem disableCrashReportingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem logAllUnrealScriptCallsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem developerModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem enableMemoryDebuggingToolStripMenuItem;
     }
 }
 

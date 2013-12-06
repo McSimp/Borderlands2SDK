@@ -23,6 +23,9 @@ oo = require("oo")
 -- Enum library
 enum = require("enum")
 
+-- Engine memory allocator library
+memory = require("memory")
+
 -- Load Unreal Engine interface
 require("engine")
 

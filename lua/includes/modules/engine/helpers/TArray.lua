@@ -5,6 +5,7 @@ local type = type
 local print = print
 local setmetatable = setmetatable
 local rawget = rawget
+local memory = memory
 
 local TArrayMT = {}
 
@@ -49,6 +50,11 @@ end
 
 function TArrayMT.__len(self)
 	return self.Count
+end
+
+function TArrayMT.__gc(self)
+	print(string.format("TArray GC: %d, 0x%X", self.Count, PtrToNum(self.Data)))
+	--memory.Free(self.Data)
 end
 
 ffi.metatype("struct TArray", TArrayMT)

@@ -24,6 +24,7 @@ namespace BL2SDK
 	void* pGCRCTable;
 	void* pNameHash;
 	void* pTextureFixLocation;
+	void* pGMalloc;
 	tProcessEvent pProcessEvent;
 	tCallFunction pCallFunction;
 	tFrameStep pFrameStep;
@@ -232,6 +233,10 @@ namespace BL2SDK
 		pTextureFixLocation = sigscan.Scan(Signatures::TextureFixLocation);
 		Logging::LogF("[Internal] Texture Fix Location = 0x%p\n", pTextureFixLocation);
 
+		// Sigscan for GMalloc and its virtual function table
+		pGMalloc = *(void**)sigscan.Scan(Signatures::GMalloc);
+		Logging::LogF("[Internal] GMalloc = 0x%p\n", pGMalloc);
+		
 		// Detour UObject::ProcessEvent()
 		SETUP_SIMPLE_DETOUR(detProcessEvent, pProcessEvent, hkProcessEvent);
 		detProcessEvent.Attach();
@@ -357,12 +362,13 @@ namespace BL2SDK
 		Logging::InitializeFile(Settings::GetLogFilePath());
 		Logging::Log("[Internal] Launching SDK...\n");
 
-		Logging::LogF("[Internal] DisableAntiDebug = %d, LogAllProcessEventCalls = %d, LogAllUnrealScriptCalls = %d, DisableCrashRpt = %d, DeveloperMode = %d, BinPath = \"%ls\"\n", 
+		Logging::LogF("[Internal] DisableAntiDebug = %d, LogAllProcessEventCalls = %d, LogAllUnrealScriptCalls = %d, DisableCrashRpt = %d, DeveloperMode = %d, MemoryDebug = %d, BinPath = \"%ls\"\n", 
 			args->DisableAntiDebug,
 			args->LogAllProcessEventCalls,
 			args->LogAllUnrealScriptCalls,
 			args->DisableCrashRpt,
 			args->DeveloperMode,
+			args->EnableMemoryDebug,
 			args->BinPath);
 
 		if(!args->DisableCrashRpt)
