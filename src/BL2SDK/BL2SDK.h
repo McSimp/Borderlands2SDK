@@ -18,7 +18,7 @@ namespace BL2SDK
 	typedef FArchive& (__thiscall *tByteOrderSerialize) (FArchive* Ar, void* V, int Length);
 
 	extern void* pTextureFixLocation;
-	extern void* pGMalloc;
+	extern FMalloc** pGMalloc;
 
 	extern tProcessEvent pProcessEvent;
 	extern tCallFunction pCallFunction;

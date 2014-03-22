@@ -11,6 +11,7 @@
 #include "GameSDK/Signatues.h"
 #include "LuaInterface/Exports.h"
 #include "BL2SDK/PackageFix.h"
+#include "BL2SDK/MemoryDebug.h"
 
 namespace BL2SDK
 {
@@ -24,7 +25,7 @@ namespace BL2SDK
 	void* pGCRCTable;
 	void* pNameHash;
 	void* pTextureFixLocation;
-	void* pGMalloc;
+	FMalloc** pGMalloc;
 	tProcessEvent pProcessEvent;
 	tCallFunction pCallFunction;
 	tFrameStep pFrameStep;
@@ -234,7 +235,7 @@ namespace BL2SDK
 		Logging::LogF("[Internal] Texture Fix Location = 0x%p\n", pTextureFixLocation);
 
 		// Sigscan for GMalloc and its virtual function table
-		pGMalloc = *(void**)sigscan.Scan(Signatures::GMalloc);
+		pGMalloc = *(FMalloc***)sigscan.Scan(Signatures::GMalloc);
 		Logging::LogF("[Internal] GMalloc = 0x%p\n", pGMalloc);
 		
 		// Detour UObject::ProcessEvent()
@@ -342,6 +343,13 @@ namespace BL2SDK
 
 		InitializeGameVersions();
 
+		// Annoyingly, GMalloc is not instantiated until the first memory allocation,
+		// so we have to wait until the game is ready before hooking its vftable.
+		if(Settings::MemoryDebugEnabled())
+		{
+			HookMemoryAllocator();
+		}
+
 		// Set console key to Tilde if not already set
 		UConsole* console = UObject::FindObject<UConsole>("WillowConsole Transient.WillowGameEngine_0:WillowGameViewportClient_0.WillowConsole_0");
 		if(console && (console->ConsoleKey == FName("None") || console->ConsoleKey == FName("Undefine")))
@@ -352,6 +360,7 @@ namespace BL2SDK
 		GameHooks::EngineHookManager->RemoveStaticHook(function, "StartupSDK");
 
 		GameHooks::EngineHookManager->Register("Function WillowGame.WillowGameViewportClient:PostRender", "GetCanvas", &GetCanvasPostRender);
+
 		return true;
 	}
 

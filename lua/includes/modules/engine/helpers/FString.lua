@@ -42,7 +42,7 @@ end
 function FStringMT.__gc(self)
 	if self == nil then print("FString was nil in __gc") return end
 	print(string.format("FString GC: %d, 0x%X", self.Count, PtrToNum(self.Data)))
-	print(tostring(self))
+	--print(tostring(self))
 	memory.Free(self.Data)
 	print("Memory freed")
 end
