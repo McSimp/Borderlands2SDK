@@ -54,7 +54,7 @@ end
 
 function TArrayMT.__gc(self)
 	print(string.format("TArray GC: %d, 0x%X", self.Count, PtrToNum(self.Data)))
-	--memory.Free(self.Data)
+	memory.Free(self.Data)
 end
 
 ffi.metatype("struct TArray", TArrayMT)

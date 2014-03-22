@@ -59,7 +59,20 @@ function FuncMT.__call(funcData, obj, ...)
 	local args = { ... }
 	--local n = select("#", ...)
 
+	local codeSize = 9 * #funcData.args + 10
+	local codeBuffer = ffi.new("char[?]", codeSize)
+	local codeBufferBase = ffi.cast("char*", codeBuffer)
+	ffi.fill(codeBuffer, codeSize, 0)
+
+	codeBuffer[0] = 0x1C -- EX_FinalFunction
+
+	local funcPtr = ffi.cast("struct UFunction**", codeBufferBase + 1)
+	funcPtr[0] = funcData.ptr
+
+	local nextCodeOffset = 9
+
 	local paramBlock = ffi.new("char[?]", funcData.dataSize)
+	ffi.fill(paramBlock, funcData.dataSize, 0)
 	local pParamBlockBase = ffi.cast("char*", paramBlock)
 
 	-- Process function arguments
@@ -76,8 +89,15 @@ function FuncMT.__call(funcData, obj, ...)
 		-- If the luaArg is nil here, it's either a null pointer or an unspecified optional arg.
 		-- We can safely skip it
 		if luaArg == nil then
+			codeBuffer[nextCodeOffset] = 0x4A -- EX_EmptyParmValue
+			nextCodeOffset = nextCodeOffset + 1
 			goto continue
 		end
+
+		codeBuffer[nextCodeOffset] = 0x29 -- EX_NativeParm
+		local codeProp = ffi.cast("struct UProperty**", codeBufferBase + nextCodeOffset + 1)
+		codeProp[0] = ffi.cast("struct UProperty*", engine.Objects[v.index])
+		nextCodeOffset = nextCodeOffset + 9
 
 		-- If arg expects a lua type, and it's not the right lua type
 		if flags.IsSet(v.flags, FUNCPARM_LUATYPE) and type(luaArg) ~= v.type then
@@ -152,6 +172,8 @@ function FuncMT.__call(funcData, obj, ...)
 		::continue::
 	end
 
+	codeBuffer[nextCodeOffset] = 0x16 -- EX_EndFunctionParms
+
 	--[[
 	local parms = ""
 	for i=0,(funcData.dataSize-1) do
@@ -166,19 +188,28 @@ function FuncMT.__call(funcData, obj, ...)
 	end
 
 	-- Call func
-	local func = funcData.ptr
-	local funcFlags = func.UFunction.FunctionFlags
+	local stack = ffi.new("struct FFrame")
+	stack.Code = codeBuffer
+	stack.VfTable = ffi.cast("void*", 0x16BF480)
+	stack.bAllowSuppression = true
+	stack.bSuppressEventTag = false
+	stack.bAutoEmitLineTerminator = true
+	stack.Node = ffi.cast("struct UStruct*", engine.Classes.UObject.static)
+	stack.Object = ffi.cast("struct UObject*", obj)
+	stack.Locals = paramBlock
+	stack.PreviousFrame = nil
+	stack.OutParms = nil
 
-	-- TODO: This is not the right approach, do some RE of ProcessEvent in the engine
-	func.UFunction.FunctionFlags = bit.bor(funcFlags, bit.bnot(0x400))
-	
-	local native = func.UFunction.iNative
-	func.UFunction.iNative = 0
+	print("Code:")
+	print(stack:GetFuncCodeHex())
+	print("Locals:")
+	print(stack:GetLocalsHex(funcData.dataSize))
 
-	pProcessEvent(ffi.cast("struct UObject*", obj), func, paramBlock, nil)
-
-	func.UFunction.iNative = native
-	func.UFunction.FunctionFlags = funcFlags
+	if #funcData.retvals == 0 then
+		stack:Step(stack.Object, paramBlock)
+	else
+		stack:Step(stack.Object, pParamBlockBase + funcData.retvals[1].offset)
+	end
 
 	-- This is a fairly common occurrence, usually just a bool, so we can just handle
 	-- this without having to fallback to the interpreter with unpack()

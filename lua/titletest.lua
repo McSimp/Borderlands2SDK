@@ -155,3 +155,11 @@ function TestNewCall()
 	print(stack.Code)
 	print(stack:GetLocalsHex(50))
 end
+
+function TestNewFuncMT()
+	local result = LocalPC():SplitString("Shazbot lol!")
+	print(result)
+	for k,v in pairs(result) do
+		print(k,v,v.Data)
+	end
+end

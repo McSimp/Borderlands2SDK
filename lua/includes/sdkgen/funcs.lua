@@ -72,6 +72,9 @@ local function ProcessArgument(field)
 	-- Name
 	text = text .. string.format("\t\t\t\tname = %q,\n", field:GetName())
 
+	-- Object Index
+	text = text .. string.format("\t\t\t\tindex = %d,\n", field.UObject.Index)
+
 	-- Optional or not
 	if flags.IsSet(field.UProperty.PropertyFlags.A, CPF_OptionalParm) then
 		text = text .. "\t\t\t\toptional = true,\n"

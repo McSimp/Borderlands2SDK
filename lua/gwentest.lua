@@ -135,7 +135,7 @@ function ToggleNoclipWithPC(pc)
 end
 
 function AddKeyHook()
-	engineHook.Add(engine.Classes.UWillowGameViewportClient.funcs.InputKey, "NoclipKeyHook", function(caller, args)
+	engineHook.Add("UWillowGameViewportClient", "InputKey", "NoclipKeyHook", function(caller, args)
 		local key = args.Key
 		local event = args.EventType
 
@@ -146,7 +146,7 @@ function AddKeyHook()
 end
 
 function RemoveKeyHook()
-	engineHook.Remove(engine.Classes.UWillowGameViewportClient.funcs.InputKey, "NoclipKeyHook")
+	engineHook.Remove("UWillowGameViewportClient", "InputKey", "NoclipKeyHook")
 end
 
 function Brap()

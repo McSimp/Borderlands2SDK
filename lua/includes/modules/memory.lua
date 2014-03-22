@@ -18,7 +18,7 @@ local FMallocFree = ffi.cast("tFMallocFree", GMalloc.VfTable[3])
 local FMallocMalloc = ffi.cast("tFMallocMalloc", GMalloc.VfTable[1])
 
 function memory.Free(ptr)
-	--FMallocFree(GMalloc, ptr)
+	FMallocFree(GMalloc, ptr)
 end
 
 function memory.Malloc(size)
