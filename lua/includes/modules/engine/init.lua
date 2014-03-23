@@ -14,6 +14,7 @@ require("engine.core.classes")
 TArray = require("engine.helpers.TArray")
 FString = require("engine.helpers.FString")
 UObject = require("engine.helpers.UObject")
+require("engine.helpers.FOutParmRec")
 
 engine = {}
 local engine = engine
@@ -119,7 +120,7 @@ end
 
 local function ResolveArgClasses()
 	for _,funcData in pairs(engine._FuncsInternal) do
-		for _,arg in ipairs(funcData.args) do
+		for _,arg in ipairs(funcData.fields) do
 			if arg.className ~= nil then
 				arg.class = engine.Classes[arg.className]
 				arg.className = nil

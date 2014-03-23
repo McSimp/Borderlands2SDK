@@ -34,6 +34,18 @@ local function ProcessRetval(field)
 	-- Name
 	text = text .. string.format("\t\t\t\tname = %q,\n", field:GetName())
 
+	-- We're some kind of return value (out parm)
+	text = text .. "\t\t\t\tisRet = true,\n"
+
+	-- Object Index
+	text = text .. string.format("\t\t\t\tindex = %d,\n", field.UObject.Index)
+
+	-- Out parm => needs an FOutParmRec when called
+	local fieldflags = field.UProperty.PropertyFlags.A
+	if flags.IsSet(fieldflags, CPF_OutParm) and not flags.IsSet(fieldflags, CPF_ReturnParm) then
+		text = text .. "\t\t\t\tisOutParm = true,\n"
+	end
+
 	-- Type
 	local propData = SDKGen.GetPropertyTypeData(field)
 	if not propData then return "" end
@@ -147,8 +159,8 @@ function Package:ProcessFunction(func)
 	table.sort(fields, SDKGen.SortProperty)
 
 	-- Now we'll go through them and separate them into args and return values
-	local retvals = ""
-	local args = ""
+	local luaFields = ""
+	local retVal = nil
 
 	for _,field in ipairs(fields) do
 		if field:IsA(engine.Classes.UArrayProperty) then
@@ -165,15 +177,16 @@ function Package:ProcessFunction(func)
 
 		local funcflags = field.UProperty.PropertyFlags.A
 		if flags.IsSet(funcflags, CPF_OutParm) then
-			-- If it's the return value, we want that first in the retvals list
+			-- If it's the return value, we want that first in the fields list
 			if flags.IsSet(funcflags, CPF_ReturnParm) then
-				retvals = ProcessRetval(field) .. retvals
+				luaFields = ProcessRetval(field) .. luaFields
+				retVal = field
 			else
-				retvals = retvals .. ProcessRetval(field)
+				luaFields = luaFields .. ProcessRetval(field)
 			end
 		elseif flags.IsSet(funcflags, CPF_Parm) then
 			-- It's just a regular old arg
-			args = args .. ProcessArgument(field)
+			luaFields = luaFields .. ProcessArgument(field)
 		end
 	end
 
@@ -184,16 +197,16 @@ function Package:ProcessFunction(func)
 
 	self.File:write(string.format("\t[%q] = {\n", name))
 
-	self.File:write("\t\targs = {\n")
-	self.File:write(args)
-	self.File:write("\t\t},\n")
-
-	self.File:write("\t\tretvals = {\n")
-	self.File:write(retvals)
+	self.File:write("\t\tfields = {\n")
+	self.File:write(luaFields)
 	self.File:write("\t\t},\n")
 
 	self.File:write(string.format("\t\tdataSize = %d,\n", func.UStruct.PropertySize))
-	self.File:write(string.format("\t\tindex = %d\n", func.UObject.Index))
+	self.File:write(string.format("\t\tindex = %d,\n", func.UObject.Index))
+
+	if retVal ~= nil then
+		self.File:write(string.format("\t\tretOffset = %d,\n", retVal.UProperty.Offset))
+	end
 
 	self.File:write("\t},\n")
 end

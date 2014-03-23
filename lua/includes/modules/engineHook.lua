@@ -36,11 +36,13 @@ function engineHook.ProcessHooks(pObject, pFunction, pParms, pResult)
 
 	-- TODO: This section is always run even if there are no hooks (which shouldn't happpen) or
 	-- even if all the hooks are raw hooks and don't get given argData anyway.
-	local args = engine._FuncsInternal[ptrNum].args
+	local fields = engine._FuncsInternal[ptrNum].fields
 
 	local argData = {}
-	for i=1,#args do
-		argData[args[i].name] = GetArg(args[i], pParms)
+	for i=1,#fields do
+		if not fields[i].isRet then
+			argData[fields[i].name] = GetArg(fields[i], pParms)
+		end
 	end
 
 	for _,v in pairs(hookTable) do

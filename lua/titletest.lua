@@ -157,9 +157,111 @@ function TestNewCall()
 end
 
 function TestNewFuncMT()
-	local result = LocalPC():SplitString("Shazbot lol!")
+	local result = LocalPC():SplitString("Shazbot lol!", " lo")
 	print(result)
 	for k,v in pairs(result) do
 		print(k,v,v.Data)
+	end
+end
+
+function TestOutParms()
+	local stack = ffi.new("struct FFrame")
+	local code = ffi.new("unsigned char[128]")
+	local locals = ffi.new("unsigned char[128]")
+
+	local getAxesFunc = ffi.cast("struct UFunction*", engine.FindObject("Function Core.Object:GetAxes"))
+	local parmOrientation = ffi.cast("struct UProperty*", getAxesFunc.UStruct.Children)
+	local parmAX = ffi.cast("struct UProperty*", getAxesFunc.UStruct.Children.Next)
+	local parmAY = ffi.cast("struct UProperty*", parmAX.Next)
+	local parmAZ = ffi.cast("struct UProperty*", parmAY.Next)
+
+	ffi.fill(code, 128, 0)
+	ffi.fill(locals, 128, 0)
+
+	print(getAxesFunc.iNative)
+	print(getAxesFunc)
+	print(parmOrientation)
+	print(parmAX:GetFullName())
+	print(parmAY:GetFullName())
+	print(parmAZ:GetFullName())
+
+	code[0] = 0xE5
+	code[1] = 0x29 -- EX_NativeParm
+	local prop1 = ffi.cast("struct UProperty**", code + 2)
+	prop1[0] = parmOrientation
+	code[10] = 0x29 -- EX_NativeParm
+	local prop2 = ffi.cast("struct UProperty**", code + 11)
+	prop2[0] = parmAX
+	code[19] = 0x29 -- EX_NativeParm
+	local prop3 = ffi.cast("struct UProperty**", code + 20)
+	prop3[0] = parmAY
+	code[28] = 0x29 -- EX_NativeParm
+	local prop4 = ffi.cast("struct UProperty**", code + 29)
+	prop4[0] = parmAZ
+	code[37] = 0x16 -- EX_EndFunctionParms
+
+	stack.Code = code
+
+	local localOrientation = ffi.cast("struct FRotator*", locals)
+	localOrientation[0] = LocalPC().Rotation
+
+	stack.VfTable = ffi.cast("void*", 0x16BF480)
+	stack.bAllowSuppression = true
+	stack.bSuppressEventTag = false
+	stack.bAutoEmitLineTerminator = true
+	stack.Node = ffi.cast("struct UStruct*", engine.Classes.UObject.static)
+	stack.Object = ffi.cast("struct UObject*", LocalPC())
+	stack.Locals = locals
+	stack.PreviousFrame = nil
+	stack.OutParms = nil
+
+	local headOP = ffi.new("struct FOutParmRec")
+	headOP.Property = ffi.cast("struct UProperty*", parmAX)
+	headOP.PropAddr = locals + 12
+
+	local secondOP = ffi.new("struct FOutParmRec")
+	secondOP.Property = ffi.cast("struct UProperty*", parmAY)
+	secondOP.PropAddr = locals + 24
+	headOP.NextOutParm = secondOP
+
+	local thirdOP = ffi.new("struct FOutParmRec")
+	thirdOP.Property = ffi.cast("struct UProperty*", parmAZ)
+	thirdOP.PropAddr = locals + 36
+	secondOP.NextOutParm = thirdOP
+
+	stack.OutParms = headOP
+
+	stack.OutParms:PrintInfo()
+
+	print(stack.Code)
+	print(stack:GetFuncCodeHex())
+	print(stack:GetLocalsHex(50))
+
+	local resultStorage = ffi.new("unsigned char[128]")
+	stack:Step(stack.Object, nil)
+
+	local out = ""
+	for i=0,100 do
+		out = out .. bit.tohex(resultStorage[i], 2) .. " "
+	end
+
+	print(out)
+	print(stack.Code)
+	print(stack:GetLocalsHex(50))
+end
+
+function CheckOutParms()
+	for i=0,(engine.Objects.Count-1) do
+		local obj = engine.Objects[i]
+		if IsNull(obj) then goto continue end
+		if not obj:IsA(engine.Classes.UProperty) then goto continue end
+
+		obj = ffi.cast("struct UProperty*", obj)
+		local fieldflags = obj.UProperty.PropertyFlags.A
+		if flags.IsSet(fieldflags, 0x400) and not flags.IsSet(fieldflags, 0x100) then
+			print(obj:GetFullName())
+		end
+
+		::continue::
 	end
 end

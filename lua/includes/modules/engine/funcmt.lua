@@ -59,30 +59,77 @@ function FuncMT.__call(funcData, obj, ...)
 	local args = { ... }
 	--local n = select("#", ...)
 
-	local codeSize = 9 * #funcData.args + 10
+	-- This is the maximum code size that could be required
+	local codeSize = 9 * (#funcData.fields) + 10
 	local codeBuffer = ffi.new("char[?]", codeSize)
 	local codeBufferBase = ffi.cast("char*", codeBuffer)
 	ffi.fill(codeBuffer, codeSize, 0)
 
-	codeBuffer[0] = 0x1C -- EX_FinalFunction
+	local nextCodeOffset = 0
 
-	local funcPtr = ffi.cast("struct UFunction**", codeBufferBase + 1)
-	funcPtr[0] = funcData.ptr
-
-	local nextCodeOffset = 9
+	local iNative = funcData.ptr.UFunction.iNative
+	if iNative > 0 then
+		if iNative >= 256 then
+			codeBuffer[0] = 0x60 + math.floor(iNative / 256) -- EX_ExtendedNative
+			codeBuffer[1] = iNative % 256
+			nextCodeOffset = 2
+		else
+			codeBuffer[0] = iNative
+			nextCodeOffset = 1
+		end
+	else
+		codeBuffer[0] = 0x1C -- EX_FinalFunction
+		local funcPtr = ffi.cast("struct UFunction**", codeBufferBase + 1)
+		funcPtr[0] = funcData.ptr
+		nextCodeOffset = 9
+	end
 
 	local paramBlock = ffi.new("char[?]", funcData.dataSize)
 	ffi.fill(paramBlock, funcData.dataSize, 0)
 	local pParamBlockBase = ffi.cast("char*", paramBlock)
 
+	-- We need to create an FOutParmRec for every out parm that isn't a return
+	-- value. They are combined in a linked list, so define the head here.
+	local outParmHead = nil
+	local previousOutParm = nil
+
 	-- Process function arguments
-	for k,v in ipairs(funcData.args) do
-		local luaArg = args[k]
+	local argNum = 1
+	for _,v in ipairs(funcData.fields) do
+		-- Out parameters that aren't the return value need some code
+		if v.isOutParm then
+			-- Add the code
+			codeBuffer[nextCodeOffset] = 0x29 -- EX_NativeParm
+			local codeProp = ffi.cast("struct UProperty**", codeBufferBase + nextCodeOffset + 1)
+			local outParmProp = ffi.cast("struct UProperty*", engine.Objects[v.index])
+			codeProp[0] = outParmProp
+			nextCodeOffset = nextCodeOffset + 9
+
+			-- Create the FOutParmRec
+			local outParmRec = ffi.new("struct FOutParmRec")
+			outParmRec.Property = outParmProp
+			outParmRec.PropAddr = pParamBlockBase + v.offset
+			if not outParmHead then
+				outParmHead = outParmRec
+			else
+				previousOutParm.NextOutParm = outParmRec
+			end
+
+			previousOutParm = outParmRec
+
+			goto continue
+		end
+
+		if v.isRet then
+			goto continue
+		end
+
+		local luaArg = args[argNum]
 
 		if not v.optional then
 			-- If the arg is nil and not a pointer type (where nil == NULL)
 			if luaArg == nil and not flags.IsSet(v.flags, FUNCPARM_OBJPOINTER) then
-				error(string.format("Arg #%d (%s) is required", k, v.name))
+				error(string.format("Arg #%d (%s) is required", argNum, v.name))
 			end
 		end
 
@@ -101,7 +148,7 @@ function FuncMT.__call(funcData, obj, ...)
 
 		-- If arg expects a lua type, and it's not the right lua type
 		if flags.IsSet(v.flags, FUNCPARM_LUATYPE) and type(luaArg) ~= v.type then
-			error(string.format("Arg #%d (%s) expects the Lua type %q", k, v.name, v.type))
+			error(string.format("Arg #%d (%s) expects the Lua type %q", argNum, v.name, v.type))
 		
 
 		-- If we're expecting a class, it should be a UClass* or an engine.Classes.name table with a static member
@@ -110,10 +157,10 @@ function FuncMT.__call(funcData, obj, ...)
 				if luaArg.static ~= nil then
 					luaArg = ffi.cast("struct UClass*", luaArg.static)
 				else
-					error(string.format("Arg #%d (%s) did not contain a valid class table", k, v.name))
+					error(string.format("Arg #%d (%s) did not contain a valid class table", argNum, v.name))
 				end
 			elseif not ffi.istype(v.type, luaArg) then
-				error(string.format("Arg #%d (%s) expects a class", k, v.name))
+				error(string.format("Arg #%d (%s) expects a class", argNum, v.name))
 			end
 		
 
@@ -123,11 +170,11 @@ function FuncMT.__call(funcData, obj, ...)
 			if type(luaArg) == "string" then
 				local name = FindName(luaArg)
 				if name == nil then
-					error(string.format("Arg #%d (%s): Name for %q not found", k, v.name, luaArg))
+					error(string.format("Arg #%d (%s): Name for %q not found", argNum, v.name, luaArg))
 				end
 				luaArg = name
 			elseif not ffi.istype(v.type, luaArg) then
-				error(string.format("Arg #%d (%s) expects a name", k, v.name))
+				error(string.format("Arg #%d (%s) expects a name", argNum, v.name))
 			end
 		
 
@@ -139,7 +186,7 @@ function FuncMT.__call(funcData, obj, ...)
 				-- be deleted and there's going to be issues.
 				luaArg = FString.GetFromLuaString(luaArg)
 			elseif not ffi.istype(v.type, luaArg) then
-				error(string.format("Arg #%d (%s) expects a string", k, v.name))
+				error(string.format("Arg #%d (%s) expects a string", argNum, v.name))
 			end
 		
 
@@ -149,17 +196,17 @@ function FuncMT.__call(funcData, obj, ...)
 				-- TODO: Convert table, set luaArg to struct
 				error("NYI: Converting lua table to TArray")
 			elseif not ffi.istype(v.type, luaArg) then
-				error(string.format("Arg #%d (%s) expects a %q", k, v.name, v.type))
+				error(string.format("Arg #%d (%s) expects a %q", argNum, v.name, v.type))
 			end
 		
 
 		elseif flags.IsSet(v.flags, FUNCPARM_STRUCT) and not ffi.istype(v.type, luaArg) then
-			error(string.format("Arg #%d (%s) expects a %q", k, v.name, tostring(v.type)))
+			error(string.format("Arg #%d (%s) expects a %q", argNum, v.name, tostring(v.type)))
 		
 
 		elseif flags.IsSet(v.flags, FUNCPARM_OBJPOINTER) then
 			if type(luaArg) ~= "cdata" or luaArg.IsA == nil or not luaArg:IsA(v.class) then
-				error(string.format("Arg #%d (%s) expects an object pointer for %s", k, v.name, v.class.name))
+				error(string.format("Arg #%d (%s) expects an object pointer for %s", argNum, v.name, v.class.name))
 			else
 				luaArg = ffi.cast("struct UObject*", luaArg)
 			end
@@ -168,6 +215,8 @@ function FuncMT.__call(funcData, obj, ...)
 		-- Finally set the actual field
 		local field = ffi.cast(v.castTo, pParamBlockBase + v.offset)
 		field[0] = luaArg
+
+		argNum = argNum + 1
 
 		::continue::
 	end
@@ -198,33 +247,37 @@ function FuncMT.__call(funcData, obj, ...)
 	stack.Object = ffi.cast("struct UObject*", obj)
 	stack.Locals = paramBlock
 	stack.PreviousFrame = nil
-	stack.OutParms = nil
+	stack.OutParms = outParmHead
+
+	stack.OutParms:PrintInfo()
 
 	print("Code:")
 	print(stack:GetFuncCodeHex())
 	print("Locals:")
 	print(stack:GetLocalsHex(funcData.dataSize))
 
-	if #funcData.retvals == 0 then
-		stack:Step(stack.Object, paramBlock)
+	if funcData.retOffset ~= nil then
+		print("With return val")
+		stack:Step(stack.Object, pParamBlockBase + funcData.retOffset)
 	else
-		stack:Step(stack.Object, pParamBlockBase + funcData.retvals[1].offset)
+		print("Without return val")
+		stack:Step(stack.Object, nil)
 	end
 
-	-- This is a fairly common occurrence, usually just a bool, so we can just handle
-	-- this without having to fallback to the interpreter with unpack()
-	if #funcData.retvals == 0 then
-		return
-	elseif #funcData.retvals == 1 then
-		return GetReturn(funcData.retvals[1], pParamBlockBase)
-	else
-		local returns = {}
-		for _,v in ipairs(funcData.retvals) do
+	print("Locals after call:")
+	print(stack:GetLocalsHex(funcData.dataSize))
+
+	-- TODO: Investigate having a special case for a single return value.
+	-- Is there any performance to be gained here? (Is unpack NYI?)
+	local returns = {}
+	for _,v in ipairs(funcData.fields) do
+		if v.isRet then
+			print("Adding return value")
 			table.insert(returns, GetReturn(v, pParamBlockBase))
 		end
-
-		return unpack(returns)
 	end
+
+	return unpack(returns)
 end
 
 -- Public members

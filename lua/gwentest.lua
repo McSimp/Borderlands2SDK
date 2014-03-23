@@ -151,6 +151,7 @@ end
 
 function Brap()
 	local endTrace = LocalPC():GetAxes(LocalPC().Rotation)
+	print(endTrace.X, endTrace.Y, endTrace.Z)
 	local startTrace = LocalPC().Pawn.Mesh:GetBoneLocation("Head", 0)
 
 	endTrace.X = (endTrace.X * 30000) + startTrace.X
