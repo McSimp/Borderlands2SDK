@@ -56,7 +56,7 @@ function RendererBase:Translate(x, y)
 	end
 end
 
-function RenderBase:TranslateCoords(x, y)
+function RendererBase:TranslateCoords(x, y)
 	x = x + self.renderOffset.x
 	y = y + self.renderOffset.y
 
@@ -66,7 +66,7 @@ function RenderBase:TranslateCoords(x, y)
 	return x, y
 end
 
-function RenderBase:TranslateRect(rect)
+function RendererBase:TranslateRect(rect)
 	rect.x, rect.y = self:TranslateCoords(rect.x, rect.y)
 	rect.w = math.ceil(rect.w * self.scale)
 	rect.h = math.ceil(rect.h * self.scale)

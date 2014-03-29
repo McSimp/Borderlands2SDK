@@ -249,30 +249,30 @@ function FuncMT.__call(funcData, obj, ...)
 	stack.PreviousFrame = nil
 	stack.OutParms = outParmHead
 
-	stack.OutParms:PrintInfo()
+	--stack.OutParms:PrintInfo()
 
-	print("Code:")
-	print(stack:GetFuncCodeHex())
-	print("Locals:")
-	print(stack:GetLocalsHex(funcData.dataSize))
+	--print("Code:")
+	--print(stack:GetFuncCodeHex())
+	--print("Locals:")
+	--print(stack:GetLocalsHex(funcData.dataSize))
 
 	if funcData.retOffset ~= nil then
-		print("With return val")
+		--print("With return val")
 		stack:Step(stack.Object, pParamBlockBase + funcData.retOffset)
 	else
-		print("Without return val")
+		--print("Without return val")
 		stack:Step(stack.Object, nil)
 	end
 
-	print("Locals after call:")
-	print(stack:GetLocalsHex(funcData.dataSize))
+	--print("Locals after call:")
+	--print(stack:GetLocalsHex(funcData.dataSize))
 
 	-- TODO: Investigate having a special case for a single return value.
 	-- Is there any performance to be gained here? (Is unpack NYI?)
 	local returns = {}
 	for _,v in ipairs(funcData.fields) do
 		if v.isRet then
-			print("Adding return value")
+			--print("Adding return value")
 			table.insert(returns, GetReturn(v, pParamBlockBase))
 		end
 	end

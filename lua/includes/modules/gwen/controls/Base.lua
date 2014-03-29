@@ -570,7 +570,7 @@ function BaseControl:OnMouseClickRight(x, y, down)
 end
 
 function BaseControl:OnMouseDoubleClickLeft(x, y)
-	self:OnMouseClickLeft(x, y true)
+	self:OnMouseClickLeft(x, y, true)
 end
 
 function BaseControl:OnMouseDoubleClickRight(x, y)
@@ -607,11 +607,12 @@ local function AddKeysToMap(keys)
 		keyFuncMap[keys[keyName]] = "OnKey" .. keyName
 	end
 end
-
+--[[
 AddKeysToMap({
 	"Tab", "Space", "Return", "Backspace", "Delete", "Right", "Left",
 	"Home", "End", "Up", "Down", "Escape"
 })
+]]
 
 function BaseControl:OnKeyPress(key, press)
 	if press == nil then press = true end

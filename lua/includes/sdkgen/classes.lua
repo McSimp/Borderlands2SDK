@@ -225,9 +225,11 @@ function Class:FieldsToC()
 			end
 
 			local constness = ""
+			--[[
 			if flags.IsSet(property.UProperty.PropertyFlags.A, CPF_Const) then
 				constness = "const "
 			end
+			]]
 
 			local special = ""
 			if property.UProperty.ArrayDim > 1 then -- It's a C style array, so [x] needed
