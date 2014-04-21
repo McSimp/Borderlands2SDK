@@ -18,9 +18,23 @@ function canvas._SetPos(x, y)
 	engineCanvas.UCanvas.CurY = y
 end
 
+function canvas.GetDrawColor()
+	return engineCanvas.UCanvas.DrawColor
+end
+
 function canvas.SetDrawColor(color)
 	engineCanvas.UCanvas.DrawColor = color
 	currentLinearColor = color:ToLinear()
+end
+
+function canvas.GetDrawColorRGBA()
+	local color = engineCanvas.UCanvas.DrawColor
+	return color.R, color.G, color.B, color.A
+end
+
+function canvas.SetDrawColorRGBA(r, g, b, a)
+	local color = Color(r, g, b, a)
+	canvas.SetDrawColor(color)
 end
 
 function canvas.DrawRect(x, y, w, h)
@@ -41,11 +55,24 @@ function canvas.DrawLine(startX, startY, endX, endY)
 	engineCanvas:Draw2DLine(startX, startY, endX, endY, engineCanvas.UCanvas.DrawColor)
 end
 
+function canvas.LoadFont(fontName)
+	local font = engine.FindObject(fontName, engine.Classes.UFont)
+	if font == nil then
+		error("Font could not be found")
+	end
+
+	return ffi.cast("struct UFont*", font)
+end
+
+function canvas.GetFont()
+	return engineCanvas.UCanvas.Font
+end
+
 function canvas.SetFont(font)
 	engineCanvas.UCanvas.Font = font
 end
 
-function canvas.DrawText(x, y, text)
+function canvas.DrawText(text, x, y)
 	canvas._SetPos(x, y)
 	engineCanvas:DrawText(text, false, 1, 1)
 end
